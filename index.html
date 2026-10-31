@@ -151,6 +151,8 @@ html.has-cursor .cursor-dot { display: block; }
 .hud .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .hud svg { width: 100%; height: 34px; }
 .hud.h1 { top: 8%; left: 0; }
+/* EUR/USD card lives in the hero copy, out of the photo */
+.hud.quote { position: relative; top: auto; left: auto; width: min(300px, 100%); justify-self: start; }
 .hud.h2 { bottom: 14%; right: 2%; }
 .hud.h3 { bottom: 4%; left: 6%; min-width: 0; }
 .pill { font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 6px; letter-spacing: .06em; }
@@ -160,7 +162,7 @@ html.has-cursor .cursor-dot { display: block; }
 .dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--bull); animation: ping 1.8s infinite; display: inline-block; }
 @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(46,211,160,.55); } 80%, 100% { box-shadow: 0 0 0 10px rgba(46,211,160,0); } }
 @media (max-width: 960px) { .hero-grid { grid-template-columns: 1fr; } .hero-visual { height: 380px; } .hud.h3 { display: none; } }
-@media (max-width: 520px) { .hud { min-width: 160px; padding: 10px 12px; } .hud .v { font-size: 15px; } .hud.h1 { top: 2%; } }
+@media (max-width: 520px) { .hud { min-width: 160px; padding: 10px 12px; } .hud .v { font-size: 15px; } } 
 
 /* Ticker */
 .tape { border-bottom: 1px solid var(--line); background: linear-gradient(180deg, var(--panel), #000); overflow: hidden; position: relative; }
@@ -468,16 +470,16 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
           <a class="btn btn-chrome magnetic" href="#desk">Explore the desk</a>
         </div>
         <div class="compat"><span>Works with</span><b>TradingView</b><b>MetaTrader 4</b><b>MetaTrader 5</b></div>
+        <div class="hud h1 quote" aria-label="EUR/USD sample live price">
+          <div class="row"><span class="k">EUR/USD · Live</span><span class="dot-live"></span></div>
+          <div class="row"><span class="v" id="hudPx">1.08420</span><span class="mono up" id="hudChg">+0.12%</span></div>
+          <svg viewBox="0 0 160 34" preserveAspectRatio="none"><path id="hudSpark" fill="none" stroke="#9d6bff" stroke-width="1.6"/></svg>
+        </div>
       </div>
       <div class="hero-visual" id="heroVisual">
         <div class="hero-photo" aria-hidden="true"><img src="hero-bg.webp" alt="" width="900" height="1600" decoding="async"></div>
         <canvas id="chrome3d" aria-hidden="true"></canvas>
         <div class="chrome-fallback chrome" id="chromeFallback" hidden>88</div>
-        <div class="hud h1" data-depth="1.2" aria-hidden="true">
-          <div class="row"><span class="k">EUR/USD · Live</span><span class="dot-live"></span></div>
-          <div class="row"><span class="v" id="hudPx">1.08420</span><span class="mono up" id="hudChg">+0.12%</span></div>
-          <svg viewBox="0 0 160 34" preserveAspectRatio="none"><path id="hudSpark" fill="none" stroke="#9d6bff" stroke-width="1.6"/></svg>
-        </div>
         <div class="hud h2" data-depth="1.8" aria-hidden="true">
           <span class="k">88 Trend Ribbon · GBP/USD H1</span>
           <div class="row"><span class="v">Cross</span><span class="pill long">LONG</span></div>
@@ -1365,7 +1367,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
       btn.addEventListener('pointermove', e => { const r = btn.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * .3); yTo((e.clientY - r.top - r.height / 2) * .4); });
       btn.addEventListener('pointerleave', () => { xTo(0); yTo(0); }); });
     // HUD parallax
-    $$('.hud').forEach(h => { const d = +h.dataset.depth; const hx = gsap.quickTo(h, 'x', { duration: 1, ease: 'power3' }), hy = gsap.quickTo(h, 'y', { duration: 1, ease: 'power3' });
+    $$('.hero-visual .hud').forEach(h => { const d = +h.dataset.depth; const hx = gsap.quickTo(h, 'x', { duration: 1, ease: 'power3' }), hy = gsap.quickTo(h, 'y', { duration: 1, ease: 'power3' });
       window.addEventListener('pointermove', e => { hx((e.clientX / innerWidth - .5) * -24 * d); hy((e.clientY / innerHeight - .5) * -18 * d); }); });
     // ebook shelf tilts with the pointer
     const shelf = $('#shelf'), tilts = $$('.book-tilt');
@@ -1378,7 +1380,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
   gsap.to('.aurora.a1', { x: -80, y: 60, scale: 1.15, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   gsap.to('.aurora.a2', { x: 90, y: -40, scale: 1.2, duration: 11, ease: 'sine.inOut', yoyo: true, repeat: -1 });
   gsap.to('.grid-floor', { backgroundPosition: '0px 64px', duration: 2.4, ease: 'none', repeat: -1 });
-  $$('.hud').forEach((h, i) => gsap.to(h, { yPercent: i % 2 ? 8 : -8, duration: 3 + i, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
+  $$('.hero-visual .hud').forEach((h, i) => gsap.to(h, { yPercent: i % 2 ? 8 : -8, duration: 3 + i, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
   $$('.chrome').forEach((el, i) => gsap.fromTo(el, { backgroundPosition: '160% 0, 0 0' }, { backgroundPosition: '-60% 0, 0 0', duration: 1.8, ease: 'power2.inOut', delay: 1.2 + (i % 5) * .7, repeat: -1, repeatDelay: 4.5 }));
 
   // hero intro: plays on load
