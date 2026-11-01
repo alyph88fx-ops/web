@@ -28,3 +28,8 @@ One-time setup on GitHub:
 
 - Mock site: prices, charts, account data and forms are samples. Demo forms collect no payment details.
 - Libraries load from public CDNs (GSAP, Lenis, Three.js) and fonts from Google Fonts.
+
+## 1 Percent Club
+
+A second site built from the same template, in black, red and chrome: `1percentclub/` (main page `index.html`,
+member desk `account.html`). The Pages workflow publishes it at `/1percentclub/` next to 88FX.

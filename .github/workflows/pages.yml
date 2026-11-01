@@ -35,6 +35,10 @@ jobs:
           # document head). Give the published copy its doctype, charset and mobile viewport.
           { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat index.html; } > _site/index.html
           if [ -f CNAME ]; then cp CNAME _site/; fi
+          # Second site: 1 Percent Club, served from /1percentclub/ (same body-only index.html convention).
+          mkdir -p _site/1percentclub
+          cp 1percentclub/*.html 1percentclub/*.webp _site/1percentclub/
+          { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat 1percentclub/index.html; } > _site/1percentclub/index.html
       - name: Fetch this week's economic calendar (ForexFactory feed)
         run: |
           # One request per run (hourly). If the feed is unavailable the site falls back to its sample schedule.
@@ -42,6 +46,7 @@ jobs:
                https://nfs.faireconomy.media/ff_calendar_thisweek.json -o calendar.json \
              && python3 -c "import json,sys; d=json.load(open('calendar.json')); sys.exit(0 if isinstance(d, list) else 1)"; then
             cp calendar.json _site/calendar.json
+            cp calendar.json _site/1percentclub/calendar.json
             echo "Calendar events: $(python3 -c "import json; print(len(json.load(open('calendar.json'))))")"
           else
             echo "Calendar feed unavailable; publishing without calendar.json"
