@@ -343,13 +343,33 @@ main, footer { position: relative; z-index: 1; }
 }
 
 /* ---------- session sections ---------- */
-.sess { position: relative; padding-block: clamp(96px, 12vw, 170px) 0; }
+.sess { position: relative; padding-block: 0; }
+#sun { position: fixed; left: 0; top: 0; z-index: 0; pointer-events: none; width: 80vmax; height: 80vmax; margin: -40vmax 0 0 -40vmax; border-radius: 50%;
+  background: radial-gradient(circle, rgba(235,210,145,.16) 0%, rgba(226,181,69,.08) 22%, rgba(168,132,47,.03) 45%, transparent 62%); transform: translate(-15vw, 62vh); will-change: transform; }
+/* market-open bands between sessions */
+.band { position: relative; overflow: hidden; padding-block: clamp(70px, 9vw, 130px) clamp(40px, 5vw, 70px); }
+.band-row { display: flex; gap: .4em; width: max-content; white-space: nowrap; font-size: clamp(64px, 11vw, 190px); font-weight: 700; letter-spacing: -0.055em; line-height: .9; will-change: transform; }
+.band-row + .band-row { margin-top: .06em; }
+.band-row span { color: transparent; -webkit-text-stroke: 1px rgba(236,235,230,.22); }
+.band-row b { font-weight: 700; color: var(--violet); text-shadow: 0 0 40px rgba(226,181,69,.35); font-variant-numeric: tabular-nums; }
+.band-row em { font-style: normal; background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.band-row i { font-style: normal; color: var(--line-2); }
+.band-row.small { font-size: clamp(14px, 1.3vw, 18px); letter-spacing: .3em; text-transform: uppercase; font-weight: 500; gap: 2.4em; color: var(--dim); margin-top: 22px; }
+.band-row.small b { font-weight: 600; color: var(--violet-2); text-shadow: none; }
+.band::before, .band::after { content: ""; position: absolute; top: 0; bottom: 0; width: 18vw; z-index: 1; pointer-events: none; }
+.band::before { left: 0; background: linear-gradient(90deg, var(--ink), transparent); }
+.band::after { right: 0; background: linear-gradient(-90deg, var(--ink), transparent); }
+.sess-h.rev > div:first-child { order: 2; text-align: right; }
+.sess-h.rev .t { justify-content: flex-end; }
+@media (max-width: 860px) { .sess-h.rev > div:first-child { order: 0; text-align: left; } .sess-h.rev .t { justify-content: flex-start; } }
+.pre h1 .l2 .line-in { text-shadow: 0 0 18px rgba(226,181,69,.3), 0 6px 40px rgba(0,0,0,.85); }
+.pre-flash { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; background: radial-gradient(60% 50% at 50% 50%, rgba(235,210,145,.55), rgba(226,181,69,.12) 50%, transparent 80%); mix-blend-mode: screen; }
 .sess-h { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: end; gap: 18px 48px; padding-bottom: 26px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
 .sess-h .t { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); font-variant-numeric: tabular-nums; margin-bottom: 14px; }
 .sess-h .t b { color: var(--violet-2); font-weight: 600; }
 @property --fill { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
 .sess-h .n { display: block; font-size: clamp(64px, 11vw, 168px); line-height: .82; font-weight: 700; letter-spacing: -0.06em;
-  background: linear-gradient(90deg, var(--violet) var(--fill), transparent var(--fill)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px rgba(236,235,230,.28); }
+  background: linear-gradient(0deg, var(--violet) var(--fill), rgba(226,181,69,.06) var(--fill)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px rgba(236,235,230,.28); }
 .sess-h h2 { font-size: clamp(26px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.03em; }
 .sess-h p { color: var(--muted); font-size: 17px; margin-top: 14px; max-width: 52ch; }
 @media (max-width: 860px) { .sess-h { grid-template-columns: 1fr; } }
@@ -556,6 +576,7 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<div id="sun" aria-hidden="true"></div>
 <canvas id="dayChart" aria-hidden="true"></canvas>
 
 <header class="topbar">
@@ -585,17 +606,17 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
 </div>
 
 <aside class="rail" aria-label="Trading day">
-  <div class="clock" aria-live="off"><span id="clockT">05<i>:</i>00</span><small>GMT · <span id="clockS">Pre-market</span></small></div>
+  <div class="clock" aria-live="off"><span id="clockT">22<i>:</i>00</span><small>GMT · <span id="clockS">Pre-market</span></small></div>
   <ol>
     <span class="fill" id="railFill" aria-hidden="true"></span>
-    <li data-sess="top"><a href="#top">05:00<b>Pre-market</b></a></li>
+    <li data-sess="top"><a href="#top">22:00<b>Pre-market</b></a></li>
     <li data-sess="asia"><a href="#asia">00:00<b>Asia</b></a></li>
     <li data-sess="london"><a href="#london">08:00<b>London</b></a></li>
     <li data-sess="newyork"><a href="#newyork">13:30<b>New York</b></a></li>
     <li data-sess="close"><a href="#close">21:00<b>The close</b></a></li>
   </ol>
 </aside>
-<div class="sess-pill" aria-hidden="true"><span class="dot-live"></span><b id="pillT">05:00</b><span id="pillS">Pre-market</span></div>
+<div class="sess-pill" aria-hidden="true"><span class="dot-live"></span><b id="pillT">22:00</b><span id="pillS">Pre-market</span></div>
 
 <main>
   <!-- PRE-MARKET -->
@@ -624,11 +645,13 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
         <span class="scroll-cue">Scroll to trade the day <i></i></span>
       </div>
     </div>
+    <div class="pre-flash" id="preFlash" aria-hidden="true"></div>
     <div class="tape" aria-label="Market ticker, sample prices"><div class="tape-track" id="tapeTrack"></div></div>
   </section>
 
   <!-- ASIA · LEARN -->
   <section class="sess" id="asia" data-sess="asia" aria-labelledby="asiaTitle">
+    <div class="band" aria-hidden="true"><div class="band-row" data-dir="1"><span>Asia open</span><b>00:00</b><em>88FX</em><i>/</i><span>Asia open</span><b>00:00</b><em>88FX</em><i>/</i><span>Asia open</span><b>00:00</b><em>88FX</em><i>/</i></div><div class="band-row small" data-dir="-1"><span>Tokyo · Sydney · Singapore</span><b>00:00 GMT</b><span>Study the chart</span><span>Tokyo · Sydney · Singapore</span><b>00:00 GMT</b><span>Study the chart</span><span>Tokyo · Sydney · Singapore</span><b>00:00 GMT</b><span>Study the chart</span><span>Tokyo · Sydney · Singapore</span><b>00:00 GMT</b><span>Study the chart</span></div></div>
     <div class="wrap">
       <header class="sess-h">
         <div><p class="t"><b>Asia session</b><span>00:00 – 09:00 GMT</span><span>Quiet hours. Study.</span></p><span class="n" aria-hidden="true">Learn</span></div>
@@ -667,8 +690,9 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
 
   <!-- LONDON · TOOLS -->
   <section class="sess" id="london" data-sess="london" aria-labelledby="londonTitle">
+    <div class="band" aria-hidden="true"><div class="band-row" data-dir="-1"><span>London open</span><b>08:00</b><em>88FX</em><i>/</i><span>London open</span><b>08:00</b><em>88FX</em><i>/</i><span>London open</span><b>08:00</b><em>88FX</em><i>/</i></div><div class="band-row small" data-dir="1"><span>Frankfurt · London · Zurich</span><b>08:00 GMT</b><span>Volume arrives</span><span>Frankfurt · London · Zurich</span><b>08:00 GMT</b><span>Volume arrives</span><span>Frankfurt · London · Zurich</span><b>08:00 GMT</b><span>Volume arrives</span><span>Frankfurt · London · Zurich</span><b>08:00 GMT</b><span>Volume arrives</span></div></div>
     <div class="wrap">
-      <header class="sess-h">
+      <header class="sess-h rev">
         <div><p class="t"><b>London open</b><span>08:00 – 16:30 GMT</span><span>Volume arrives.</span></p><span class="n" aria-hidden="true">Trade</span></div>
         <div><h2 id="londonTitle">Your desk, <span class="script">already open.</span></h2>
           <p>The tools from every lesson in one workspace: chart, position sizer, the indicator lab and your alerts. Drag the windows around and arrange it your way.</p></div>
@@ -747,6 +771,7 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
 
   <!-- NEW YORK · LIVE -->
   <section class="sess" id="newyork" data-sess="newyork" aria-labelledby="nyTitle">
+    <div class="band" aria-hidden="true"><div class="band-row" data-dir="1"><span>New York open</span><b>13:30</b><em>88FX</em><i>/</i><span>New York open</span><b>13:30</b><em>88FX</em><i>/</i><span>New York open</span><b>13:30</b><em>88FX</em><i>/</i></div><div class="band-row small" data-dir="-1"><span>NFP · CPI · FOMC</span><b>13:30 GMT</b><span>News hits the tape</span><span>NFP · CPI · FOMC</span><b>13:30 GMT</b><span>News hits the tape</span><span>NFP · CPI · FOMC</span><b>13:30 GMT</b><span>News hits the tape</span><span>NFP · CPI · FOMC</span><b>13:30 GMT</b><span>News hits the tape</span></div></div>
     <div class="wrap">
       <header class="sess-h">
         <div><p class="t"><b>New York session</b><span>13:30 – 21:00 GMT</span><span>News hits. Go live.</span></p><span class="n" aria-hidden="true">Live</span></div>
@@ -775,8 +800,9 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
 
   <!-- THE CLOSE · PLANS -->
   <section class="sess" id="close" data-sess="close" aria-labelledby="closeTitle">
+    <div class="band" aria-hidden="true"><div class="band-row" data-dir="-1"><span>The close</span><b>21:00</b><em>88FX</em><i>/</i><span>The close</span><b>21:00</b><em>88FX</em><i>/</i><span>The close</span><b>21:00</b><em>88FX</em><i>/</i></div><div class="band-row small" data-dir="1"><span>Review · Journal · Plan</span><b>21:00 GMT</b><span>Tomorrow starts tonight</span><span>Review · Journal · Plan</span><b>21:00 GMT</b><span>Tomorrow starts tonight</span><span>Review · Journal · Plan</span><b>21:00 GMT</b><span>Tomorrow starts tonight</span><span>Review · Journal · Plan</span><b>21:00 GMT</b><span>Tomorrow starts tonight</span></div></div>
     <div class="wrap">
-      <header class="sess-h">
+      <header class="sess-h rev">
         <div><p class="t"><b>The close</b><span>21:00 GMT</span><span>Review. Plan tomorrow.</span></p><span class="n" aria-hidden="true">Climb</span></div>
         <div><h2 id="closeTitle">Four stages. <span class="script">One ladder.</span></h2>
           <p>Every video, ebook and indicator is tagged to a stage, so you always know the next rung. This is where a sample member stands today.</p></div>
@@ -1317,13 +1343,13 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
     const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xe8c66a, size: .035, transparent: true, opacity: .85, blending: THREE.AdditiveBlending, depthWrite: false }));
     const orbit = new THREE.Group(); orbit.rotation.set(1.15, 0, -.3); scene.add(orbit); orbit.add(pts);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(3.6, .008, 8, 220), new THREE.MeshBasicMaterial({ color: 0xe2b545, transparent: true, opacity: .5 })); ring.rotation.x = Math.PI / 2; orbit.add(ring);
-    function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = Math.max(12, 4.7 / (Math.tan(16 * Math.PI / 180) * camera.aspect)); camera.updateProjectionMatrix(); }
+    function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = Math.max(12, 4.2 / (Math.tan(16 * Math.PI / 180) * camera.aspect)); camera.updateProjectionMatrix(); }
     size(); window.addEventListener('resize', size);
     const cur = { rx: 0, ry: 0 }; const clock = new THREE.Clock();
     three.render = () => { const t = clock.getElapsedTime();
-      const tx = three.my * .35 + three.scroll * 1.1, ty = three.mx * .7 + Math.sin(t * .45) * .35;
+      const tx = three.my * .35 + three.scroll * .5, ty = three.mx * .7 + Math.sin(t * .45) * .35;
       cur.rx += (tx - cur.rx) * .06; cur.ry += (ty - cur.ry) * .06;
-      group.rotation.set(cur.rx, cur.ry, Math.sin(t * .3) * .05); group.position.y = Math.sin(t * .9) * .12 + three.scroll * 1.6; group.scale.setScalar(1 - three.scroll * .25);
+      group.rotation.set(cur.rx, cur.ry, Math.sin(t * .3) * .05); group.position.y = Math.sin(t * .9) * .12 - three.scroll * .4; group.scale.setScalar(1 + three.scroll * three.scroll * 2.6);
       e1.rotation.y = Math.sin(t * .6) * .25; e2.rotation.y = Math.sin(t * .6 + 1.4) * .25;
       pts.rotation.y = t * .08; ring.rotation.z = -t * .05; renderer.render(scene, camera); };
     three.render(); three.ok = true;
@@ -1365,12 +1391,14 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
   })();
 
   // ---------- the trading-day clock, session rail and nav ----------
-  const SESS = [['top', 'Pre-market', 300, 360], ['asia', 'Asia', 360, 480], ['london', 'London', 480, 810], ['newyork', 'New York', 810, 1260], ['close', 'The close', 1260, 1320]];
-  const clockT = $('#clockT'), clockS = $('#clockS'), pillT = $('#pillT'), pillS = $('#pillS');
+  const SESS = [['top', 'Pre-market', 1320, 1440], ['asia', 'Asia', 1440, 1920], ['london', 'London', 1920, 2250], ['newyork', 'New York', 2250, 2700], ['close', 'The close', 2700, 2760]];
+  const sun = $('#sun'), clockT = $('#clockT'), clockS = $('#clockS'), pillT = $('#pillT'), pillS = $('#pillS');
   let lastSess = '';
   function setDay(min, sess) {
     const m = Math.round(min) % 1440, hh = String(Math.floor(m / 60)).padStart(2, '0'), mm = String(m % 60).padStart(2, '0');
     clockT.innerHTML = `${hh}<i>:</i>${mm}`; pillT.textContent = `${hh}:${mm} GMT`;
+    const f = Math.max(0, Math.min(1, (min - 1320) / 1440)), arc = Math.sin(f * Math.PI);
+    sun.style.transform = `translate(${(-15 + f * 130).toFixed(2)}vw, ${(62 - arc * 58).toFixed(2)}vh)`; sun.style.opacity = (.35 + arc * .65).toFixed(3);
     if (sess && sess[0] !== lastSess) {
       lastSess = sess[0]; clockS.textContent = sess[1]; pillS.textContent = sess[1]; $('.sess-pill').classList.toggle('away', sess[0] === 'top');
       $$('.rail li').forEach(li => li.classList.toggle('on', li.dataset.sess === sess[0]));
@@ -1448,9 +1476,16 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
       .from('.topbar', { yPercent: -100, duration: 1 }, .2)
       .from('.rail > *', { x: -20, opacity: 0, duration: .9, stagger: .1 }, .5);
   });
-  ScrollTrigger.create({ trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true, onUpdate: s => { three.scroll = s.progress; } });
-  gsap.to('.pre-copy', { yPercent: -14, opacity: .3, ease: 'none', scrollTrigger: { trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true } });
-  gsap.to('.hero-photo img', { yPercent: 6, scale: 1.1, ease: 'none', scrollTrigger: { trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true } });
+  // the open: the hero holds, the headline splits apart, the chrome 88 flies at you and the market flashes open
+  const open = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.pre', start: 'top top', end: '+=110%', pin: true, scrub: .8, anticipatePin: 1,
+    onUpdate: s => { three.scroll = s.progress; } } });
+  open.to('.pre h1 .l1', { xPercent: -60, opacity: 0 }, 0)
+      .to('.pre h1 .l2', { xPercent: 60, opacity: 0 }, 0)
+      .to('.pre-eyebrow, .pre-foot, .pre-side', { y: -40, opacity: 0, duration: .45 }, 0)
+      .to('.hero-photo', { scale: 1.35, opacity: .35 }, 0)
+      .to('#preFlash', { opacity: 1, duration: .25 }, .62).to('#preFlash', { opacity: 0, duration: .13 }, .87)
+      .to('.pre-stage', { opacity: .28, duration: .2 }, .8)
+      .to('.tape', { yPercent: 100, opacity: 0, duration: .3 }, .7);
   const tapeLoop = gsap.to('#tapeTrack', { xPercent: -50, duration: 46, ease: 'none', repeat: -1 });
   let tapeIdle; ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { const v = s.getVelocity();
     gsap.to(tapeLoop, { timeScale: (v < 0 ? -1 : 1) * (1 + Math.min(6, Math.abs(v) / 300)), duration: .2, overwrite: true });
@@ -1461,8 +1496,15 @@ footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
     const tl = gsap.timeline({ scrollTrigger: { trigger: head, start: 'top 82%' } });
     const t = $('.t', head); if (t) { const s = scramble($('b', t), .9); if (s) tl.add(s, 0); }
     tl.from($$('h2, p', head), { y: 30, opacity: .2, duration: 1, stagger: .1, ease: 'power3.out' }, .05);
-    gsap.fromTo($('.n', head), { '--fill': '0%' }, { '--fill': '100%', ease: 'none', scrollTrigger: { trigger: head, start: 'top 85%', end: 'bottom 45%', scrub: true } });
+    gsap.fromTo($('.n', head), { '--fill': '0%' }, { '--fill': '100%', ease: 'none', scrollTrigger: { trigger: head, start: 'top 90%', end: 'bottom 25%', scrub: .6 } });
   });
+
+  // ---------- market-open bands: giant type slides as you pass, faster when you scroll faster ----------
+  $$('.band').forEach(band => $$('.band-row', band).forEach(row => {
+    const dir = +row.dataset.dir;
+    gsap.fromTo(row, { xPercent: dir > 0 ? -38 : -2 }, { xPercent: dir > 0 ? -2 : -38, ease: 'none', scrollTrigger: { trigger: band, start: 'top bottom', end: 'bottom top', scrub: .5 } });
+  }));
+  $$('.band b').forEach(b => { if (!b.closest('.small')) ScrollTrigger.create({ trigger: b.closest('.band'), start: 'top 75%', once: true, onEnter: () => scramble(b, 1.1, '0123456789:') }); });
 
   // ---------- Asia: the reel runs sideways while the section is pinned ----------
   const mm = gsap.matchMedia();
