@@ -5,12 +5,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap">
 <style>
-/* Layout concept: a black trading terminal in liquid chrome with a night-flight mood: chromatic fringing
-   that widens with scroll speed, a darkly lit chrome "88", and bats that take off as you scroll.
-   A black trading terminal in liquid chrome. A real-time chrome "88" anchors the hero,
-   an interactive desk (chart, sizing calculator, calendar, alerts) proves "all in one place", then the
-   products: journey rail, video library, ebook shelf, indicator lab, pricing. Semi-dark by design.
-   Black is the ground, yellow is the single accent, chrome is the material, green/red appear only as market semantics. */
 :root {
   color-scheme: dark;
   --ink: #15161a;
@@ -61,7 +55,7 @@ p { margin: 0; }
 .violet-glow { color: var(--violet); text-shadow: 0 0 28px rgba(226,181,69,.55), 0 0 2px rgba(235,210,145,.8); }
 .script { color: var(--violet-2); text-shadow: 0 0 18px rgba(226,181,69,.3); }
 /* Chromatic aberration: red/cyan fringes that widen with scroll speed (--ab is driven from JS). */
-h1, h2, .stat .n, .stage .num { filter: drop-shadow(calc(var(--ab) * -.6px) 0 rgba(255,40,90,.4)) drop-shadow(calc(var(--ab) * .6px) 0 rgba(0,220,255,.35)); }
+h1, h2, .sess-h .n { filter: drop-shadow(calc(var(--ab) * -.6px) 0 rgba(255,40,90,.4)) drop-shadow(calc(var(--ab) * .6px) 0 rgba(0,220,255,.35)); }
 h2:hover { animation: glitch .45s steps(3) 1; }
 @keyframes glitch { 0% { --ab: 6; } 40% { --ab: 2; } 70% { --ab: 7; } 100% { --ab: 1; } }
 .logo img { height: 42px; width: auto; display: block; filter: drop-shadow(0 0 14px rgba(226,181,69,.45)); }
@@ -98,72 +92,6 @@ html.has-cursor .cursor-dot { display: block; }
 .btn-chrome:hover { box-shadow: 0 1px 0 #fff inset, 0 14px 40px -10px rgba(235,210,145,.7); }
 .btn-ghost { border-color: var(--line-2); background: rgba(255,255,255,.02); }
 .btn-ghost:hover { border-color: var(--violet-2); color: #fff; }
-
-/* Header */
-.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 70; background: rgba(21,22,26,.78); backdrop-filter: blur(16px) saturate(140%); -webkit-backdrop-filter: blur(16px) saturate(140%); border-bottom: 1px solid rgba(65,67,76,.5); }
-.nav { height: 68px; display: flex; align-items: center; gap: 28px; }
-.logo { display: inline-flex; align-items: center; gap: 12px; font: 900 18px/1 var(--display); letter-spacing: .04em; }
-.logo-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--chrome); color: #0b0b0a; font-size: 13px; box-shadow: 0 0 0 1px rgba(255,255,255,.4) inset, 0 6px 18px -6px rgba(226,181,69,.8); }
-.nav-links { display: flex; gap: 28px; margin-left: 16px; }
-.nav-links a { position: relative; color: var(--muted); font-size: 15px; font-weight: 500; transition: color .25s; padding-block: 6px; }
-.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--chrome-h); transform: scaleX(0); transform-origin: right; transition: transform .4s cubic-bezier(.7,0,.2,1); }
-.nav-links a:hover { color: #fff; }
-.nav-links a:hover::after { transform: scaleX(1); transform-origin: left; }
-.nav-cta { margin-left: auto; display: flex; gap: 10px; align-items: center; }
-.nav-cta .btn { padding: 11px 18px; font-size: 14px; }
-.menu-btn { display: none; margin-left: auto; background: none; border: 1px solid var(--line-2); border-radius: 10px; width: 44px; height: 44px; place-items: center; }
-.menu-btn svg { width: 20px; height: 20px; }
-.mobile-menu { border-top: 1px solid var(--line); padding-block: 8px 20px; }
-.mobile-menu a:not(.btn) { display: block; padding: 14px 0; font: 700 18px/1.2 var(--display); border-bottom: 1px solid var(--line); }
-.mobile-menu .btn { margin-top: 16px; }
-@media (max-width: 900px) { .nav-links, .nav-cta { display: none; } .menu-btn { display: grid; } }
-
-/* Hero */
-.hero { position: relative; isolation: isolate; overflow: hidden; border-bottom: 1px solid var(--line); }
-.aurora { position: absolute; border-radius: 50%; filter: blur(80px); z-index: -3; pointer-events: none; }
-.aurora.a1 { width: 620px; height: 620px; right: -120px; top: -160px; background: radial-gradient(circle, rgba(226,181,69,.55), transparent 65%); }
-.aurora.a2 { width: 520px; height: 520px; left: -200px; bottom: -220px; background: radial-gradient(circle, rgba(168,132,47,.45), transparent 65%); }
-.grid-floor { position: absolute; left: -25%; right: -25%; bottom: -2px; height: 46%; z-index: -2; pointer-events: none;
-  background-image: linear-gradient(rgba(226,181,69,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(226,181,69,.35) 1px, transparent 1px);
-  background-size: 64px 64px; transform: perspective(520px) rotateX(62deg); transform-origin: 50% 100%;
-  -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 85%); mask-image: linear-gradient(to top, #000 10%, transparent 85%); }
-.hero-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 24px; align-items: center; padding-block: clamp(56px, 7vw, 96px) 64px; }
-.hero-copy { display: grid; gap: 26px; position: relative; z-index: 2; }
-.hero h1 { font-size: clamp(36px, 5.8vw, 78px); line-height: 1.02; font-weight: 700; letter-spacing: -0.04em; }
-.hero h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
-.hero h1 .line-in { display: block; }
-.hero-sub { color: #cfcbc0; font-size: clamp(17px, 1.5vw, 20px); max-width: 48ch; font-weight: 300; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.compat { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; color: var(--dim); font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
-.compat b { color: var(--muted); font-weight: 500; }
-.hero-visual { position: relative; height: clamp(420px, 44vw, 600px); }
-.hero-photo { position: absolute; inset: -4% 2% -4% 6%; z-index: 0; pointer-events: none; overflow: hidden; border-radius: 28px; opacity: .9;
-  -webkit-mask-image: radial-gradient(ellipse 66% 68% at 50% 50%, #000 46%, transparent 84%); mask-image: radial-gradient(ellipse 66% 68% at 50% 50%, #000 46%, transparent 84%); }
-.hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 48% 60%; transform: scale(1.06); filter: grayscale(1) contrast(1.3) brightness(1.75); }
-.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(226,181,69,.18), rgba(168,132,47,.1)); mix-blend-mode: color; }
-@media (max-width: 960px) { .hero-photo { opacity: .8; } }
-#chrome3d { position: absolute; left: -10%; top: -10%; width: 124%; height: 120%; filter: url(#chroma); }
-.chrome-fallback { position: absolute; inset: 0; display: grid; place-items: center; font: 900 clamp(140px, 22vw, 300px)/1 var(--display); }
-.hud { position: absolute; z-index: 2; padding: 14px 16px; border-radius: 14px; min-width: 190px;
-  background: linear-gradient(180deg, rgba(32,33,39,.72), rgba(24,25,30,.72)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(235,210,145,.18); box-shadow: 0 20px 50px -20px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.08) inset; display: grid; gap: 6px; }
-.hud .k { font: 500 10px/1 var(--mono); letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
-.hud .v { font: 500 18px/1 var(--mono); font-variant-numeric: tabular-nums; }
-.hud .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.hud svg { width: 100%; height: 34px; }
-.hud.h1 { top: 8%; left: 0; }
-/* EUR/USD card lives in the hero copy, out of the photo */
-.hud.quote { position: relative; top: auto; left: auto; width: min(300px, 100%); justify-self: start; }
-.hud.h2 { bottom: 14%; right: 2%; }
-.hud.h3 { bottom: 4%; left: 6%; min-width: 0; }
-.pill { font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 6px; letter-spacing: .06em; }
-.pill.long { color: var(--bull); background: rgba(46,211,160,.12); }
-.pill.short { color: var(--bear); background: rgba(255,93,115,.12); }
-.up { color: var(--bull); } .down { color: var(--bear); }
-.dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--bull); animation: ping 1.8s infinite; display: inline-block; }
-@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(46,211,160,.55); } 80%, 100% { box-shadow: 0 0 0 10px rgba(46,211,160,0); } }
-@media (max-width: 960px) { .hero-grid { grid-template-columns: 1fr; } .hero-visual { height: 380px; } .hud.h3 { display: none; } }
-@media (max-width: 520px) { .hud { min-width: 160px; padding: 10px 12px; } .hud .v { font-size: 15px; } } 
 
 /* Ticker */
 .tape { border-bottom: 1px solid var(--line); background: linear-gradient(180deg, var(--panel), var(--ink)); overflow: hidden; position: relative; }
@@ -242,25 +170,6 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; bo
 .sig-row .what span { color: var(--dim); font: 500 12px/1 var(--mono); }
 .sample { font: 500 10px/1 var(--mono); letter-spacing: .12em; color: var(--dim); text-transform: uppercase; }
 
-/* Journey */
-.journey { overflow: hidden; }
-.journey-viewport { overflow: hidden; }
-.journey-track { display: flex; gap: 20px; width: max-content; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
-.journey-intro { width: min(440px, 82vw); display: grid; align-content: center; gap: 20px; padding-right: 24px; }
-.journey-intro h2 { font-size: clamp(30px, 4vw, 48px); line-height: 1.08; }
-.journey-intro p { color: var(--muted); font-size: 18px; }
-.stage { width: min(460px, 84vw); min-height: 460px; border: 1px solid var(--line); border-radius: 22px; position: relative; overflow: hidden;
-  background: radial-gradient(120% 70% at 100% 0%, rgba(226,181,69,.12), transparent 55%), linear-gradient(180deg, var(--panel-2), var(--panel));
-  padding: 30px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 14px; }
-.stage .num { font: 700 64px/1 var(--display); letter-spacing: -0.04em; justify-self: start; }
-.stage h3 { font-size: 22px; line-height: 1.2; }
-.stage p { color: var(--muted); }
-.stage svg.art { width: 100%; height: 120px; align-self: end; }
-.stage .meta { display: flex; flex-wrap: wrap; gap: 8px; }
-.journey-progress { margin-top: 40px; height: 2px; background: var(--line); position: relative; }
-.journey-progress span { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--violet-deep), var(--violet), #fff); box-shadow: 0 0 14px var(--violet); }
-@media (max-width: 899px) { .journey-track { flex-direction: column; width: auto; } .journey-intro, .stage { width: 100%; } .stage { min-height: 0; } .journey-progress { display: none; } }
-
 /* Videos */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
 .filter { border: 1px solid var(--line-2); background: transparent; border-radius: 10px; padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--muted); transition: all .25s; }
@@ -289,34 +198,6 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; bo
 .lvl.a { color: var(--bear); background: rgba(255,93,115,.1); } .lvl.all { color: var(--muted); background: rgba(179,175,163,.12); }
 .cat { color: var(--dim); font-size: 13px; }
 
-/* Ebooks */
-.ebooks { overflow-x: clip; background: radial-gradient(60% 50% at 50% 0%, rgba(168,132,47,.16), transparent 70%), var(--ink); border-block: 1px solid var(--line); }
-.shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; perspective: 1400px; }
-@media (max-width: 1000px) { .shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 540px) { .shelf { grid-template-columns: 1fr; max-width: 300px; margin-inline: auto; } }
-.book-wrap { display: grid; gap: 20px; }
-.book-tilt { transform-style: preserve-3d; }
-.book { position: relative; aspect-ratio: 3 / 4.2; max-width: 100%; transform-style: preserve-3d; transform: rotateY(-24deg) rotateX(4deg); transition: transform .8s cubic-bezier(.2,.7,.2,1); }
-.book-wrap:hover .book, .book-wrap:focus-visible .book { transform: rotateY(-4deg) rotateX(0deg) translateY(-10px); }
-.cover { position: absolute; inset: 0; border-radius: 4px 12px 12px 4px; overflow: hidden; padding: 22px 20px; display: grid; grid-template-rows: auto 1fr auto;
-  box-shadow: 22px 30px 50px rgba(0,0,0,.7), inset 4px 0 0 rgba(255,255,255,.14), 0 0 60px -20px rgba(226,181,69,.5); transform: translateZ(14px); }
-.cover::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,.22), transparent 32%, transparent 70%, rgba(255,255,255,.06)); pointer-events: none; }
-.cover .brand { font: 900 11px/1 var(--display); letter-spacing: .12em; }
-.cover .big { font: 900 clamp(56px, 7vw, 80px)/0.9 var(--display); align-self: center; opacity: .2; }
-.cover h3 { font-size: 16px; line-height: 1.2; }
-.cover .vol { font: 500 10px/1 var(--mono); letter-spacing: .12em; margin-top: 10px; opacity: .8; }
-.spine { position: absolute; top: 0; bottom: 0; left: 0; width: 28px; transform: rotateY(-90deg); transform-origin: left; filter: brightness(.6); border-radius: 3px 0 0 3px; }
-.pages { position: absolute; top: 6px; bottom: 6px; right: 2px; width: 26px; transform: rotateY(90deg) translateZ(-12px); transform-origin: right; background: repeating-linear-gradient(0deg, #ecebf2 0 2px, #c8c6d2 2px 3px); }
-.c1 { background: var(--chrome); color: #0b0b0a; } .s1 { background: #8d90a0; }
-.c2 { background: radial-gradient(120% 80% at 80% 10%, #ebd291, #d9aa3a 45%, #4f3d12); color: #fff; } .s2 { background: #86672a; }
-.c3 { background: radial-gradient(120% 80% at 80% 10%, #3c392f, #171612 55%, #000); color: #ecebe6; } .s3 { background: #1c1b16; }
-.c4 { background: linear-gradient(160deg, #1d1b12, #000 60%); color: #fff; } .s4 { background: #14130f; }
-.c4 h3, .c4 .big { background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.book-info { display: grid; gap: 6px; }
-.book-info h4 { margin: 0; font: 600 17px/1.3 var(--body); }
-.book-info p { color: var(--muted); font-size: 14px; }
-.book-info .mono { color: var(--dim); font-size: 12px; }
-
 /* Indicator lab */
 .lab { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; align-items: stretch; }
 @media (max-width: 1000px) { .lab { grid-template-columns: 1fr; } }
@@ -338,65 +219,6 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; bo
 .more-ind { color: var(--muted); font-size: 14px; padding: 6px 2px; }
 .more-ind a { color: var(--violet-2); border-bottom: 1px solid rgba(235,210,145,.4); }
 
-/* Stats */
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--line); }
-.stat { padding: 40px 24px; border-left: 1px solid var(--line); display: grid; gap: 10px; }
-.stat:first-child { border-left: 0; }
-.stat .n { font: 700 clamp(32px, 4.4vw, 56px)/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; justify-self: start; }
-.stat .l { color: var(--muted); font-size: 15px; }
-@media (max-width: 860px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--line); } }
-
-/* Pricing */
-.bill { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); margin-bottom: 36px; }
-.bill button { border: 0; background: none; padding: 10px 18px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--muted); }
-.bill button[aria-pressed="true"] { background: var(--chrome); color: #0b0b0a; }
-.bill .save { font: 500 11px/1 var(--mono); color: var(--bull); margin-left: 6px; }
-.bill button[aria-pressed="true"] .save { color: #0b6b4e; }
-.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
-@media (max-width: 960px) { .plans { grid-template-columns: 1fr; max-width: 540px; } }
-.plan { border: 1px solid var(--line); border-radius: 22px; background: var(--panel); padding: 30px; display: grid; gap: 22px; grid-template-rows: auto auto 1fr auto; position: relative; overflow: hidden; }
-.plan.featured { border-color: transparent; background: radial-gradient(100% 60% at 50% 0%, rgba(226,181,69,.18), transparent 70%), var(--panel-2); }
-.plan.featured .ring { position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
-  background: conic-gradient(from var(--ang), #fff, var(--violet), #6f7284, var(--violet-2), #fff, var(--violet-deep), #fff);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: spin 6s linear infinite; }
-@keyframes spin { to { --ang: 360deg; } }
-.plan .badge { display: inline-block; background: var(--chrome); color: #0b0b0a; font: 500 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 7px 10px; border-radius: 6px; margin-bottom: 14px; }
-.plan h3 { font-size: 18px; letter-spacing: .04em; }
-.plan .tagline { color: var(--muted); font-size: 15px; margin-top: 8px; }
-.amount { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.amount .val { font: 700 50px/1 var(--display); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
-.amount .per { color: var(--muted); font-size: 14px; }
-.plan ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 11px; align-content: start; }
-.plan li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; color: #d6d2c6; font-size: 15px; }
-.plan li svg { width: 18px; height: 18px; color: var(--violet-2); margin-top: 3px; }
-.plan .btn { justify-content: center; }
-
-/* CTA + footer */
-.cta-box { border: 1px solid var(--line-2); border-radius: 28px; padding: clamp(28px, 6vw, 68px); position: relative; overflow: hidden;
-  background: radial-gradient(70% 120% at 100% 0%, rgba(226,181,69,.24), transparent 60%), radial-gradient(50% 80% at 0% 100%, rgba(168,132,47,.18), transparent 70%), var(--panel);
-  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 36px; align-items: end; }
-@media (max-width: 880px) { .cta-box { grid-template-columns: 1fr; } }
-.cta-box h2 { font-size: clamp(30px, 4.6vw, 58px); line-height: 1.04; font-weight: 700; position: relative; }
-.cta-box p { color: var(--muted); margin-top: 16px; font-size: 18px; position: relative; }
-.signup { display: grid; gap: 10px; position: relative; }
-.signup label { font: 500 12px/1 var(--mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
-.signup-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.signup input { flex: 1 1 220px; min-width: 0; background: #111216; border: 1px solid var(--line-2); border-radius: 12px; padding: 15px 18px; color: var(--fg); font: inherit; font-size: 15px; }
-.signup .msg { font-size: 14px; color: var(--bull); min-height: 1.4em; }
-.big-88 { position: absolute; right: -4%; bottom: -16%; width: min(620px, 70%); opacity: .22; mix-blend-mode: screen; pointer-events: none; user-select: none; }
-footer { position: relative; padding-block: 48px 40px; margin-top: 40px; overflow: hidden; }
-.foot { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)); gap: 32px; }
-@media (max-width: 820px) { .foot { grid-template-columns: 1fr 1fr; } }
-.foot h4 { margin: 0 0 12px; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
-.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.foot ul a { color: var(--muted); font-size: 15px; transition: color .2s; }
-.foot ul a:hover { color: #fff; }
-.foot .about { color: var(--muted); font-size: 15px; max-width: 36ch; margin-top: 14px; }
-.wordmark-wrap { text-align: center; margin-top: 56px; }
-.wordmark { display: inline-block; width: min(900px, 92%); height: auto; user-select: none; filter: drop-shadow(0 0 60px rgba(226,181,69,.35)); }
-.risk { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; line-height: 1.6; display: grid; gap: 10px; max-width: 110ch; }
-.risk b { color: var(--muted); font-weight: 600; }
-
 /* Player */
 dialog.player { width: min(960px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line-2); border-radius: 22px; background: var(--panel); color: var(--fg); overflow: auto; }
 dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px); }
@@ -415,6 +237,307 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
 .player-info p { color: var(--muted); font-size: 15px; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; } }
+
+/* =====================================================================================
+   Layout concept: one trading day. Scrolling walks the sessions (Pre-market, Asia, London,
+   New York, the close) and a session clock on the rail ticks with it; a faint price line
+   is drawn behind the page as you go. Each session holds one part of 88FX: learn, use the
+   tools, go live, then choose a plan. Charcoal ground, muted gold accent, chrome material.
+   ===================================================================================== */
+:root { --bar: 64px; --rail: 132px; }
+html { scroll-padding-top: var(--bar); }
+.wrap { max-width: 1240px; margin-inline: auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+main, footer { position: relative; z-index: 1; }
+@media (min-width: 1100px) { main > .sess, main > .bell, footer { padding-left: var(--rail); } }
+.mono { font-variant-numeric: tabular-nums; }
+.pill { font: 500 11px/1 var(--mono); padding: 5px 8px; border-radius: 6px; letter-spacing: .06em; }
+.pill.long { color: var(--bull); background: rgba(46,211,160,.12); }
+.pill.short { color: var(--bear); background: rgba(255,93,115,.12); }
+.pill.gold { color: var(--violet-2); background: rgba(226,181,69,.14); }
+.pill.mute { color: var(--muted); background: rgba(168,167,162,.12); }
+.up { color: var(--bull); } .down { color: var(--bear); }
+.dot-live { width: 8px; height: 8px; border-radius: 50%; background: var(--bull); animation: ping 1.8s infinite; display: inline-block; flex: none; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(46,211,160,.55); } 80%, 100% { box-shadow: 0 0 0 10px rgba(46,211,160,0); } }
+#dayChart { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 80%, transparent 96%); mask-image: linear-gradient(90deg, transparent 4%, #000 30%, #000 80%, transparent 96%); }
+
+/* ---------- top bar ---------- */
+.topbar { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 70; height: var(--bar); display: flex; align-items: center; gap: 18px;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); background: linear-gradient(180deg, rgba(21,22,26,.94), rgba(21,22,26,.7)); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); border-bottom: 1px solid rgba(65,67,76,.45); }
+.topbar .logo img { height: 38px; width: auto; display: block; filter: drop-shadow(0 0 12px rgba(226,181,69,.35)); }
+.topbar nav { display: flex; gap: 2px; margin-left: 14px; }
+.topbar nav a { display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 12px; border-radius: 10px; color: var(--muted); font-size: 14px; font-weight: 500; transition: color .2s, background-color .2s; }
+.topbar nav a small { font-size: 10px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; transition: color .2s; }
+.topbar nav a:hover, .topbar nav a.on { color: #fff; background: rgba(255,255,255,.04); }
+.topbar nav a.on small { color: var(--violet-2); }
+.quote-chip { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(255,255,255,.02); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.quote-chip .k { color: var(--dim); font-size: 11px; letter-spacing: .1em; }
+.quote-chip svg { width: 64px; height: 20px; }
+.topbar .actions { display: flex; gap: 8px; }
+.topbar .btn { padding: 10px 16px; font-size: 14px; }
+.menu-btn { display: none; margin-left: auto; background: none; border: 1px solid var(--line-2); border-radius: 10px; width: 44px; height: 44px; place-items: center; color: var(--fg); }
+.menu-btn svg { width: 20px; height: 20px; }
+.mobile-menu { position: fixed; z-index: 69; top: calc(env(safe-area-inset-top, 0px) + var(--bar)); left: 0; right: 0; padding: 10px var(--gutter-r) 22px var(--gutter-l); background: rgba(21,22,26,.97); border-bottom: 1px solid var(--line); }
+.mobile-menu a:not(.btn) { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; font-size: 20px; font-weight: 600; border-bottom: 1px solid var(--line); }
+.mobile-menu a small { font-size: 11px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; font-weight: 500; }
+.mobile-menu .btn { margin-top: 16px; width: 100%; justify-content: center; }
+@media (max-width: 1180px) { .topbar nav { display: none; } }
+@media (max-width: 760px) { .quote-chip, .topbar .actions { display: none; } .menu-btn { display: grid; } }
+
+/* ---------- session rail + clock ---------- */
+.rail { position: fixed; z-index: 50; left: max(22px, env(safe-area-inset-left, 0px)); top: calc(env(safe-area-inset-top, 0px) + var(--bar) + 30px); bottom: 30px; width: 104px; display: flex; flex-direction: column; gap: 22px; }
+.clock { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: #fff; line-height: 1; }
+.clock small { display: block; margin-top: 6px; font-size: 9px; letter-spacing: .12em; white-space: nowrap; color: var(--dim); font-weight: 500; text-transform: uppercase; }
+.clock i { font-style: normal; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.rail ol { list-style: none; margin: 0; padding: 0 0 0 16px; position: relative; display: flex; flex-direction: column; justify-content: space-between; flex: 1; max-height: 460px; }
+.rail ol::before { content: ""; position: absolute; left: 3px; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
+.rail .fill { position: absolute; left: 3px; top: 6px; width: 1px; height: calc(100% - 12px); transform-origin: top; transform: scaleY(0); background: linear-gradient(var(--violet-2), var(--violet)); box-shadow: 0 0 8px var(--violet); }
+.rail li a { display: grid; gap: 3px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); position: relative; transition: color .3s; }
+.rail li a::before { content: ""; position: absolute; left: -16px; top: 2px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); border: 1px solid var(--line-2); transition: all .3s; }
+.rail li a b { font-size: 13px; color: var(--muted); letter-spacing: -0.01em; text-transform: none; font-weight: 600; transition: color .3s; }
+.rail li.on a { color: var(--violet-2); }
+.rail li.on a b { color: #fff; }
+.rail li.on a::before { background: var(--violet); border-color: var(--violet); box-shadow: 0 0 10px var(--violet); }
+.sess-pill { position: fixed; z-index: 50; left: 50%; bottom: max(14px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); display: none; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 999px;
+  background: rgba(27,28,33,.9); border: 1px solid var(--line-2); backdrop-filter: blur(10px); font-size: 13px; white-space: nowrap; box-shadow: 0 14px 30px -14px #000; }
+.sess-pill.away { opacity: 0; transform: translate(-50%, 16px); pointer-events: none; }
+.sess-pill { transition: opacity .35s, transform .35s; }
+.sess-pill b { font-variant-numeric: tabular-nums; }
+.sess-pill span { color: var(--violet-2); }
+@media (max-width: 1099px) { .rail { display: none; } .sess-pill { display: inline-flex; } }
+
+/* ---------- pre-market hero ---------- */
+.pre { position: relative; isolation: isolate; overflow: hidden; }
+.pre-stage { position: absolute; inset: 0 0 52px 0; z-index: 0; }
+.pre-stage .hero-photo { position: absolute; left: 50%; top: 4%; bottom: 0; width: min(820px, 82vw); transform: translateX(-50%); pointer-events: none; opacity: .88;
+  -webkit-mask-image: radial-gradient(ellipse 52% 56% at 50% 52%, #000 40%, transparent 82%); mask-image: radial-gradient(ellipse 52% 56% at 50% 52%, #000 40%, transparent 82%); }
+.hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 48% 58%; filter: grayscale(1) contrast(1.3) brightness(1.7); }
+.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(226,181,69,.18), rgba(168,132,47,.1)); mix-blend-mode: color; }
+.pre-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 70% at 50% 110%, rgba(226,181,69,.12), transparent 60%), linear-gradient(180deg, transparent 70%, var(--ink)); }
+#chrome3d { position: absolute; inset: 0; width: 100%; height: 100%; filter: url(#chroma); }
+.chrome-fallback { position: absolute; inset: 0; display: grid; place-items: center; font: 700 clamp(140px, 22vw, 300px)/1 var(--display); }
+.pre-copy { position: relative; z-index: 2; min-height: calc(100svh - 52px); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: 18px 40px;
+  padding: calc(env(safe-area-inset-top, 0px) + var(--bar) + clamp(28px, 6vh, 64px)) var(--gutter-r) clamp(26px, 5vh, 48px) var(--gutter-l); pointer-events: none; }
+@media (min-width: 1100px) { .pre-copy { padding-left: calc(var(--rail) + 24px); } }
+.pre-copy a, .pre-copy button { pointer-events: auto; }
+.pre-eyebrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.pre-eyebrow b { color: var(--violet-2); font-weight: 600; }
+.pre h1 { grid-column: 1 / -1; display: flex; flex-direction: column; justify-content: space-between; font-size: clamp(40px, 6.6vw, 108px); line-height: .95; font-weight: 700; letter-spacing: -0.05em; }
+.pre h1 .line { display: block; overflow: hidden; padding-bottom: .08em; }
+.pre h1 .line-in { display: block; }
+.pre h1 .l2 { align-self: flex-end; text-align: right; }
+.pre-foot { display: grid; gap: 20px; align-content: end; max-width: 520px; }
+.hero-sub { color: #cfcbc0; font-size: clamp(16px, 1.4vw, 19px); font-weight: 300; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.pre-side { justify-self: end; align-self: end; display: grid; gap: 12px; justify-items: end; text-align: right; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.pre-side b { color: var(--muted); font-weight: 500; }
+.scroll-cue { display: inline-flex; align-items: center; gap: 10px; color: var(--violet-2); }
+.scroll-cue i { width: 1px; height: 38px; background: linear-gradient(var(--violet), transparent); animation: cue 1.8s ease-in-out infinite; transform-origin: top; }
+@keyframes cue { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+@media (max-width: 760px) {
+  .pre-copy { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
+  .pre h1 { font-size: clamp(36px, 11vw, 54px); gap: min(38vh, 300px); }
+  .pre h1 .l2 { align-self: flex-start; text-align: left; }
+  .pre-side { display: none; }
+}
+
+/* ---------- session sections ---------- */
+.sess { position: relative; padding-block: clamp(96px, 12vw, 170px) 0; }
+.sess-h { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: end; gap: 18px 48px; padding-bottom: 26px; margin-bottom: 40px; border-bottom: 1px solid var(--line); }
+.sess-h .t { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); font-variant-numeric: tabular-nums; margin-bottom: 14px; }
+.sess-h .t b { color: var(--violet-2); font-weight: 600; }
+@property --fill { syntax: "<percentage>"; inherits: false; initial-value: 0%; }
+.sess-h .n { display: block; font-size: clamp(64px, 11vw, 168px); line-height: .82; font-weight: 700; letter-spacing: -0.06em;
+  background: linear-gradient(90deg, var(--violet) var(--fill), transparent var(--fill)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px rgba(236,235,230,.28); }
+.sess-h h2 { font-size: clamp(26px, 3vw, 40px); line-height: 1.1; letter-spacing: -0.03em; }
+.sess-h p { color: var(--muted); font-size: 17px; margin-top: 14px; max-width: 52ch; }
+@media (max-width: 860px) { .sess-h { grid-template-columns: 1fr; } }
+
+/* ---------- Asia: the reel ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.reel-pin { position: relative; }
+.reel-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; }
+.reel-hint { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.reel { position: relative; padding: 30px 0; background: #111216; border-block: 1px solid var(--line); overflow: hidden; }
+.reel::before, .reel::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; pointer-events: none;
+  background-image: radial-gradient(ellipse 5px 3.5px at 50% 50%, var(--ink) 92%, transparent 100%); background-size: 24px 12px; opacity: .9; }
+.reel::before { top: 8px; } .reel::after { bottom: 8px; }
+.reel-track { display: flex; gap: 18px; width: max-content; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
+@media (min-width: 1100px) { .reel-track { padding-left: calc(var(--rail) + 24px); } }
+.reel-track > .video { width: clamp(270px, 27vw, 380px); flex: none; }
+@media (max-width: 899px) { .reel { overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; } .reel::-webkit-scrollbar { display: none; } .reel-track > .video { scroll-snap-align: start; } }
+
+/* Asia: ebook spines */
+.shelf-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 18px; margin: 64px 0 18px; }
+.shelf-h h3 { font-size: 22px; }
+.shelf-h p { color: var(--dim); font-size: 14px; }
+.spines { display: flex; gap: 10px; align-items: stretch; height: 380px; padding: 0 0 14px; border-bottom: 6px solid #2a2b31; box-shadow: 0 10px 20px -12px #000; }
+.spine-b { position: relative; flex: 0 0 64px; display: flex; overflow: hidden; border-radius: 6px 10px 10px 6px; text-align: left; padding: 0; border: 0; transition: flex-basis .7s cubic-bezier(.2,.7,.2,1); }
+.spine-b[aria-expanded="true"] { flex-basis: min(520px, 60vw); }
+.sp-edge { flex: 0 0 64px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 14px 0; box-shadow: inset -6px 0 12px rgba(0,0,0,.35); }
+.sp-edge .sp-t { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 13px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; }
+.sp-edge .sp-n { font-size: 12px; font-weight: 700; opacity: .7; }
+.sp-open { flex: 1; min-width: 0; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 20px; align-items: center; padding: 22px; background: var(--panel-2); color: var(--fg); }
+.sp-cover { aspect-ratio: 3 / 4.2; border-radius: 3px 10px 10px 3px; padding: 14px; display: grid; grid-template-rows: auto 1fr auto; box-shadow: 14px 20px 34px rgba(0,0,0,.6), inset 3px 0 0 rgba(255,255,255,.14); }
+.sp-cover .brand { font-size: 10px; font-weight: 700; letter-spacing: .14em; }
+.sp-cover .big { align-self: center; font-size: 56px; font-weight: 700; letter-spacing: -0.05em; opacity: .22; }
+.sp-cover b { font-size: 15px; line-height: 1.15; }
+.sp-info { display: grid; gap: 10px; align-content: center; min-width: 0; }
+.sp-info b { font-size: 20px; letter-spacing: -0.02em; }
+.sp-info span { color: var(--muted); font-size: 15px; }
+.sp-info small { color: var(--dim); font-size: 13px; }
+.c1 { background: var(--chrome); color: #0b0b0a; }
+.c2 { background: radial-gradient(120% 80% at 80% 10%, #ebd291, #d9aa3a 45%, #4f3d12); color: #141000; }
+.c3 { background: radial-gradient(120% 80% at 80% 10%, #3c392f, #23242a 55%, #111216); color: #ecebe6; }
+.c4 { background: linear-gradient(160deg, #2a2b31, #111216 60%); color: #ebd291; }
+@media (max-width: 760px) {
+  .spines { flex-direction: column; height: auto; border-bottom: 0; box-shadow: none; }
+  .spine-b { flex-basis: auto; flex-direction: column; border-radius: 10px; }
+  .spine-b[aria-expanded="true"] { flex-basis: auto; }
+  .sp-edge { flex: none; flex-direction: row; padding: 12px 16px; }
+  .sp-edge .sp-t { writing-mode: horizontal-tb; transform: none; }
+  .spine-b[aria-expanded="false"] .sp-open { display: none; }
+  .sp-open { grid-template-columns: 110px minmax(0, 1fr); padding: 16px; }
+}
+
+/* ---------- London: the workspace ---------- */
+.ws { border-radius: 22px; border: 1px solid var(--line-2); background: radial-gradient(80% 60% at 0% 0%, rgba(226,181,69,.07), transparent 60%), #17181c; overflow: hidden; box-shadow: 0 40px 80px -40px #000; }
+.ws-bar { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.02); font-size: 13px; color: var(--muted); }
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line-2); }
+.dots i:first-child { background: var(--violet); box-shadow: 0 0 8px rgba(226,181,69,.6); }
+.ws-bar b { color: var(--fg); font-weight: 600; }
+.ws-bar .hint { margin-left: auto; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.ws-grid { display: grid; gap: 14px; padding: 14px; grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas: "term term term term term term term term calc calc calc calc" "lab lab lab lab lab lab lab ind ind ind ind ind" "lab lab lab lab lab lab lab sig sig sig sig sig"; }
+.w-term { grid-area: term; } .w-calc { grid-area: calc; } .w-lab { grid-area: lab; } .w-ind { grid-area: ind; } .w-sig { grid-area: sig; }
+@media (max-width: 1000px) { .ws-bar .hint { display: none; } .ws-grid { grid-template-columns: 1fr; grid-template-areas: "term" "calc" "lab" "ind" "sig"; } }
+.win { position: relative; min-width: 0; display: flex; flex-direction: column; border-radius: 14px; border: 1px solid var(--line-2); background: rgba(27,28,33,.96); box-shadow: 0 24px 50px -30px rgba(0,0,0,.9); transition: box-shadow .25s, border-color .25s; }
+.win-h { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,.04), transparent); border-radius: 14px 14px 0 0; user-select: none; }
+.win-h > b { font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+.win-h > span { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+.win-h .seg { margin-left: auto; }
+.win-b { padding: 14px; display: grid; gap: 12px; min-width: 0; align-content: start; }
+.win .ohlc { min-height: 12px; }
+.win.dragging { z-index: 20; border-color: rgba(226,181,69,.55); box-shadow: 0 40px 80px -30px #000, 0 0 0 1px rgba(226,181,69,.35); }
+@media (min-width: 1001px) and (pointer: fine) { .win-h { cursor: grab; } .win.dragging .win-h { cursor: grabbing; } }
+.w-ind .ind { padding: 14px 14px 14px 18px; }
+.w-ind .ind p { font-size: 14px; }
+.sig-list { min-height: 220px; }
+
+/* ---------- New York: split-flap boards ---------- */
+.ny-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 1000px) { .ny-grid { grid-template-columns: 1fr; } }
+.board { border-radius: 20px; border: 1px solid var(--line-2); background: #111216; padding: 18px; min-width: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 40px 80px -50px #000; }
+.board-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 16px; }
+.board-h b { display: block; font-size: 18px; letter-spacing: -0.01em; }
+.board-h .tile-sub { margin-top: 4px; }
+.board-cols { display: grid; grid-template-columns: 116px 58px minmax(0, 1fr) 44px; gap: 8px; padding: 0 0 8px; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.board .cal-row { grid-template-columns: 116px 58px minmax(0, 1fr) 44px; gap: 8px; padding: 6px 0; border-top: 0; }
+.flap { position: relative; display: block; padding: 9px 10px; border-radius: 6px; font-weight: 600; letter-spacing: .04em; color: var(--violet-2); overflow: hidden;
+  background: linear-gradient(180deg, #23242a 0 49.5%, #0c0d10 49.5% 50.5%, #1d1e23 50.5%); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 2px 0 rgba(0,0,0,.5); transform-origin: 50% 50%; }
+.board .cal-row .cd { font-size: 13px; color: var(--violet-2); }
+.board .cal-row .ccy { border: 0; font-size: 12px; text-align: center; color: #fff; }
+.board .cal-row .ev { gap: 4px; }
+.board .cal-row .ev-t { text-transform: uppercase; font-size: 13px; color: #fff; }
+.board .cal-row .ev small { padding-left: 2px; }
+.board .cal-row .impact { justify-self: center; }
+.board .cal-row.next .cd { color: #fff; background: linear-gradient(180deg, #a8842f 0 49.5%, #4f3d12 49.5% 50.5%, #8f6d1f 50.5%); }
+.board .cal-row .cd, .board .cal-row .ccy, .board .cal-row .ev-t { position: relative; display: block; padding: 9px 10px; border-radius: 6px; font-weight: 600; letter-spacing: .04em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  background: linear-gradient(180deg, #23242a 0 49.5%, #0c0d10 49.5% 50.5%, #1d1e23 50.5%); box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 2px 0 rgba(0,0,0,.5); }
+.board .cal-row.next .cd { background: linear-gradient(180deg, #a8842f 0 49.5%, #4f3d12 49.5% 50.5%, #8f6d1f 50.5%); }
+.class-row { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: center; padding: 6px 0; }
+.class-row .when { text-align: center; }
+.class-row .when b { display: block; font-size: 15px; }
+.class-row .when small { font-size: 10px; letter-spacing: .1em; color: var(--dim); text-transform: uppercase; }
+.class-row .what { display: grid; gap: 4px; min-width: 0; }
+.class-row .what span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; font-size: 13px; }
+.class-row .what small { color: var(--dim); font-size: 12px; }
+.board-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.board-foot a { color: var(--violet-2); border-bottom: 1px solid currentColor; }
+@media (max-width: 560px) { .board { padding: 14px; } .board-cols { display: none; } .board .cal-row { grid-template-columns: 104px 46px minmax(0, 1fr); gap: 6px; } .board .cal-row .impact { display: none; }
+  .board .cal-row .cd, .board .cal-row .ccy, .board .cal-row .ev-t { padding: 9px 7px; font-size: 12px; letter-spacing: .02em; }
+  .ladder { margin-left: 46px; } .rung { padding-left: 20px; } .rung .lv { left: -46px; width: 36px; } }
+
+/* ---------- The close: ladder, closing prices, tickets ---------- */
+.close-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 1000px) { .close-grid { grid-template-columns: 1fr; } }
+.ladder { position: relative; display: grid; border-left: 1px solid var(--line-2); margin-left: 64px; }
+.rung { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 18px; padding: 22px 0 22px 26px; border-bottom: 1px dashed var(--line); }
+.rung:last-of-type { border-bottom: 0; }
+.rung .lv { position: absolute; left: -64px; top: 22px; width: 52px; text-align: right; font-size: 13px; font-weight: 600; color: var(--dim); font-variant-numeric: tabular-nums; }
+.rung::before { content: ""; position: absolute; left: -5px; top: 27px; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); border: 1px solid var(--line-2); }
+.rung h3 { font-size: 22px; letter-spacing: -0.02em; }
+.rung > .pill { align-self: start; justify-self: end; margin-top: 4px; }
+.rung p { grid-column: 1 / -1; color: var(--muted); max-width: 56ch; }
+.rung .chips { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; }
+.rung.done::before { background: var(--violet); border-color: var(--violet); }
+.rung.done .lv, .rung.now .lv { color: var(--violet-2); }
+.rung.now { background: linear-gradient(90deg, rgba(226,181,69,.08), transparent 70%); }
+.rung.now::before { background: var(--violet); border-color: #fff; box-shadow: 0 0 0 4px rgba(226,181,69,.25), 0 0 14px var(--violet); }
+.ladder-mark { position: absolute; left: -1px; right: 0; top: 0; height: 0; border-top: 1px solid var(--violet); pointer-events: none; z-index: 2; box-shadow: 0 0 10px rgba(226,181,69,.6); }
+.ladder-mark span { position: absolute; right: 0; top: -13px; padding: 4px 9px; border-radius: 6px; background: var(--violet); color: var(--violet-ink); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.closing { border-radius: 20px; border: 1px solid var(--line-2); background: var(--panel); padding: 20px; }
+.closing-h { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.closing-h b { font-size: 15px; }
+.cp { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--line); }
+.cp:first-of-type { border-top: 0; }
+.cp dt { color: var(--muted); font-size: 14px; }
+.cp dd { margin: 0; text-align: right; display: grid; gap: 2px; }
+.cp .n { font-size: 30px; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.cp .chg { font-size: 12px; font-variant-numeric: tabular-nums; }
+.orders-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; margin: 96px 0 26px; }
+.orders-h h2 { font-size: clamp(30px, 4vw, 52px); letter-spacing: -0.04em; line-height: 1; }
+.orders-h p { color: var(--muted); margin-top: 10px; }
+.bill { display: inline-flex; gap: 4px; padding: 4px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); }
+.bill button { border: 0; background: none; padding: 10px 18px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--muted); }
+.bill button[aria-pressed="true"] { background: var(--chrome); color: #0b0b0a; }
+.bill .save { font-size: 11px; color: var(--bull); margin-left: 6px; }
+.bill button[aria-pressed="true"] .save { color: #0b6b4e; }
+#close { overflow-x: clip; }
+.tickets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; perspective: 1400px; }
+@media (max-width: 960px) { .tickets { grid-template-columns: 1fr; max-width: 520px; } }
+.ticket { position: relative; display: grid; grid-template-rows: auto auto auto 1fr auto auto; border-radius: 18px; border: 1px solid var(--line-2); background: var(--panel-2); overflow: hidden; }
+.ticket.featured { border-color: rgba(226,181,69,.6); background: radial-gradient(100% 60% at 50% 0%, rgba(226,181,69,.14), transparent 70%), var(--panel-2); box-shadow: 0 30px 70px -40px rgba(226,181,69,.6); }
+.tk-top { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.tk-side { padding: 4px 8px; border-radius: 6px; background: rgba(46,211,160,.14); color: var(--bull); font-weight: 700; }
+.tk-top .badge { margin-left: auto; padding: 4px 8px; border-radius: 6px; background: var(--chrome); color: #0b0b0a; font-weight: 700; }
+.tk-name { padding: 18px 18px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.03em; }
+.tk-price { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; padding: 6px 18px 18px; }
+.tk-price .val { font-size: 50px; font-weight: 700; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.tk-price .per { color: var(--muted); font-size: 14px; }
+.tk-list { list-style: none; margin: 0; padding: 18px; display: grid; gap: 10px; align-content: start; border-top: 2px dashed var(--line-2); position: relative; }
+.tk-list::before, .tk-list::after { content: ""; position: absolute; top: -11px; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); border: 1px solid var(--line-2); }
+.tk-list::before { left: -11px; } .tk-list::after { right: -11px; }
+.tk-list li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; color: #d6d2c6; font-size: 15px; }
+.tk-list svg { width: 16px; height: 16px; color: var(--violet-2); margin-top: 3px; }
+.tk-meta { display: flex; justify-content: space-between; gap: 10px; padding: 0 18px 12px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); font-variant-numeric: tabular-nums; }
+.ticket .btn { margin: 0 18px 18px; justify-content: center; }
+
+/* ---------- closing bell + footer ---------- */
+.bell { position: relative; padding-block: clamp(110px, 13vw, 180px) clamp(70px, 9vw, 120px); overflow: hidden; }
+.bell-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: end; position: relative; z-index: 1; }
+@media (max-width: 880px) { .bell-grid { grid-template-columns: 1fr; } }
+.bell h2 { font-size: clamp(36px, 5.6vw, 80px); line-height: .98; letter-spacing: -0.05em; font-weight: 700; }
+.bell p { color: var(--muted); margin-top: 16px; font-size: 18px; }
+.bell-logo { position: absolute; right: -6%; bottom: -14%; width: min(720px, 80vw); opacity: .16; mix-blend-mode: screen; pointer-events: none; }
+.signup { display: grid; gap: 10px; }
+.signup label { font-size: 12px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.signup-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.signup input { flex: 1 1 220px; min-width: 0; background: #111216; border: 1px solid var(--line-2); border-radius: 12px; padding: 15px 18px; color: var(--fg); font: inherit; font-size: 15px; }
+.signup .msg { font-size: 14px; color: var(--bull); min-height: 1.4em; }
+footer { border-top: 1px solid var(--line); padding-block: 48px 90px; }
+.foot { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)); gap: 32px; }
+@media (max-width: 820px) { .foot { grid-template-columns: 1fr 1fr; } }
+.foot .logo img { height: 46px; width: auto; filter: drop-shadow(0 0 14px rgba(226,181,69,.35)); }
+.foot h4 { margin: 0 0 12px; font-size: 12px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot ul a { color: var(--muted); font-size: 15px; transition: color .2s; }
+.foot ul a:hover { color: #fff; }
+.foot .about { color: var(--muted); font-size: 15px; max-width: 36ch; margin-top: 14px; }
+.risk { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--dim); font-size: 13px; line-height: 1.6; display: grid; gap: 10px; max-width: 110ch; }
+.risk b { color: var(--muted); font-weight: 600; }
 </style>
 
 <div class="noise" aria-hidden="true"></div>
@@ -433,98 +556,137 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
 <div class="progress" id="progress" aria-hidden="true"></div>
 <div class="cursor" id="cursor" aria-hidden="true"></div>
 <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+<canvas id="dayChart" aria-hidden="true"></canvas>
 
-<header class="site-header" id="top">
-  <div class="wrap">
-    <nav class="nav" aria-label="Main">
-      <a class="logo" href="#top" aria-label="88FX home"><img src="88fx-logo.webp" alt="88FX" width="600" height="305"></a>
-      <div class="nav-links">
-        <a href="#desk">Desk</a><a href="#videos">Videos</a><a href="#ebooks">Ebooks</a><a href="#indicators">Indicators</a><a href="#pricing">Pricing</a>
-      </div>
-      <div class="nav-cta">
-        <a class="btn btn-ghost" href="account.html">Sign in</a>
-        <a class="btn btn-violet magnetic" href="#join">Start free</a>
-      </div>
-      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-      </button>
-    </nav>
-    <div class="mobile-menu" id="mobileMenu" hidden>
-      <a href="#desk">Desk</a><a href="#videos">Videos</a><a href="#ebooks">Ebooks</a><a href="#indicators">Indicators</a><a href="#pricing">Pricing</a>
-      <a href="account.html">Sign in</a>
-      <a class="btn btn-violet" href="#join">Start free</a>
-    </div>
+<header class="topbar">
+  <a class="logo" href="#top" aria-label="88FX home"><img src="88fx-logo.webp" alt="88FX" width="600" height="305"></a>
+  <nav aria-label="Sessions">
+    <a href="#asia" data-sess="asia"><small>Asia</small>Learn</a>
+    <a href="#london" data-sess="london"><small>London</small>Tools</a>
+    <a href="#newyork" data-sess="newyork"><small>New York</small>Live</a>
+    <a href="#close" data-sess="close"><small>Close</small>Plans</a>
+  </nav>
+  <div class="quote-chip" aria-label="EUR/USD sample live price">
+    <span class="dot-live"></span><span class="k">EUR/USD</span><b id="hudPx">1.08420</b><span class="up" id="hudChg">+0.12%</span>
+    <svg viewBox="0 0 160 34" preserveAspectRatio="none" aria-hidden="true"><path id="hudSpark" fill="none" stroke="#e2b545" stroke-width="2"/></svg>
   </div>
+  <div class="actions">
+    <a class="btn btn-ghost" href="account.html">Sign in</a>
+    <a class="btn btn-violet magnetic" href="#join">Start free</a>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+  </button>
 </header>
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <a href="#asia">Learn <small>Asia</small></a><a href="#london">Tools <small>London</small></a><a href="#newyork">Live <small>New York</small></a><a href="#close">Plans <small>Close</small></a>
+  <a href="account.html">Sign in <small>Your desk</small></a>
+  <a class="btn btn-violet" href="#join">Start free</a>
+</div>
+
+<aside class="rail" aria-label="Trading day">
+  <div class="clock" aria-live="off"><span id="clockT">05<i>:</i>00</span><small>GMT · <span id="clockS">Pre-market</span></small></div>
+  <ol>
+    <span class="fill" id="railFill" aria-hidden="true"></span>
+    <li data-sess="top"><a href="#top">05:00<b>Pre-market</b></a></li>
+    <li data-sess="asia"><a href="#asia">00:00<b>Asia</b></a></li>
+    <li data-sess="london"><a href="#london">08:00<b>London</b></a></li>
+    <li data-sess="newyork"><a href="#newyork">13:30<b>New York</b></a></li>
+    <li data-sess="close"><a href="#close">21:00<b>The close</b></a></li>
+  </ol>
+</aside>
+<div class="sess-pill" aria-hidden="true"><span class="dot-live"></span><b id="pillT">05:00</b><span id="pillS">Pre-market</span></div>
 
 <main>
-  <section class="hero" aria-labelledby="heroTitle">
-    <div class="aurora a1" aria-hidden="true"></div>
-    <div class="aurora a2" aria-hidden="true"></div>
-    <div class="grid-floor" aria-hidden="true"></div>
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow">Forex · Indices · Gold · Crypto</span>
-        <h1 id="heroTitle">
-          <span class="line"><span class="line-in chrome">Your trading journey.</span></span>
-          <span class="line"><span class="line-in script">All in one place.</span></span>
-        </h1>
-        <p class="hero-sub">Video courses, ebooks and custom indicators from the 88FX desk, organized from your first pip to a funded account.</p>
+  <!-- PRE-MARKET -->
+  <section class="pre hero" id="top" data-sess="top" aria-labelledby="heroTitle">
+    <div class="pre-stage" id="heroVisual">
+      <div class="hero-photo" aria-hidden="true"><img src="hero-bg.webp" alt="" width="900" height="1600" decoding="async"></div>
+      <canvas id="chrome3d" aria-hidden="true"></canvas>
+      <div class="chrome-fallback chrome" id="chromeFallback" hidden>88</div>
+    </div>
+    <div class="pre-copy">
+      <p class="pre-eyebrow"><b>Pre-market</b><span>Forex · Indices · Gold · Crypto</span></p>
+      <h1 id="heroTitle">
+        <span class="line l1"><span class="line-in chrome">Your trading journey.</span></span>
+        <span class="line l2"><span class="line-in script">All in one place.</span></span>
+      </h1>
+      <div class="pre-foot">
+        <p class="hero-sub">Video courses, ebooks and custom indicators from the 88FX desk, organized like a trading day: learn in Asia, work the London open, go live in New York.</p>
         <div class="hero-actions">
           <a class="btn btn-violet magnetic" href="#join">Start learning free
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          <a class="btn btn-chrome magnetic" href="#desk">Explore the desk</a>
-        </div>
-        <div class="compat"><span>Works with</span><b>TradingView</b><b>MetaTrader 4</b><b>MetaTrader 5</b></div>
-        <div class="hud h1 quote" aria-label="EUR/USD sample live price">
-          <div class="row"><span class="k">EUR/USD · Live</span><span class="dot-live"></span></div>
-          <div class="row"><span class="v" id="hudPx">1.08420</span><span class="mono up" id="hudChg">+0.12%</span></div>
-          <svg viewBox="0 0 160 34" preserveAspectRatio="none"><path id="hudSpark" fill="none" stroke="#e2b545" stroke-width="1.6"/></svg>
+          <a class="btn btn-chrome magnetic" href="#asia">Open the market</a>
         </div>
       </div>
-      <div class="hero-visual" id="heroVisual">
-        <div class="hero-photo" aria-hidden="true"><img src="hero-bg.webp" alt="" width="900" height="1600" decoding="async"></div>
-        <canvas id="chrome3d" aria-hidden="true"></canvas>
-        <div class="chrome-fallback chrome" id="chromeFallback" hidden>88</div>
-        <div class="hud h2" data-depth="1.8" aria-hidden="true">
-          <span class="k">88 Trend Ribbon · GBP/USD H1</span>
-          <div class="row"><span class="v">Cross</span><span class="pill long">LONG</span></div>
+      <div class="pre-side">
+        <span>Works with <b>TradingView · MT4 · MT5</b></span>
+        <span class="scroll-cue">Scroll to trade the day <i></i></span>
+      </div>
+    </div>
+    <div class="tape" aria-label="Market ticker, sample prices"><div class="tape-track" id="tapeTrack"></div></div>
+  </section>
+
+  <!-- ASIA · LEARN -->
+  <section class="sess" id="asia" data-sess="asia" aria-labelledby="asiaTitle">
+    <div class="wrap">
+      <header class="sess-h">
+        <div><p class="t"><b>Asia session</b><span>00:00 – 09:00 GMT</span><span>Quiet hours. Study.</span></p><span class="n" aria-hidden="true">Learn</span></div>
+        <div><h2 id="asiaTitle">Learn it on the chart, <span class="script">not in theory.</span></h2>
+          <p>Short lessons recorded on live charts, full session replays, and ebooks you can read offline. Every video comes with the chart file and a one-page summary.</p></div>
+      </header>
+    </div>
+    <div class="reel-pin" id="reelPin">
+      <div class="wrap reel-top">
+        <div class="filters" role="group" aria-label="Filter videos by topic">
+          <button class="filter" aria-pressed="true" data-filter="all">All</button>
+          <button class="filter" aria-pressed="false" data-filter="Price action">Price action</button>
+          <button class="filter" aria-pressed="false" data-filter="Risk">Risk</button>
+          <button class="filter" aria-pressed="false" data-filter="Psychology">Psychology</button>
+          <button class="filter" aria-pressed="false" data-filter="Indicators">Indicators</button>
+          <button class="filter" aria-pressed="false" data-filter="Live sessions">Live sessions</button>
         </div>
-        <div class="hud h3" data-depth="0.8" aria-hidden="true">
-          <span class="k">Your path</span>
-          <div class="row"><span class="v">Stage 02</span><span class="mono" style="color:var(--violet-2)">38%</span></div>
-        </div>
+        <span class="reel-hint">E-videos · scroll the reel</span>
+      </div>
+      <div class="reel" id="reel"><div class="reel-track" id="videoGrid"></div></div>
+    </div>
+    <div class="wrap">
+      <div class="shelf-h"><h3>The desk library</h3><p>41 ebooks · PDF and EPUB · pull one off the shelf</p></div>
+      <div class="spines" id="spines">
+        <button class="spine-b" aria-expanded="true" data-book="1"><span class="sp-edge c1"><span class="sp-t">The Pip Primer</span><span class="sp-n">01</span></span>
+          <span class="sp-open"><span class="sp-cover c1"><span class="brand">88FX</span><span class="big">01</span><b>The Pip Primer</b></span><span class="sp-info"><b>The Pip Primer</b><span>Pips, lots, margin and leverage, explained with a calculator you can follow by hand.</span><small>Vol. 01 · Foundations · 64 pages</small></span></span></button>
+        <button class="spine-b" aria-expanded="false" data-book="2"><span class="sp-edge c2"><span class="sp-t">Candles in Context</span><span class="sp-n">02</span></span>
+          <span class="sp-open"><span class="sp-cover c2"><span class="brand">88FX</span><span class="big">02</span><b>Candles in Context</b></span><span class="sp-info"><b>Candles in Context</b><span>Why the same pin bar means different things at support, in a range and mid-trend.</span><small>Vol. 02 · Price action · 128 pages</small></span></span></button>
+        <button class="spine-b" aria-expanded="false" data-book="3"><span class="sp-edge c3"><span class="sp-t">Risk Before Reward</span><span class="sp-n">03</span></span>
+          <span class="sp-open"><span class="sp-cover c3"><span class="brand">88FX</span><span class="big">03</span><b>Risk Before Reward</b></span><span class="sp-info"><b>Risk Before Reward</b><span>Position sizing, R-multiples and drawdown math, with a sizing sheet for every pair.</span><small>Vol. 03 · Strategy &amp; risk · 96 pages</small></span></span></button>
+        <button class="spine-b" aria-expanded="false" data-book="4"><span class="sp-edge c4"><span class="sp-t">The Funded Trader Playbook</span><span class="sp-n">04</span></span>
+          <span class="sp-open"><span class="sp-cover c4"><span class="brand">88FX</span><span class="big">04</span><b>The Funded Trader Playbook</b></span><span class="sp-info"><b>The Funded Trader Playbook</b><span>Daily loss limits, trailing drawdown and a 30-day plan for passing a prop challenge.</span><small>Vol. 04 · Funded · 152 pages</small></span></span></button>
       </div>
     </div>
   </section>
 
-  <div class="tape" aria-label="Market ticker, sample prices"><div class="tape-track" id="tapeTrack"></div></div>
-
-  <section class="section" id="desk" aria-labelledby="deskTitle">
+  <!-- LONDON · TOOLS -->
+  <section class="sess" id="london" data-sess="london" aria-labelledby="londonTitle">
     <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">The desk</span>
-        <h2 id="deskTitle">Everything you trade with, <span class="script">in one workspace.</span></h2>
-        <p>Your chart, your risk, the calendar and your alerts sit next to the lessons that explain them. Try it: hover the chart, drag the sliders.</p>
-      </div>
-      <div class="bento">
-        <article class="tile spot t-terminal">
-          <div class="tile-head">
-            <div><div class="tile-title">Market terminal</div><div class="tile-sub">EUR/USD · sample data</div></div>
-            <div class="seg" role="tablist" aria-label="Timeframe">
-              <button role="tab" aria-selected="false" data-tf="M15">M15</button>
-              <button role="tab" aria-selected="true" data-tf="H1">H1</button>
-              <button role="tab" aria-selected="false" data-tf="H4">H4</button>
-              <button role="tab" aria-selected="false" data-tf="D1">D1</button>
-            </div>
-          </div>
-          <div class="ohlc" id="termOhlc"><span>O <b>-</b></span></div>
-          <canvas class="chart" id="termChart" role="img" aria-label="EUR/USD candlestick chart with a 20-period moving average and volume. Hover to read prices."></canvas>
-        </article>
-
-        <article class="tile spot t-calc">
-          <div class="tile-head"><div><div class="tile-title">Position size</div><div class="tile-sub">EUR/USD · $10 per pip per lot</div></div></div>
-          <div class="calc">
+      <header class="sess-h">
+        <div><p class="t"><b>London open</b><span>08:00 – 16:30 GMT</span><span>Volume arrives.</span></p><span class="n" aria-hidden="true">Trade</span></div>
+        <div><h2 id="londonTitle">Your desk, <span class="script">already open.</span></h2>
+          <p>The tools from every lesson in one workspace: chart, position sizer, the indicator lab and your alerts. Drag the windows around and arrange it your way.</p></div>
+      </header>
+      <div class="ws" id="ws">
+        <div class="ws-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><b>88FX Desk</b><span>EUR/USD · sample data</span><span class="hint">Drag a window by its title bar · double-click to reset</span></div>
+        <div class="ws-grid">
+          <article class="win w-term spot">
+            <header class="win-h"><b>Market terminal</b><span>EUR/USD</span>
+              <div class="seg" role="tablist" aria-label="Timeframe">
+                <button role="tab" aria-selected="false" data-tf="M15">M15</button><button role="tab" aria-selected="true" data-tf="H1">H1</button><button role="tab" aria-selected="false" data-tf="H4">H4</button><button role="tab" aria-selected="false" data-tf="D1">D1</button>
+              </div></header>
+            <div class="win-b"><div class="ohlc" id="termOhlc"><span>O <b>-</b></span></div>
+              <canvas class="chart" id="termChart" role="img" aria-label="EUR/USD candlestick chart with a 20-period moving average and volume. Hover to read prices."></canvas></div>
+          </article>
+          <article class="win w-calc spot">
+            <header class="win-h"><b>Position size</b><span>$10 per pip per lot</span></header>
+            <div class="win-b">          <div class="calc">
             <div class="field"><div class="field-top"><label for="calcBal">Account balance</label><output id="outBal" for="calcBal">$10,000</output></div>
               <input type="range" id="calcBal" min="500" max="100000" step="500" value="10000"></div>
             <div class="field"><div class="field-top"><label for="calcRisk">Risk per trade</label><output id="outRisk" for="calcRisk">1.0%</output></div>
@@ -544,138 +706,20 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
                 <div class="risk-tag" id="riskTag" style="color:var(--bull)">Conservative</div>
               </div>
             </div>
-          </div>
-        </article>
-
-        <article class="tile spot t-cal">
-          <div class="tile-head"><div><div class="tile-title">Economic calendar</div><div class="tile-sub" id="calSub">Countdown to release</div></div><span class="sample" id="calTag">Sample schedule</span></div>
-          <ul class="cal-list" id="calList"></ul>
-        </article>
-
-        <article class="tile spot t-sig">
-          <div class="tile-head"><div><div class="tile-title">Indicator alerts</div><div class="tile-sub">From your watchlist</div></div><span class="sample">Sample alerts</span></div>
-          <ul class="sig-list" id="sigList"></ul>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="journey section" id="journey" aria-labelledby="journeyTitle">
-    <div class="journey-viewport">
-      <div class="journey-track" id="journeyTrack">
-        <div class="journey-intro">
-          <span class="eyebrow">The path</span>
-          <h2 id="journeyTitle">Four stages. <span class="script">One library that grows with you.</span></h2>
-          <p>Every video, ebook and indicator is tagged to a stage, so you always know what to learn next.</p>
-        </div>
-        <article class="stage">
-          <span class="num chrome">01</span>
-          <h3>Foundations</h3>
-          <p>Pips, lots, leverage and spreads. How a quote is built and why price moves when it does.</p>
-          <svg class="art" viewBox="0 0 400 120" fill="none" aria-hidden="true">
-            <path class="draw" d="M0 90 C60 88 90 70 140 72 S220 92 270 60 S350 40 400 46" stroke="#e2b545" stroke-width="2.5"/>
-            <path d="M0 110H400" stroke="#2f3138"/>
-          </svg>
-          <div class="meta"><span class="chip">48 lessons</span><span class="chip">6 ebooks</span><span class="chip">Beginner</span></div>
-        </article>
-        <article class="stage">
-          <span class="num chrome">02</span>
-          <h3>Price action</h3>
-          <p>Market structure, supply and demand, and reading candles in the context of the higher timeframe.</p>
-          <svg class="art" viewBox="0 0 400 120" aria-hidden="true"><g class="candles"></g></svg>
-          <div class="meta"><span class="chip">96 lessons</span><span class="chip">12 ebooks</span><span class="chip">Intermediate</span></div>
-        </article>
-        <article class="stage">
-          <span class="num chrome">03</span>
-          <h3>Strategy &amp; risk</h3>
-          <p>Write a rule-based plan, size every position by risk instead of hope, and backtest before you go live.</p>
-          <svg class="art" viewBox="0 0 400 120" fill="none" aria-hidden="true">
-            <rect x="40" y="18" width="300" height="34" fill="rgba(46,211,160,.12)" stroke="#2ed3a0" stroke-dasharray="4 4"/>
-            <rect x="40" y="52" width="300" height="22" fill="rgba(255,93,115,.12)" stroke="#ff5d73" stroke-dasharray="4 4"/>
-            <path class="draw" d="M40 52 L110 60 L170 44 L230 38 L290 24 L340 20" stroke="#ecebe6" stroke-width="2.5"/>
-            <text x="346" y="24" fill="#2ed3a0" font-family="Space Grotesk, sans-serif" font-size="11">TP 2R</text>
-            <text x="346" y="76" fill="#ff5d73" font-family="Space Grotesk, sans-serif" font-size="11">SL 1R</text>
-          </svg>
-          <div class="meta"><span class="chip">104 lessons</span><span class="chip">14 ebooks</span><span class="chip">Intermediate</span></div>
-        </article>
-        <article class="stage">
-          <span class="num chrome">04</span>
-          <h3>Funded &amp; beyond</h3>
-          <p>Pass a prop-firm challenge, journal every trade, and scale your size only as fast as your discipline.</p>
-          <svg class="art" viewBox="0 0 400 120" fill="none" aria-hidden="true">
-            <path d="M0 100 H400" stroke="#2f3138"/>
-            <path class="draw" d="M0 96 L50 92 L90 94 L140 80 L180 84 L230 62 L270 66 L320 40 L360 44 L400 16" stroke="#2ed3a0" stroke-width="2.5"/>
-            <path d="M0 30 H400" stroke="#ebd291" stroke-dasharray="6 6" opacity=".7"/>
-            <text x="4" y="24" fill="#ebd291" font-family="Space Grotesk, sans-serif" font-size="11">PROFIT TARGET +10%</text>
-          </svg>
-          <div class="meta"><span class="chip">64 lessons</span><span class="chip">9 ebooks</span><span class="chip">Advanced</span></div>
-        </article>
-      </div>
-    </div>
-    <div class="wrap"><div class="journey-progress" aria-hidden="true"><span id="journeyBar"></span></div></div>
-  </section>
-
-  <section class="section" id="videos" aria-labelledby="videosTitle">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">E-videos</span>
-        <h2 id="videosTitle">Learn it on the chart, <span class="script">not in theory.</span></h2>
-        <p>Short lessons recorded on live charts, plus full session replays. Every video comes with the chart file and a one-page summary.</p>
-      </div>
-      <div class="filters" role="group" aria-label="Filter videos by topic">
-        <button class="filter" aria-pressed="true" data-filter="all">All</button>
-        <button class="filter" aria-pressed="false" data-filter="Price action">Price action</button>
-        <button class="filter" aria-pressed="false" data-filter="Risk">Risk</button>
-        <button class="filter" aria-pressed="false" data-filter="Psychology">Psychology</button>
-        <button class="filter" aria-pressed="false" data-filter="Indicators">Indicators</button>
-        <button class="filter" aria-pressed="false" data-filter="Live sessions">Live sessions</button>
-      </div>
-      <div class="video-grid" id="videoGrid"></div>
-    </div>
-  </section>
-
-  <section class="section ebooks" id="ebooks" aria-labelledby="ebooksTitle">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Ebooks</span>
-        <h2 id="ebooksTitle">A desk library <span class="script">you can read anywhere.</span></h2>
-        <p>Concise, illustrated guides with worked chart examples. Download as PDF or EPUB and keep them forever.</p>
-      </div>
-      <div class="shelf" id="shelf">
-        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c1"><span class="brand">88FX</span><span class="big">01</span><div><h3>The Pip Primer</h3><div class="vol">VOL. 01 · FOUNDATIONS</div></div></div><div class="spine s1"></div><div class="pages"></div></div></div>
-          <div class="book-info"><h4>The Pip Primer</h4><p>Pips, lots, margin and leverage, explained with a calculator you can follow by hand.</p><span class="mono">64 pages · PDF + EPUB</span></div></div>
-        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c2"><span class="brand">88FX</span><span class="big">02</span><div><h3>Candles in Context</h3><div class="vol">VOL. 02 · PRICE ACTION</div></div></div><div class="spine s2"></div><div class="pages"></div></div></div>
-          <div class="book-info"><h4>Candles in Context</h4><p>Why the same pin bar means different things at support, in a range and mid-trend.</p><span class="mono">128 pages · PDF + EPUB</span></div></div>
-        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c3"><span class="brand">88FX</span><span class="big">03</span><div><h3>Risk Before Reward</h3><div class="vol">VOL. 03 · STRATEGY &amp; RISK</div></div></div><div class="spine s3"></div><div class="pages"></div></div></div>
-          <div class="book-info"><h4>Risk Before Reward</h4><p>Position sizing, R-multiples and drawdown math, with a sizing sheet for every pair.</p><span class="mono">96 pages · PDF + EPUB</span></div></div>
-        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c4"><span class="brand">88FX</span><span class="big">04</span><div><h3>The Funded Trader Playbook</h3><div class="vol">VOL. 04 · FUNDED</div></div></div><div class="spine s4"></div><div class="pages"></div></div></div>
-          <div class="book-info"><h4>The Funded Trader Playbook</h4><p>Daily loss limits, trailing drawdown and a 30-day plan for passing a prop challenge.</p><span class="mono">152 pages · PDF + EPUB</span></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="indicators" aria-labelledby="indTitle">
-    <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Indicators</span>
-        <h2 id="indTitle">Tools built on the desk, <span class="script">used in every lesson.</span></h2>
-        <p>The same indicators you see in the videos, for TradingView, MT4 and MT5. Scroll to watch one draw, switch tools, hover for readings.</p>
-      </div>
-      <div class="lab">
-        <div class="chart-card">
-          <div class="chart-top">
-            <div class="ohlc" id="labOhlc"><span><b>EUR/USD</b></span><span>H1</span></div>
-            <div class="seg" role="tablist" aria-label="Indicator preview">
-              <button role="tab" aria-selected="true" data-ind="ribbon">Ribbon</button>
-              <button role="tab" aria-selected="false" data-ind="sessions">Sessions</button>
-              <button role="tab" aria-selected="false" data-ind="sweep">Sweep</button>
-            </div>
-          </div>
-          <canvas class="chart" id="labChart" role="img" aria-label="EUR/USD hourly candlestick chart with the selected indicator drawn on top"></canvas>
-          <div class="chart-foot" id="labLegend"></div>
-        </div>
-        <div class="ind-list">
-          <article class="ind spot active" data-ind="ribbon"><span class="bar"></span>
+          </div></div>
+          </article>
+          <article class="win w-lab spot">
+            <header class="win-h"><b>Indicator lab</b><span>H1</span>
+              <div class="seg" role="tablist" aria-label="Indicator preview">
+                <button role="tab" aria-selected="true" data-ind="ribbon">Ribbon</button><button role="tab" aria-selected="false" data-ind="sessions">Sessions</button><button role="tab" aria-selected="false" data-ind="sweep">Sweep</button>
+              </div></header>
+            <div class="win-b"><div class="ohlc" id="labOhlc"><span><b>EUR/USD</b></span><span>H1</span></div>
+              <canvas class="chart" id="labChart" role="img" aria-label="EUR/USD hourly candlestick chart with the selected indicator drawn on top"></canvas>
+              <div class="chart-foot" id="labLegend" style="border:0;padding:0"></div></div>
+          </article>
+          <article class="win w-ind">
+            <header class="win-h"><b>Indicators</b><span>TradingView · MT4 · MT5</span></header>
+            <div class="win-b ind-list">          <article class="ind spot active" data-ind="ribbon"><span class="bar"></span>
             <div class="ind-head"><h3>88 Trend Ribbon</h3><span class="price">PRO</span></div>
             <p>A fast and slow EMA pair with a shaded ribbon. Marks the cross and colors the trend so you only trade with it.</p>
             <div class="specs"><span class="chip">EMA 8 / 21</span><span class="chip">Alerts</span><span class="chip">TV · MT4 · MT5</span></div>
@@ -690,88 +734,132 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
             <p>Finds swing highs and lows, then flags the candle that wicks through one and closes back inside.</p>
             <div class="specs"><span class="chip">Pivot length 4</span><span class="chip">Alerts</span><span class="chip">TV · MT4 · MT5</span></div>
           </article>
-          <p class="more-ind">15 more in the library, including ATR stops, a position-size calculator and a trade journal overlay. <a href="#pricing">See plans</a></p>
+          <p class="more-ind">15 more in the library, including ATR stops, a position-size calculator and a trade journal overlay. <a href="#pricing">See plans</a></p></div>
+          </article>
+          <article class="win w-sig">
+            <header class="win-h"><b>Alerts</b><span>From your watchlist</span><span class="sample" style="margin-left:auto">Sample</span></header>
+            <div class="win-b"><ul class="sig-list" id="sigList"></ul></div>
+          </article>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap">
-    <div class="stats" aria-label="88FX in numbers (illustrative)">
-      <div class="stat"><span class="n chrome" data-to="12480">12,480</span><span class="l">Students learning</span></div>
-      <div class="stat"><span class="n chrome" data-to="64">64</span><span class="l">Countries</span></div>
-      <div class="stat"><span class="n chrome" data-to="1920">1,920</span><span class="l">Hours watched each week</span></div>
-      <div class="stat"><span class="n chrome" data-to="8">8</span><span class="l">Live sessions a month</span></div>
-    </div>
-  </div>
-
-  <section class="section" id="pricing" aria-labelledby="priceTitle">
+  <!-- NEW YORK · LIVE -->
+  <section class="sess" id="newyork" data-sess="newyork" aria-labelledby="nyTitle">
     <div class="wrap">
-      <div class="section-head">
-        <span class="eyebrow">Pricing</span>
-        <h2 id="priceTitle">One membership. <span class="script">Everything on the desk.</span></h2>
-        <p>Start free and upgrade when you are ready for the full library. Cancel any time.</p>
+      <header class="sess-h">
+        <div><p class="t"><b>New York session</b><span>13:30 – 21:00 GMT</span><span>News hits. Go live.</span></p><span class="n" aria-hidden="true">Live</span></div>
+        <div><h2 id="nyTitle">Every release, <span class="script">on the board.</span></h2>
+          <p>The economic calendar and our live classes, side by side. Times count down in your own time zone.</p></div>
+      </header>
+      <div class="ny-grid">
+        <article class="board" aria-labelledby="calBoardT">
+          <div class="board-h"><div><b id="calBoardT">Economic calendar</b><div class="tile-sub" id="calSub">Countdown to release</div></div><span class="sample" id="calTag">Sample schedule</span></div>
+          <div class="board-cols" aria-hidden="true"><span>Time to</span><span>Ccy</span><span>Event</span><span>Impact</span></div>
+          <ul class="cal-list" id="calList"></ul>
+        </article>
+        <article class="board" aria-labelledby="classBoardT">
+          <div class="board-h"><div><b id="classBoardT">Live classes</b><div class="tile-sub">With the 88FX desk</div></div><span class="sample">Sample</span></div>
+          <ul class="cal-list" id="classList" style="list-style:none;margin:0;padding:0">
+            <li class="class-row"><span class="when flap"><b>TUE</b><small>07:00 GMT</small></span><span class="what"><span class="flap">London open, live</span><small>Every Tuesday · 60 min · <span class="pill long">Live</span></small></span></li>
+            <li class="class-row"><span class="when flap"><b>WED</b><small>18:00 GMT</small></span><span class="what"><span class="flap">Higher-timeframe structure</span><small>Stage 02 class · 75 min · 14 seats left</small></span></li>
+            <li class="class-row"><span class="when flap"><b>THU</b><small>19:30 GMT</small></span><span class="what"><span class="flap">Q&amp;A: prop challenge rules</span><small>Funded track · 45 min</small></span></li>
+            <li class="class-row"><span class="when flap"><b>FRI</b><small>12:00 GMT</small></span><span class="what"><span class="flap">NFP preview, live</span><small>The 88FX desk · 60 min · <span class="pill long">Live</span></small></span></li>
+          </ul>
+          <div class="board-foot"><span>Reminders and replays live on your desk.</span><a href="account.html#live">Open your desk</a></div>
+        </article>
       </div>
-      <div class="bill" role="group" aria-label="Billing period">
-        <button aria-pressed="true" data-bill="monthly">Monthly</button>
-        <button aria-pressed="false" data-bill="yearly">Yearly <span class="save">-25%</span></button>
+    </div>
+  </section>
+
+  <!-- THE CLOSE · PLANS -->
+  <section class="sess" id="close" data-sess="close" aria-labelledby="closeTitle">
+    <div class="wrap">
+      <header class="sess-h">
+        <div><p class="t"><b>The close</b><span>21:00 GMT</span><span>Review. Plan tomorrow.</span></p><span class="n" aria-hidden="true">Climb</span></div>
+        <div><h2 id="closeTitle">Four stages. <span class="script">One ladder.</span></h2>
+          <p>Every video, ebook and indicator is tagged to a stage, so you always know the next rung. This is where a sample member stands today.</p></div>
+      </header>
+      <div class="close-grid">
+        <div class="ladder" id="ladder" aria-label="Learning path, top stage first">
+          <div class="rung" data-rung="4"><span class="lv">04</span><h3>Funded &amp; beyond</h3><span class="pill mute">Target</span><p>Pass a prop-firm challenge, journal every trade, and scale your size only as fast as your discipline.</p><div class="chips"><span class="chip">64 lessons</span><span class="chip">9 ebooks</span><span class="chip">Advanced</span></div></div>
+          <div class="rung" data-rung="3"><span class="lv">03</span><h3>Strategy &amp; risk</h3><span class="pill mute">Next</span><p>Write a rule-based plan, size every position by risk instead of hope, and backtest before you go live.</p><div class="chips"><span class="chip">104 lessons</span><span class="chip">14 ebooks</span><span class="chip">Intermediate</span></div></div>
+          <div class="rung now" data-rung="2"><span class="lv">02</span><h3>Price action</h3><span class="pill gold">You are here</span><p>Market structure, supply and demand, and reading candles in the context of the higher timeframe.</p><div class="chips"><span class="chip">96 lessons</span><span class="chip">12 ebooks</span><span class="chip">Intermediate</span></div></div>
+          <div class="rung done" data-rung="1"><span class="lv">01</span><h3>Foundations</h3><span class="pill long">Filled</span><p>Pips, lots, leverage and spreads. How a quote is built and why price moves when it does.</p><div class="chips"><span class="chip">48 lessons</span><span class="chip">6 ebooks</span><span class="chip">Beginner</span></div></div>
+          <div class="ladder-mark" id="ladderMark" aria-hidden="true"><span>Stage 02 · 38%</span></div>
+        </div>
+        <aside class="closing" aria-label="88FX in numbers (illustrative)">
+          <div class="closing-h"><b>Closing prices</b><span class="sample">Illustrative</span></div>
+          <dl style="margin:0">
+            <div class="cp"><dt>Students learning</dt><dd><span class="n" data-to="12480">12,480</span><span class="chg up">▲ 3.2% this month</span></dd></div>
+            <div class="cp"><dt>Countries</dt><dd><span class="n" data-to="64">64</span><span class="chg up">▲ 4 new</span></dd></div>
+            <div class="cp"><dt>Hours watched each week</dt><dd><span class="n" data-to="1920">1,920</span><span class="chg up">▲ 11.0%</span></dd></div>
+            <div class="cp"><dt>Live sessions a month</dt><dd><span class="n" data-to="8">8</span><span class="chg">unchanged</span></dd></div>
+          </dl>
+        </aside>
       </div>
-      <div class="plans">
-        <article class="plan spot">
-          <div><h3>Starter</h3><p class="tagline">For your first month on the charts.</p></div>
-          <div class="amount"><span class="val">$0</span><span class="per">forever</span></div>
-          <ul>
+
+      <div class="orders-h" id="pricing">
+        <div><h2>Place your order.</h2><p>Start free and upgrade when you are ready for the full library. Cancel any time.</p></div>
+        <div class="bill" role="group" aria-label="Billing period"><button aria-pressed="true" data-bill="monthly">Monthly</button><button aria-pressed="false" data-bill="yearly">Yearly <span class="save">-25%</span></button></div>
+      </div>
+      <div class="tickets">
+        <article class="ticket spot">
+          <div class="tk-top"><span class="tk-side">Buy</span><span>Market order</span></div>
+          <div class="tk-name">Starter</div>
+          <div class="tk-price"><span class="val">$0</span><span class="per">forever</span></div>
+          <ul class="tk-list">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>24 Foundations lessons</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>The Pip Primer ebook</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Trend Ribbon Lite indicator</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Position size calculator</li>
           </ul>
-          <a class="btn btn-ghost" href="#join">Start free</a>
+          <div class="tk-meta"><span>Ticket #88-0001</span><span>Fill: instant</span></div>
+          <a class="btn btn-ghost" href="#join">Place order</a>
         </article>
-        <article class="plan spot featured">
-          <span class="ring" aria-hidden="true"></span>
-          <div><span class="badge">Most popular</span><h3>Pro</h3><p class="tagline">The full library, updated every week.</p></div>
-          <div class="amount"><span class="val" id="proVal">$39</span><span class="per" id="proPer">per month</span></div>
-          <ul>
+        <article class="ticket featured spot">
+          <div class="tk-top"><span class="tk-side">Buy</span><span>Limit · GTC</span><span class="badge">Most filled</span></div>
+          <div class="tk-name">Pro</div>
+          <div class="tk-price"><span class="val" id="proVal">$39</span><span class="per" id="proPer">per month</span></div>
+          <ul class="tk-list">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>All 312 video lessons and replays</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>All 41 ebooks, PDF and EPUB</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>17 indicators for TV, MT4 and MT5</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Weekly live session at the London open</li>
           </ul>
-          <a class="btn btn-violet magnetic" href="#join">Go Pro</a>
+          <div class="tk-meta"><span>Ticket #88-0002</span><span>Fill: instant</span></div>
+          <a class="btn btn-violet magnetic" href="#join">Place order</a>
         </article>
-        <article class="plan spot">
-          <div><h3>Lifetime</h3><p class="tagline">Pay once. Keep every future update.</p></div>
-          <div class="amount"><span class="val">$699</span><span class="per">one time</span></div>
-          <ul>
+        <article class="ticket spot">
+          <div class="tk-top"><span class="tk-side">Buy</span><span>Hold forever</span></div>
+          <div class="tk-name">Lifetime</div>
+          <div class="tk-price"><span class="val">$699</span><span class="per">one time</span></div>
+          <ul class="tk-list">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Everything in Pro, forever</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>All 18 indicators, incl. Liquidity Sweep</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Private desk community</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Monthly trade review call</li>
           </ul>
-          <a class="btn btn-chrome" href="#join">Get Lifetime</a>
+          <div class="tk-meta"><span>Ticket #88-0003</span><span>Fill: instant</span></div>
+          <a class="btn btn-chrome" href="#join">Place order</a>
         </article>
       </div>
     </div>
   </section>
 
-  <section class="section" id="join" aria-labelledby="joinTitle" style="padding-top:0">
-    <div class="wrap">
-      <div class="cta-box">
-        <img class="big-88" src="88fx-logo.webp" alt="" aria-hidden="true" width="600" height="305">
-        <div>
-          <h2 id="joinTitle"><span class="chrome">Start where you are.</span> We'll take it from there.</h2>
-          <p>Get the free Foundations track and The Pip Primer today.</p>
-        </div>
-        <form class="signup" id="signup" novalidate>
-          <label for="email">Email address</label>
-          <div class="signup-row">
-            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-            <button class="btn btn-violet" type="submit">Create free account</button>
-          </div>
-          <p class="msg" id="signupMsg" aria-live="polite"></p>
-        </form>
-      </div>
+  <!-- CLOSING BELL -->
+  <section class="bell" id="join" aria-labelledby="joinTitle">
+    <img class="bell-logo" src="88fx-logo.webp" alt="" aria-hidden="true" width="600" height="305">
+    <div class="wrap bell-grid">
+      <div><span class="eyebrow">Closing bell</span>
+        <h2 id="joinTitle" style="margin-top:16px"><span class="chrome">Start where you are.</span> <span class="script">We'll take it from there.</span></h2>
+        <p>Get the free Foundations track and The Pip Primer today. Tomorrow's session starts on your desk.</p></div>
+      <form class="signup" id="signup" novalidate>
+        <label for="email">Email address</label>
+        <div class="signup-row"><input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required><button class="btn btn-violet" type="submit">Create free account</button></div>
+        <p class="msg" id="signupMsg" aria-live="polite"></p>
+      </form>
     </div>
   </section>
 </main>
@@ -779,18 +867,15 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div>
-        <a class="logo" href="#top" aria-label="88FX home"><img src="88fx-logo.webp" alt="88FX" width="600" height="305"></a>
-        <p class="about">Your trading journey. All in one place. Videos, ebooks and indicators from one desk.</p>
-      </div>
-      <div><h4>Learn</h4><ul><li><a href="#videos">Video library</a></li><li><a href="#ebooks">Ebooks</a></li><li><a href="#journey">Learning path</a></li></ul></div>
-      <div><h4>Tools</h4><ul><li><a href="#desk">The desk</a></li><li><a href="#indicators">Indicators</a></li><li><a href="#indicators">MT4 / MT5 setup</a></li></ul></div>
-      <div><h4>Account</h4><ul><li><a href="#pricing">Pricing</a></li><li><a href="#join">Start free</a></li><li><a href="account.html">Sign in</a></li></ul></div>
+      <div><a class="logo" href="#top" aria-label="88FX home"><img src="88fx-logo.webp" alt="88FX" width="600" height="305"></a>
+        <p class="about">Your trading journey. All in one place. Videos, ebooks and indicators from one desk.</p></div>
+      <div><h4>The day</h4><ul><li><a href="#asia">Learn · Asia</a></li><li><a href="#london">Tools · London</a></li><li><a href="#newyork">Live · New York</a></li><li><a href="#close">Plans · The close</a></li></ul></div>
+      <div><h4>Library</h4><ul><li><a href="#asia">Video library</a></li><li><a href="#spines">Ebooks</a></li><li><a href="#london">Indicators</a></li></ul></div>
+      <div><h4>Account</h4><ul><li><a href="account.html">Sign in</a></li><li><a href="#join">Start free</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
     </div>
-    <div class="wordmark-wrap" aria-hidden="true"><img class="wordmark" id="wordmark" src="88fx-logo.webp" alt="" width="600" height="305"></div>
     <div class="risk">
       <p><b>Risk warning.</b> Trading foreign exchange, CFDs and crypto on margin carries a high level of risk and may not be suitable for all investors. You could lose more than your initial deposit. 88FX provides education only and does not give investment advice or manage funds. Past performance and backtests are not indicative of future results.</p>
-      <p>Mock website for design purposes. Prices, counts, charts, alerts and calendar times are illustrative. © 2026 88FX.</p>
+      <p>Mock website for design purposes. Prices, counts, charts, alerts and class times are illustrative; the economic calendar is live from ForexFactory on the published site. © 2026 88FX.</p>
     </div>
   </div>
 </footer>
@@ -1025,11 +1110,6 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     if (last) { if (hasGsap) gsap.to(last, { opacity: 0, duration: .3, onComplete: () => last.remove() }); else last.remove(); } }
   if (!reduce) setInterval(pushSig, 3200);
 
-  // ---------- journey candle art ----------
-  (function () { const g = $('.stage .candles'); const b = series(26, 21, 1, 0.012); let hi = -Infinity, lo = Infinity; b.forEach(k => { hi = Math.max(hi, k.h); lo = Math.min(lo, k.l); });
-    const y = v => 112 - (v - lo) / (hi - lo) * 100;
-    g.innerHTML = b.map((k, i) => { const x = 10 + i * 15, col = k.c >= k.o ? C.bull : C.bear; return `<g class="cdl"><line x1="${x}" x2="${x}" y1="${y(k.h)}" y2="${y(k.l)}" stroke="${col}"/><rect x="${x - 4}" y="${y(Math.max(k.o, k.c))}" width="8" height="${Math.max(1.5, Math.abs(y(k.o) - y(k.c)))}" fill="${col}"/></g>`; }).join(''); })();
-
   // ---------- videos ----------
   const videos = [
     { t: 'Market structure in 20 minutes', c: 'Price action', l: 'b', d: '18:42', s: 11 }, { t: 'Supply and demand zones that hold', c: 'Price action', l: 'i', d: '32:10', s: 12 },
@@ -1237,7 +1317,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xe8c66a, size: .035, transparent: true, opacity: .85, blending: THREE.AdditiveBlending, depthWrite: false }));
     const orbit = new THREE.Group(); orbit.rotation.set(1.15, 0, -.3); scene.add(orbit); orbit.add(pts);
     const ring = new THREE.Mesh(new THREE.TorusGeometry(3.6, .008, 8, 220), new THREE.MeshBasicMaterial({ color: 0xe2b545, transparent: true, opacity: .5 })); ring.rotation.x = Math.PI / 2; orbit.add(ring);
-    function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = r.width < 560 ? 15 : 12; camera.updateProjectionMatrix(); }
+    function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = Math.max(12, 4.7 / (Math.tan(16 * Math.PI / 180) * camera.aspect)); camera.updateProjectionMatrix(); }
     size(); window.addEventListener('resize', size);
     const cur = { rx: 0, ry: 0 }; const clock = new THREE.Clock();
     three.render = () => { const t = clock.getElapsedTime();
@@ -1250,23 +1330,175 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     new IntersectionObserver(es => { three.visible = es[0].isIntersecting; }).observe(cv);
   })();
 
+
+  // ---------- ebook spines: pull one book off the shelf at a time ----------
+  const spines = $$('.spine-b');
+  spines.forEach(b => b.addEventListener('click', () => { spines.forEach(x => x.setAttribute('aria-expanded', String(x === b))); }));
+
+  // ---------- draggable workspace windows (wide screens, fine pointers) ----------
+  (function () {
+    const ws = $('#ws'); let top = 10;
+    const canDrag = () => matchMedia('(min-width: 1001px) and (pointer: fine)').matches;
+    $$('.win', ws).forEach(win => {
+      const h = $('.win-h', win); let sx = 0, sy = 0, ox = 0, oy = 0, on = false;
+      win.dataset.x = 0; win.dataset.y = 0;
+      const place = (x, y) => { win.dataset.x = x; win.dataset.y = y; win.style.transform = (x || y) ? `translate(${x}px, ${y}px)` : ''; };
+      h.addEventListener('pointerdown', e => {
+        if (!canDrag() || e.button !== 0 || e.target.closest('button, a, input')) return;
+        on = true; sx = e.clientX; sy = e.clientY; ox = +win.dataset.x; oy = +win.dataset.y;
+        win.classList.add('dragging'); win.style.zIndex = ++top; h.setPointerCapture(e.pointerId); e.preventDefault();
+      });
+      h.addEventListener('pointermove', e => {
+        if (!on) return;
+        const wr = ws.getBoundingClientRect(), r = win.getBoundingClientRect();
+        let x = ox + e.clientX - sx, y = oy + e.clientY - sy;
+        const baseL = r.left - (+win.dataset.x), baseT = r.top - (+win.dataset.y);
+        x = Math.max(wr.left - baseL + 6, Math.min(wr.right - baseL - r.width - 6, x));
+        y = Math.max(wr.top - baseT + 44, Math.min(wr.bottom - baseT - 60, y));
+        place(Math.round(x), Math.round(y));
+      });
+      const end = () => { if (!on) return; on = false; win.classList.remove('dragging'); };
+      h.addEventListener('pointerup', end); h.addEventListener('pointercancel', end);
+      h.addEventListener('dblclick', () => { if (hasGsap && !reduce) gsap.to(win, { x: 0, y: 0, duration: .5, ease: 'power3.out', onComplete: () => { win.style.transform = ''; place(0, 0); } }); else place(0, 0); });
+    });
+    addEventListener('resize', () => { if (!canDrag()) $$('.win', ws).forEach(w => { w.style.transform = ''; w.dataset.x = 0; w.dataset.y = 0; }); });
+  })();
+
+  // ---------- the trading-day clock, session rail and nav ----------
+  const SESS = [['top', 'Pre-market', 300, 360], ['asia', 'Asia', 360, 480], ['london', 'London', 480, 810], ['newyork', 'New York', 810, 1260], ['close', 'The close', 1260, 1320]];
+  const clockT = $('#clockT'), clockS = $('#clockS'), pillT = $('#pillT'), pillS = $('#pillS');
+  let lastSess = '';
+  function setDay(min, sess) {
+    const m = Math.round(min) % 1440, hh = String(Math.floor(m / 60)).padStart(2, '0'), mm = String(m % 60).padStart(2, '0');
+    clockT.innerHTML = `${hh}<i>:</i>${mm}`; pillT.textContent = `${hh}:${mm} GMT`;
+    if (sess && sess[0] !== lastSess) {
+      lastSess = sess[0]; clockS.textContent = sess[1]; pillS.textContent = sess[1]; $('.sess-pill').classList.toggle('away', sess[0] === 'top');
+      $$('.rail li').forEach(li => li.classList.toggle('on', li.dataset.sess === sess[0]));
+      $$('.topbar nav a').forEach(a => a.classList.toggle('on', a.dataset.sess === sess[0]));
+    }
+  }
+  function dayFromScroll() {
+    const mid = scrollY + innerHeight * .45; let cur = SESS[0], p = 0;
+    for (const s of SESS) { const el = document.getElementById(s[0]); if (!el) continue; const t = el.offsetTop, b = t + el.offsetHeight; if (mid >= t) { cur = s; p = Math.min(1, (mid - t) / Math.max(1, b - t)); } }
+    setDay(cur[2] + (cur[3] - cur[2]) * p, cur);
+    const max = document.documentElement.scrollHeight - innerHeight; $('#railFill').style.transform = `scaleY(${max > 0 ? scrollY / max : 0})`;
+    return max > 0 ? scrollY / max : 0;
+  }
+  addEventListener('scroll', dayFromScroll, { passive: true }); dayFromScroll();
+
   // =================== motion ===================
   if (!hasGsap) return;
   gsap.registerPlugin(ScrollTrigger); if (window.Flip) gsap.registerPlugin(Flip); if (window.ScrambleTextPlugin) gsap.registerPlugin(ScrambleTextPlugin);
   if (three.ok && !reduce) gsap.ticker.add(() => { if (three.visible) three.render(); });
 
-  // Lenis smooth scroll, driven by the GSAP ticker (one RAF loop)
+  // Lenis smooth scroll on the GSAP ticker (one RAF loop)
   if (!reduce && typeof window.Lenis !== 'undefined') {
     lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
     lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
   }
-  const headerH = () => $('.site-header').offsetHeight;
+  const barH = () => $('.topbar').offsetHeight;
   $$('a[href^="#"]').forEach(a => a.addEventListener('click', e => { const id = a.getAttribute('href'); const target = id === '#top' ? 0 : $(id); if (target === null) return; e.preventDefault();
-    if (lenis) lenis.scrollTo(target, { offset: target === 0 ? 0 : -headerH() + 1, duration: 1.4, easing: t => 1 - Math.pow(1 - t, 4) });
-    else window.scrollTo({ top: target === 0 ? 0 : target.getBoundingClientRect().top + scrollY - headerH(), behavior: reduce ? 'auto' : 'smooth' }); }));
-
+    if (lenis) lenis.scrollTo(target, { offset: target === 0 ? 0 : -barH() + 1, duration: 1.5, easing: t => 1 - Math.pow(1 - t, 4) });
+    else window.scrollTo({ top: target === 0 ? 0 : target.getBoundingClientRect().top + scrollY - barH(), behavior: reduce ? 'auto' : 'smooth' }); }));
   gsap.to('#progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
   if (reduce) return;
+
+  // ---------- the day's price line, drawn behind the page as you scroll ----------
+  const dc = $('#dayChart'), dayBars = series(480, 2026, 1.08, .0011), dayC = dayBars.map(b => b.c), dayE = ema(dayC, 18), day = { p: 0, shown: -1 };
+  function drawDay() {
+    if (Math.abs(day.p - day.shown) < .0005) return; day.shown = day.p;
+    const { ctx, w, h } = fitCanvas(dc); ctx.clearRect(0, 0, w, h);
+    const N = dayC.length, head = Math.max(40, Math.round(40 + (N - 40) * day.p)), span = Math.round(w > 900 ? 150 : 70), from = Math.max(0, head - span);
+    const vis = dayC.slice(from, head); let hi = Math.max(...vis), lo = Math.min(...vis); const pad = (hi - lo) * .35 + 1e-6; hi += pad; lo -= pad;
+    const step = (w * .78) / span, xi = i => w * .88 - (head - 1 - i) * step, y = v => h * .82 - (v - lo) / (hi - lo) * h * .46;
+    const g = ctx.createLinearGradient(0, h * .3, 0, h); g.addColorStop(0, 'rgba(226,181,69,.16)'); g.addColorStop(1, 'rgba(226,181,69,0)');
+    ctx.beginPath(); for (let i = from; i < head; i++) i === from ? ctx.moveTo(xi(i), y(dayC[i])) : ctx.lineTo(xi(i), y(dayC[i])); ctx.lineTo(xi(head - 1), h); ctx.lineTo(xi(from), h); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+    ctx.save(); ctx.strokeStyle = 'rgba(235,210,145,.55)'; ctx.lineWidth = 1.4; ctx.beginPath(); for (let i = from; i < head; i++) i === from ? ctx.moveTo(xi(i), y(dayE[i])) : ctx.lineTo(xi(i), y(dayE[i])); ctx.setLineDash([4, 6]); ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.strokeStyle = '#e2b545'; ctx.lineWidth = 2; ctx.shadowColor = '#e2b545'; ctx.shadowBlur = 12; ctx.beginPath(); for (let i = from; i < head; i++) i === from ? ctx.moveTo(xi(i), y(dayC[i])) : ctx.lineTo(xi(i), y(dayC[i])); ctx.stroke(); ctx.restore();
+    const hx = xi(head - 1), hy = y(dayC[head - 1]); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(hx, hy, 3.5, 0, 6.3); ctx.fill();
+    ctx.strokeStyle = 'rgba(226,181,69,.5)'; ctx.setLineDash([3, 5]); ctx.beginPath(); ctx.moveTo(0, hy); ctx.lineTo(w, hy); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { gsap.to(day, { p: s.progress, duration: .6, ease: 'power2.out', overwrite: true, onUpdate: drawDay }); } });
+  addEventListener('resize', () => { day.shown = -1; drawDay(); });
+  gsap.fromTo('#dayChart', { opacity: 0 }, { opacity: .26, ease: 'none', scrollTrigger: { trigger: '#asia', start: 'top bottom', end: 'top 40%', scrub: true } });
+  drawDay();
+
+  // ---------- pointer niceties ----------
+  if (fine) {
+    document.documentElement.classList.add('has-cursor'); const cur = $('#cursor'), dot = $('#cursorDot');
+    const cx = gsap.quickTo(cur, 'x', { duration: .45, ease: 'power3' }), cy = gsap.quickTo(cur, 'y', { duration: .45, ease: 'power3' });
+    const dx = gsap.quickTo(dot, 'x', { duration: .08 }), dy = gsap.quickTo(dot, 'y', { duration: .08 });
+    addEventListener('pointermove', e => { cx(e.clientX); cy(e.clientY); dx(e.clientX); dy(e.clientY); three.mx = (e.clientX / innerWidth - .5) * 2; three.my = (e.clientY / innerHeight - .5) * 2; });
+    document.addEventListener('pointerover', e => { const t = e.target.closest('a, button, [data-cursor], input, .ind, canvas.chart, .win-h');
+      const label = t && (t.dataset.cursor || (t.classList.contains('win-h') ? 'Drag' : '')); cur.textContent = label || ''; cur.classList.toggle('is-label', !!label);
+      gsap.to(cur, { scale: label ? 1.9 : t ? 1.5 : 1, duration: .35, ease: 'power3.out' }); });
+    $$('.magnetic').forEach(btn => { const xTo = gsap.quickTo(btn, 'x', { duration: .5, ease: 'power3' }), yTo = gsap.quickTo(btn, 'y', { duration: .5, ease: 'power3' });
+      btn.addEventListener('pointermove', e => { const r = btn.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * .3); yTo((e.clientY - r.top - r.height / 2) * .4); });
+      btn.addEventListener('pointerleave', () => { xTo(0); yTo(0); }); });
+  }
+
+  // ---------- pre-market: the open ----------
+  const scramble = (el, d = 1, chars = '0123456789$%#/88FX') => window.ScrambleTextPlugin ? gsap.to(el, { duration: d, scrambleText: { text: el.textContent, chars, speed: .5 } }) : null;
+  document.fonts.ready.then(() => {
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+    tl.from('.pre h1 .line-in', { yPercent: 115, duration: 1.3, stagger: .18 }, .15)
+      .from('.pre-stage', { opacity: 0, scale: 1.08, duration: 1.8 }, 0)
+      .from('.pre-eyebrow > *', { y: 14, opacity: 0, duration: .8, stagger: .08 }, .1)
+      .from('.pre-foot > *, .pre-side > *', { y: 24, opacity: 0, duration: 1, stagger: .08 }, .55)
+      .from('.topbar', { yPercent: -100, duration: 1 }, .2)
+      .from('.rail > *', { x: -20, opacity: 0, duration: .9, stagger: .1 }, .5);
+  });
+  ScrollTrigger.create({ trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true, onUpdate: s => { three.scroll = s.progress; } });
+  gsap.to('.pre-copy', { yPercent: -14, opacity: .3, ease: 'none', scrollTrigger: { trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true } });
+  gsap.to('.hero-photo img', { yPercent: 6, scale: 1.1, ease: 'none', scrollTrigger: { trigger: '.pre', start: 'top top', end: 'bottom top', scrub: true } });
+  const tapeLoop = gsap.to('#tapeTrack', { xPercent: -50, duration: 46, ease: 'none', repeat: -1 });
+  let tapeIdle; ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { const v = s.getVelocity();
+    gsap.to(tapeLoop, { timeScale: (v < 0 ? -1 : 1) * (1 + Math.min(6, Math.abs(v) / 300)), duration: .2, overwrite: true });
+    clearTimeout(tapeIdle); tapeIdle = setTimeout(() => gsap.to(tapeLoop, { timeScale: 1, duration: 1.2, overwrite: true }), 180); } });
+
+  // ---------- session headers: the big word fills with gold as the session opens ----------
+  $$('.sess-h').forEach(head => {
+    const tl = gsap.timeline({ scrollTrigger: { trigger: head, start: 'top 82%' } });
+    const t = $('.t', head); if (t) { const s = scramble($('b', t), .9); if (s) tl.add(s, 0); }
+    tl.from($$('h2, p', head), { y: 30, opacity: .2, duration: 1, stagger: .1, ease: 'power3.out' }, .05);
+    gsap.fromTo($('.n', head), { '--fill': '0%' }, { '--fill': '100%', ease: 'none', scrollTrigger: { trigger: head, start: 'top 85%', end: 'bottom 45%', scrub: true } });
+  });
+
+  // ---------- Asia: the reel runs sideways while the section is pinned ----------
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 900px)', () => {
+    const track = $('#videoGrid'); const dist = () => Math.max(0, track.scrollWidth - innerWidth + 40);
+    gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#reelPin', start: () => 'center ' + Math.round(barH() + (innerHeight - barH()) / 2), end: () => '+=' + dist(), pin: true, scrub: 1, invalidateOnRefresh: true } });
+  });
+  ScrollTrigger.batch('.video', { start: 'top 92%', once: true, onEnter: b => gsap.from(b, { y: 50, opacity: .2, rotateY: -12, transformPerspective: 900, duration: 1, stagger: .07, ease: 'power3.out', clearProps: 'opacity,y,rotateY,transformPerspective' }) });
+  gsap.from('.spine-b', { y: 60, rotate: -3, opacity: .25, stagger: .08, duration: 1, ease: 'power3.out', transformOrigin: '50% 100%', scrollTrigger: { trigger: '#spines', start: 'top 85%' } });
+
+  // ---------- London: windows open one by one; charts draw in ----------
+  gsap.from('.win', { y: 40, scale: .96, opacity: .2, duration: .9, stagger: .09, ease: 'power3.out', clearProps: 'scale,opacity,y', scrollTrigger: { trigger: '#ws', start: 'top 80%' } });
+  ScrollTrigger.create({ trigger: '#termChart', start: 'top 85%', once: true, onEnter: () => gsap.fromTo(term, { p: .05 }, { p: 1, duration: 1.8, ease: 'power3.out', onUpdate: term.draw }) });
+  gsap.fromTo(lab, { p: .1 }, { p: 1, ease: 'none', onUpdate: lab.draw, scrollTrigger: { trigger: '.w-lab', start: 'top 85%', end: 'bottom 60%', scrub: .6 } });
+
+  // ---------- New York: split-flap boards flip when they change ----------
+  const FLAP = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  function flapIn(cells) {
+    cells.forEach((c, i) => {
+      gsap.fromTo(c, { rotateX: -90, transformPerspective: 400 }, { rotateX: 0, duration: .5, delay: i * .045, ease: 'back.out(1.6)', clearProps: 'transform' });
+      if (window.ScrambleTextPlugin && c.childElementCount === 0 && !c.classList.contains('cd')) gsap.to(c, { duration: .8, delay: i * .045, scrambleText: { text: c.textContent, chars: FLAP, speed: .7 } });
+    });
+  }
+  new MutationObserver(() => flapIn($$('#calList .cd, #calList .ccy, #calList .ev-t'))).observe($('#calList'), { childList: true });
+  ScrollTrigger.create({ trigger: '.ny-grid', start: 'top 80%', once: true, onEnter: () => { flapIn($$('#calList .cd, #calList .ccy, #calList .ev-t')); flapIn($$('#classList .flap')); } });
+
+  // ---------- the close: climb the ladder, count the closing prices, tear off tickets ----------
+  const ladder = $('#ladder'), mark = $('#ladderMark');
+  const rungY = n => { const r = $(`.rung[data-rung="${n}"]`, ladder); return r.offsetTop + 31; };
+  gsap.set(mark, { y: () => rungY(1) });
+  gsap.to(mark, { y: () => rungY(2) - (rungY(2) - rungY(3)) * .38, ease: 'none', scrollTrigger: { trigger: ladder, start: 'top 70%', end: 'bottom 50%', scrub: 1, invalidateOnRefresh: true } });
+  gsap.from('.rung', { x: 30, opacity: .25, duration: .9, stagger: .1, ease: 'power3.out', scrollTrigger: { trigger: ladder, start: 'top 80%' } });
+  $$('.cp .n').forEach(el => { const to = +el.dataset.to, o = { v: Math.round(to * .4) };
+    gsap.to(o, { v: to, duration: 2, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true }, onUpdate: () => el.textContent = Math.round(o.v).toLocaleString('en-US') }); });
+  gsap.from('.ticket', { y: 80, rotateX: 18, opacity: .2, transformOrigin: '50% 0%', duration: 1.1, stagger: .12, ease: 'power3.out', clearProps: 'transform,opacity', scrollTrigger: { trigger: '.tickets', start: 'top 85%' } });
+  gsap.from('.bell-logo', { yPercent: 30, xPercent: 10, rotate: -6, ease: 'none', scrollTrigger: { trigger: '.bell', start: 'top bottom', end: 'bottom top', scrub: true } });
 
   // ---------- bats: neon-outline bats with erratic flight; scroll disturbs them, the cursor scatters them ----------
   const bats = (() => {
@@ -1377,110 +1609,10 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     return { tick, burst };
   })();
   gsap.ticker.add(bats.tick);
-  // a colony takes off from the chrome 88 when the page opens
-  setTimeout(() => { const r = $('#heroVisual').getBoundingClientRect(); bats.burst(r.left + r.width / 2, r.top + r.height * .45, 26); }, 700);
-  // clicking the hero (not a control) sends another swarm
-  $('.hero').addEventListener('click', e => { if (e.target.closest('a, button')) return; bats.burst(e.clientX, e.clientY, 12, .9); });
+  // a colony takes off from the chrome 88 at the open
+  setTimeout(() => { const r = $('#heroVisual').getBoundingClientRect(); bats.burst(r.left + r.width / 2, r.top + r.height * .48, 24); }, 900);
+  $('.pre').addEventListener('click', e => { if (e.target.closest('a, button')) return; bats.burst(e.clientX, e.clientY, 12, .9); });
 
-
-  if (fine) {
-    // custom cursor
-    document.documentElement.classList.add('has-cursor'); const cur = $('#cursor'), dot = $('#cursorDot');
-    const cx = gsap.quickTo(cur, 'x', { duration: .45, ease: 'power3' }), cy = gsap.quickTo(cur, 'y', { duration: .45, ease: 'power3' });
-    const dx = gsap.quickTo(dot, 'x', { duration: .08 }), dy = gsap.quickTo(dot, 'y', { duration: .08 });
-    window.addEventListener('pointermove', e => { cx(e.clientX); cy(e.clientY); dx(e.clientX); dy(e.clientY); three.mx = (e.clientX / innerWidth - .5) * 2; three.my = (e.clientY / innerHeight - .5) * 2; });
-    document.addEventListener('pointerover', e => { const t = e.target.closest('a, button, [data-cursor], input, .ind, .book-wrap, canvas.chart');
-      const label = t && t.dataset.cursor; cur.textContent = label || ''; cur.classList.toggle('is-label', !!label);
-      gsap.to(cur, { scale: label ? 1.9 : t ? 1.5 : 1, duration: .35, ease: 'power3.out' }); });
-    // magnetic buttons
-    $$('.magnetic').forEach(btn => { const xTo = gsap.quickTo(btn, 'x', { duration: .5, ease: 'power3' }), yTo = gsap.quickTo(btn, 'y', { duration: .5, ease: 'power3' });
-      btn.addEventListener('pointermove', e => { const r = btn.getBoundingClientRect(); xTo((e.clientX - r.left - r.width / 2) * .3); yTo((e.clientY - r.top - r.height / 2) * .4); });
-      btn.addEventListener('pointerleave', () => { xTo(0); yTo(0); }); });
-    // HUD parallax
-    $$('.hero-visual .hud').forEach(h => { const d = +h.dataset.depth; const hx = gsap.quickTo(h, 'x', { duration: 1, ease: 'power3' }), hy = gsap.quickTo(h, 'y', { duration: 1, ease: 'power3' });
-      window.addEventListener('pointermove', e => { hx((e.clientX / innerWidth - .5) * -24 * d); hy((e.clientY / innerHeight - .5) * -18 * d); }); });
-    // ebook shelf tilts with the pointer
-    const shelf = $('#shelf'), tilts = $$('.book-tilt');
-    shelf.addEventListener('pointermove', e => { const r = shelf.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-      gsap.to(tilts, { rotateY: px * 18, rotateX: -py * 10, duration: .8, ease: 'power3.out' }); });
-    shelf.addEventListener('pointerleave', () => gsap.to(tilts, { rotateY: 0, rotateX: 0, duration: 1, ease: 'power3.out' }));
-  }
-
-  // ambient motion: aurora drift, grid floor runs toward you, chrome sheen sweeps, HUD floats
-  gsap.to('.aurora.a1', { x: -80, y: 60, scale: 1.15, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-  gsap.to('.aurora.a2', { x: 90, y: -40, scale: 1.2, duration: 11, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-  gsap.to('.grid-floor', { backgroundPosition: '0px 64px', duration: 2.4, ease: 'none', repeat: -1 });
-  $$('.hero-visual .hud').forEach((h, i) => gsap.to(h, { yPercent: i % 2 ? 8 : -8, duration: 3 + i, ease: 'sine.inOut', yoyo: true, repeat: -1 }));
-  $$('.chrome').forEach((el, i) => gsap.fromTo(el, { backgroundPosition: '160% 0, 0 0' }, { backgroundPosition: '-60% 0, 0 0', duration: 1.8, ease: 'power2.inOut', delay: 1.2 + (i % 5) * .7, repeat: -1, repeatDelay: 4.5 }));
-
-  // hero intro: plays on load
-  const scramble = (el, d = 1.2) => window.ScrambleTextPlugin ? gsap.to(el, { duration: d, scrambleText: { text: el.textContent, chars: '0123456789$%#/88FX', speed: .5 } }) : null;
-  document.fonts.ready.then(() => {
-    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
-    tl.from('.hero h1 .line-in', { yPercent: 115, rotate: 3, duration: 1.3, stagger: .12 }, .1)
-      .from('#heroVisual', { scale: .85, opacity: 0, duration: 1.6 }, 0)
-      .from('.hero-sub', { y: 24, opacity: 0, duration: 1 }, .45)
-      .from('.hero-actions > *', { y: 24, opacity: 0, duration: .9, stagger: .08 }, .55)
-      .from('.compat > *', { y: 10, opacity: 0, duration: .6, stagger: .05 }, .7)
-      .from('.hud', { y: 30, opacity: 0, scale: .9, duration: 1, stagger: .12 }, .8);
-    const s = scramble($('.hero .eyebrow')); if (s) tl.add(s, 0);
-  });
-  // scroll: 3D object lifts and turns as the hero leaves; copy drifts
-  ScrollTrigger.create({ trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true, onUpdate: s => { three.scroll = s.progress; } });
-  gsap.to('.hero-photo img', { yPercent: 6, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-  gsap.to('.hero-copy', { yPercent: -16, opacity: .35, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
-
-  // ticker marquee speeds up (and reverses) with scroll velocity
-  const tapeLoop = gsap.to('#tapeTrack', { xPercent: -50, duration: 46, ease: 'none', repeat: -1 });
-  let tapeIdle; ScrollTrigger.create({ start: 0, end: 'max', onUpdate: s => { const v = s.getVelocity();
-    gsap.to(tapeLoop, { timeScale: (v < 0 ? -1 : 1) * (1 + Math.min(6, Math.abs(v) / 300)), duration: .2, overwrite: true });
-    clearTimeout(tapeIdle); tapeIdle = setTimeout(() => gsap.to(tapeLoop, { timeScale: 1, duration: 1.2, overwrite: true }), 180); } });
-
-  // section heads
-  $$('.section-head, .journey-intro').forEach(head => {
-    const tl = gsap.timeline({ scrollTrigger: { trigger: head, start: 'top 85%' } });
-    const eb = $('.eyebrow', head); if (eb) { const s = scramble(eb, 1); if (s) tl.add(s, 0); }
-    tl.from($('h2', head), { y: 36, opacity: .2, duration: 1, ease: 'power3.out' }, .05).from($('p', head), { y: 20, opacity: .25, duration: .9, ease: 'power3.out' }, .2);
-  });
-
-  // bento
-  gsap.from('.tile', { y: 60, opacity: .2, rotateX: 6, transformPerspective: 1000, duration: 1, stagger: .1, ease: 'power3.out', clearProps: 'transform', scrollTrigger: { trigger: '.bento', start: 'top 85%' } });
-  ScrollTrigger.create({ trigger: '#termChart', start: 'top 85%', once: true, onEnter: () => gsap.fromTo(term, { p: .05 }, { p: 1, duration: 1.8, ease: 'power3.out', onUpdate: term.draw }) });
-
-  // journey: pinned horizontal rail on wide screens
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 900px)', () => {
-    const trackEl = $('#journeyTrack'), vp = $('.journey-viewport'); const dist = () => Math.max(0, trackEl.scrollWidth - vp.clientWidth);
-    const tween = gsap.to(trackEl, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: '#journey', start: 'top top+=' + headerH(), end: () => '+=' + dist(), pin: true, scrub: 1, invalidateOnRefresh: true,
-      onUpdate: s => gsap.set('#journeyBar', { scaleX: s.progress }) } });
-    $$('.stage').forEach(st => { const tl = gsap.timeline({ scrollTrigger: { trigger: st, containerAnimation: tween, start: 'left 95%', end: 'left 40%', scrub: true } });
-      tl.from(st, { rotateY: -14, rotateZ: 1.5, y: 40, transformPerspective: 1200, ease: 'none' });
-      $$('.draw', st).forEach(p => { const L = p.getTotalLength(); gsap.set(p, { strokeDasharray: L }); tl.fromTo(p, { strokeDashoffset: L }, { strokeDashoffset: 0, ease: 'none' }, 0); });
-      const cd = $$('.cdl', st); if (cd.length) tl.from(cd, { scaleY: 0, transformOrigin: '50% 100%', stagger: .02, ease: 'none' }, 0); });
-  });
-  mm.add('(max-width: 899px)', () => { $$('.stage').forEach(st => { const tl = gsap.timeline({ scrollTrigger: { trigger: st, start: 'top 85%' } });
-    tl.from(st, { y: 40, opacity: .25, duration: .8, ease: 'power3.out' });
-    $$('.draw', st).forEach(p => { const L = p.getTotalLength(); gsap.set(p, { strokeDasharray: L }); tl.fromTo(p, { strokeDashoffset: L }, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut' }, .1); }); }); });
-
-  // videos
-  ScrollTrigger.batch('.video', { start: 'top 92%', once: true, onEnter: b => gsap.from(b, { y: 60, opacity: .2, duration: 1, stagger: .08, ease: 'power3.out', clearProps: 'opacity,y' }) });
-
-  // ebooks
-  gsap.from('.book', { rotateY: -80, y: 80, stagger: .12, ease: 'none', clearProps: 'transform', scrollTrigger: { trigger: '#shelf', start: 'top 95%', end: 'top 40%', scrub: 1 } });
-  gsap.from('.book-info', { y: 24, opacity: .25, stagger: .1, duration: .8, ease: 'power3.out', scrollTrigger: { trigger: '#shelf', start: 'top 75%' } });
-
-  // indicator lab draws with scroll
-  gsap.fromTo(lab, { p: .1 }, { p: 1, ease: 'none', onUpdate: lab.draw, scrollTrigger: { trigger: '.chart-card', start: 'top 85%', end: 'bottom 65%', scrub: .6 } });
-
-  // stats odometers
-  $$('.stat .n').forEach(el => { const to = +el.dataset.to, o = { v: Math.round(to * .4) };
-    gsap.to(o, { v: to, duration: 2, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true }, onUpdate: () => el.textContent = Math.round(o.v).toLocaleString('en-US') }); });
-
-  // pricing, CTA, wordmark
-  gsap.from('.plan', { y: 70, opacity: .2, stagger: .12, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: '.plans', start: 'top 85%' } });
-  gsap.from('.big-88', { yPercent: 35, xPercent: 12, rotate: -6, ease: 'none', scrollTrigger: { trigger: '.cta-box', start: 'top bottom', end: 'bottom top', scrub: true } });
-  gsap.from('#wordmark', { yPercent: 40, scaleY: .6, opacity: .3, transformOrigin: '50% 100%', ease: 'none', scrollTrigger: { trigger: '#wordmark', start: 'top bottom', end: 'bottom 85%', scrub: true } });
-
-  window.addEventListener('load', () => ScrollTrigger.refresh());
+  addEventListener('load', () => ScrollTrigger.refresh());
 })();
 </script>
