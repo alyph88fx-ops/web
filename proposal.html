@@ -731,6 +731,72 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 .presenting .nav:not(:hover) { opacity: .0; pointer-events: none; transition: opacity .5s; }
 .presenting #progress { opacity: 1; }
 
+/* ---------- founders ---------- */
+@property --dev { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --lr { syntax: "<length>"; inherits: true; initial-value: 0px; }
+.founders { overflow-x: clip; }
+.fd-head { margin-bottom: clamp(40px, 6vw, 72px); }
+.fd-head h2 { font-size: clamp(34px, 4.4vw, 64px); }
+@media (min-width: 721px) {
+  .fd-head { margin-bottom: clamp(32px, 4vw, 52px); max-width: none; }
+  .fd-grid .fd-frame { max-height: none; }
+  .fd-grid .fd { width: min(100%, calc(52vh * .75), 440px); width: min(100%, calc(52svh * .75), 440px); }
+  .fd-grid .fd[data-i="1"] { justify-self: end; }
+  .fd-grid .fd[data-i="2"] { justify-self: start; }
+}
+.fd-grid { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(56px, 8vw, 120px); max-width: 1060px; margin: 0 auto; }
+.fd { position: relative; min-width: 0; }
+.fd[data-i="2"] { margin-top: clamp(40px, 8vw, 110px); }
+@media (max-height: 900px) and (min-width: 900px) { .fd[data-i="2"] { margin-top: 28px; } }
+.fd-frame { position: relative; aspect-ratio: 3 / 4; width: 100%; max-height: 64vh; max-height: 64svh; overflow: hidden; border-radius: var(--radius); background: var(--ink); border: 1px solid var(--line-2); isolation: isolate; touch-action: pan-y; cursor: crosshair; --dev: 1; --mx: 50%; --my: 40%; box-shadow: 0 50px 100px -50px #000, 0 0 0 1px rgba(255,255,255,.03) inset; }
+.fd-frame:focus-visible { outline-offset: 6px; }
+.fd-print, .fd-xray { position: absolute; inset: 0; background: var(--ink); background-image: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent) 1px, transparent 1px); background-size: 28px 28px; }
+.fd-tint { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .3; filter: grayscale(1) contrast(1.15); }
+.fd-print::after, .fd-xray::after { content: ""; position: absolute; inset: 0; background: var(--accent); mix-blend-mode: color; opacity: .9; pointer-events: none; }
+.fd-lines { position: absolute; inset: 0; z-index: 1; background: color-mix(in srgb, var(--accent) 70%, #fff); -webkit-mask: var(--src) center / cover no-repeat; mask: var(--src) center / cover no-repeat; filter: drop-shadow(0 0 5px var(--accent)); }
+.fd-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; clip-path: inset(0 0 calc((1 - var(--dev)) * 100%) 0); transition: filter .6s; }
+.fd-xray { z-index: 3; -webkit-mask: radial-gradient(circle var(--lr) at var(--mx) var(--my), #000 97%, transparent 100%); mask: radial-gradient(circle var(--lr) at var(--mx) var(--my), #000 97%, transparent 100%); transition: --lr .45s cubic-bezier(.2,.8,.2,1); }
+.fd-lens { position: absolute; z-index: 4; left: var(--mx); top: var(--my); width: calc(var(--lr) * 2); height: calc(var(--lr) * 2); transform: translate(-50%, -50%); border-radius: 50%; border: 1px solid var(--accent); box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 0 30px color-mix(in srgb, var(--accent) 50%, transparent), inset 0 0 20px color-mix(in srgb, var(--accent) 30%, transparent); pointer-events: none; opacity: 0; transition: opacity .3s, --lr .45s cubic-bezier(.2,.8,.2,1); }
+.fd-lens::before, .fd-lens::after { content: ""; position: absolute; left: 50%; top: 50%; background: var(--accent); opacity: .7; }
+.fd-lens::before { width: 14px; height: 1px; margin-left: -7px; } .fd-lens::after { width: 1px; height: 14px; margin-top: -7px; }
+.fd-frame.lens { --lr: clamp(64px, 9vw, 104px); }
+.fd-frame.lens .fd-lens { opacity: 1; }
+.fd-scan { position: absolute; z-index: 5; left: 0; right: 0; top: calc(var(--dev) * 100%); height: 2px; margin-top: -1px; background: color-mix(in srgb, var(--accent) 60%, #fff); box-shadow: 0 0 14px 3px var(--accent), 0 0 60px 10px color-mix(in srgb, var(--accent) 40%, transparent); opacity: 0; pointer-events: none; }
+.fd-frame.developing .fd-scan { opacity: 1; }
+.fd-corners { position: absolute; z-index: 6; inset: 12px; pointer-events: none; --c: color-mix(in srgb, var(--accent) 80%, #fff); --k: 22px;
+  background: linear-gradient(var(--c), var(--c)) left top / var(--k) 1.5px, linear-gradient(var(--c), var(--c)) left top / 1.5px var(--k),
+    linear-gradient(var(--c), var(--c)) right top / var(--k) 1.5px, linear-gradient(var(--c), var(--c)) right top / 1.5px var(--k),
+    linear-gradient(var(--c), var(--c)) left bottom / var(--k) 1.5px, linear-gradient(var(--c), var(--c)) left bottom / 1.5px var(--k),
+    linear-gradient(var(--c), var(--c)) right bottom / var(--k) 1.5px, linear-gradient(var(--c), var(--c)) right bottom / 1.5px var(--k);
+  background-repeat: no-repeat; }
+.fd-fig, .fd-dim { position: absolute; z-index: 6; font: 500 10.5px/1 var(--f-mono); letter-spacing: .16em; color: #fff; padding: 6px 8px; background: rgba(0,0,0,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 4px; pointer-events: none; }
+.fd-fig { left: 22px; top: 22px; } .fd-dim { right: 22px; bottom: 22px; color: color-mix(in srgb, var(--accent) 60%, #fff); }
+.fd-meta { display: flex; gap: 18px; align-items: flex-start; margin-top: 22px; }
+.fd-no { font: 650 clamp(40px, 4.4vw, 60px)/.8 var(--f-display); font-stretch: var(--h-stretch); letter-spacing: -.04em; color: transparent; -webkit-text-stroke: 1px var(--line-2); flex: none; }
+.fd-meta h3 { font-size: clamp(24px, 2.3vw, 34px); line-height: 1.05; }
+.fd-title { display: block; margin-bottom: 8px; font: 500 11.5px/1 var(--f-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+.fd-roles { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.fd-roles li { display: inline-flex; align-items: center; gap: 10px; font: 500 12px/1.4 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.fd-roles li::before { content: ""; width: 18px; height: 1px; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.fd-link { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+.fd-link > path { fill: none; stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 4 6; filter: drop-shadow(0 0 4px var(--accent)); }
+.fd-node circle { fill: var(--ink); stroke: var(--accent); stroke-width: 1.4; }
+.fd-node .plus { fill: none; stroke: var(--fg); stroke-width: 1.6; stroke-linecap: round; }
+.fd-node { transform-box: fill-box; }
+.fd-sum { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 14px; margin-top: clamp(40px, 6vw, 72px); font: 500 12px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.fd-sum span { padding: 10px 14px; border: 1px solid var(--line-2); border-radius: 999px; background: color-mix(in srgb, var(--panel) 70%, transparent); }
+.fd-sum i { font-style: normal; color: var(--dim); }
+.fd-sum b { font-weight: 500; color: var(--accent-ink); background: var(--accent); padding: 10px 16px; border-radius: 999px; }
+:root[data-brand="1pc"] :is(.fd-frame, .fd-fig, .fd-dim, .fd-sum span, .fd-sum b) { border-radius: 0; }
+:root[data-brand="1pc"] .fd-frame { --cut: 20px; clip-path: var(--chamfer); }
+:root[data-brand="1pc"] .fd-meta h3 { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; }
+@media (max-width: 720px) {
+  .fd-grid { grid-template-columns: 1fr; gap: 56px; }
+  .fd[data-i="2"] { margin-top: 0; }
+  .fd-frame { max-height: none; }
+  .fd-link { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
@@ -744,6 +810,7 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
   <div class="wrap nav-in">
     <a class="logo" href="#top" aria-label="Trading Brand Blueprint, back to top"><img data-logo src="88fx-logo.webp" alt="88FX" width="600" height="305"><span class="wm"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="2"/><path d="M2.5 9h19M2.5 15h19M9 2.5v19M15 2.5v19"/><path d="M9 15 15 9" stroke-width="2.2"/></svg><b>Blueprint</b></span><span class="tag">IB · 2026</span></a>
     <nav class="nav-links" aria-label="Sections">
+      <a href="#founders">Founders</a>
       <a href="#shift">The shift</a>
       <a href="#structure">Structure</a>
       <a href="#ecosystem">Ecosystem</a>
@@ -808,6 +875,50 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
       </div>
     </div>
     <span class="cue" aria-hidden="true"></span>
+  </section>
+
+  <!-- FOUNDERS -->
+  <section class="sec founders" id="founders" aria-labelledby="h-founders">
+    <div class="wrap">
+      <div class="sec-head fd-head">
+        <p class="eyebrow" data-scramble><b>Introduction</b><i>—</i>The founders</p>
+        <h2 id="h-founders" class="ti">The people drawing the <span class="accent">blueprint</span>.</h2>
+      </div>
+      <div class="fd-grid" id="fdGrid">
+        <svg class="fd-link" id="fdLink" aria-hidden="true"><path d=""/><g class="fd-node-pos"><g class="fd-node"><circle r="17"/><path class="plus" d="M-6 0H6M0 -6V6"/></g></g></svg>
+        <article class="fd" data-i="1">
+          <div class="fd-frame" tabindex="0" role="img" aria-label="Portrait of Alyph Farhan, Founder. Hover, or tap and drag, to see the blueprint drawing.">
+            <div class="fd-print" aria-hidden="true"><img class="fd-tint" src="founder-1.webp" alt="" width="900" height="1200"><i class="fd-lines" style="--src:url(founder-1-lines.webp)"></i></div>
+            <img class="fd-photo" src="founder-1.webp" alt="" width="900" height="1200">
+            <div class="fd-xray" aria-hidden="true"><img class="fd-tint" src="founder-1.webp" alt="" width="900" height="1200"><i class="fd-lines" style="--src:url(founder-1-lines.webp)"></i></div>
+            <i class="fd-lens" aria-hidden="true"></i>
+            <i class="fd-scan" aria-hidden="true"></i>
+            <i class="fd-corners" aria-hidden="true"></i>
+            <span class="fd-fig" aria-hidden="true">FIG. 01</span><span class="fd-dim" aria-hidden="true">900 × 1200</span>
+          </div>
+          <div class="fd-meta">
+            <span class="fd-no" aria-hidden="true">01</span>
+            <div><span class="fd-title">Founder</span><h3>Alyph Farhan</h3><ul class="fd-roles"><li>Strategist</li><li>Brand coordinator</li></ul></div>
+          </div>
+        </article>
+        <article class="fd" data-i="2">
+          <div class="fd-frame" tabindex="0" role="img" aria-label="Portrait of Haqim Izaaq, Co-Founder. Hover, or tap and drag, to see the blueprint drawing.">
+            <div class="fd-print" aria-hidden="true"><img class="fd-tint" src="founder-2.webp" alt="" width="900" height="1200"><i class="fd-lines" style="--src:url(founder-2-lines.webp)"></i></div>
+            <img class="fd-photo" src="founder-2.webp" alt="" width="900" height="1200">
+            <div class="fd-xray" aria-hidden="true"><img class="fd-tint" src="founder-2.webp" alt="" width="900" height="1200"><i class="fd-lines" style="--src:url(founder-2-lines.webp)"></i></div>
+            <i class="fd-lens" aria-hidden="true"></i>
+            <i class="fd-scan" aria-hidden="true"></i>
+            <i class="fd-corners" aria-hidden="true"></i>
+            <span class="fd-fig" aria-hidden="true">FIG. 02</span><span class="fd-dim" aria-hidden="true">900 × 1200</span>
+          </div>
+          <div class="fd-meta">
+            <span class="fd-no" aria-hidden="true">02</span>
+            <div><span class="fd-title">Co-Founder</span><h3>Haqim Izaaq</h3><ul class="fd-roles"><li>Strategist</li><li>Creative director</li></ul></div>
+          </div>
+        </article>
+      </div>
+      <p class="fd-sum" aria-label="Strategy, brand and creative: one blueprint"><span>Strategy</span><i>+</i><span>Brand</span><i>+</i><span>Creative</span><i>=</i><b>One blueprint</b></p>
+    </div>
   </section>
 
   <!-- THESIS / CYCLE -->
@@ -1206,7 +1317,7 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 <footer>
   <div class="wrap foot">
     <a class="logo" href="#top" aria-label="Back to top"><img data-logo src="88fx-logo.webp" alt="88FX" width="600" height="305"><span class="wm"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="2"/><path d="M2.5 9h19M2.5 15h19M9 2.5v19M15 2.5v19"/><path d="M9 15 15 9" stroke-width="2.2"/></svg><b>Blueprint</b></span></a>
-    <nav aria-label="Footer"><a href="#shift">The shift</a><a href="#structure">Structure</a><a href="#ecosystem">Ecosystem</a><a href="#portfolio">Portfolio</a><a href="#process">Process</a></nav>
+    <nav aria-label="Footer"><a href="#founders">Founders</a><a href="#shift">The shift</a><a href="#structure">Structure</a><a href="#ecosystem">Ecosystem</a><a href="#portfolio">Portfolio</a><a href="#process">Process</a></nav>
     <small>© 2026 Blueprint · 88FX · 1 Percent Club. Proposal draft. Visuals are illustrative, not trading advice. Trading involves risk.</small>
   </div>
 </footer>
@@ -1436,6 +1547,29 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
     el.addEventListener('pointerleave', () => { el.style.transform = ''; });
   });
 
+  /* founders: connector between the portraits, and the x-ray lens */
+  const fdGrid = q('#fdGrid'), fdLink = q('#fdLink');
+  function fdLayout() {
+    if (!fdGrid || getComputedStyle(fdLink).display === 'none') return;
+    const g = fdGrid.getBoundingClientRect(); const [a, b] = qa('.fd-frame', fdGrid).map(f => f.getBoundingClientRect());
+    const x1 = a.right - g.left + 10, y1 = a.top - g.top + a.height * .42, x2 = b.left - g.left - 10, y2 = b.top - g.top + b.height * .58, mx = (x1 + x2) / 2;
+    fdLink.setAttribute('viewBox', `0 0 ${g.width} ${g.height}`);
+    const path = fdLink.querySelector(':scope > path'); path.setAttribute('d', `M${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    const L = path.getTotalLength(), mid = path.getPointAtLength(L / 2);
+    fdLink.querySelector('.fd-node-pos').setAttribute('transform', `translate(${mid.x} ${mid.y})`);
+    fdLink.dataset.len = L;
+  }
+  fdLayout(); addEventListener('resize', fdLayout); if (document.fonts) document.fonts.ready.then(fdLayout);
+  qa('.fd-frame').forEach(f => {
+    const set = e => { const r = f.getBoundingClientRect(); f.style.setProperty('--mx', (e.clientX - r.left) + 'px'); f.style.setProperty('--my', (e.clientY - r.top) + 'px'); };
+    f.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { set(e); f.classList.add('lens'); } });
+    f.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') f.classList.remove('lens'); });
+    f.addEventListener('pointermove', e => { if (f.classList.contains('lens')) set(e); });
+    /* touch: tap to open the lens, drag to move it, tap again to close */
+    f.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; if (f.classList.contains('lens')) { f.classList.remove('lens'); f.style.touchAction = ''; } else { set(e); f.classList.add('lens'); f.style.touchAction = 'none'; } });
+    f.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const r = f.getBoundingClientRect(); f.style.setProperty('--mx', r.width / 2 + 'px'); f.style.setProperty('--my', r.height * .3 + 'px'); f.classList.toggle('lens'); } });
+  });
+
   /* card spotlight */
   qa('.card').forEach(c => c.addEventListener('pointermove', e => { const b = c.getBoundingClientRect(); c.style.setProperty('--mx', `${e.clientX - b.left}px`); c.style.setProperty('--my', `${e.clientY - b.top}px`); }));
 
@@ -1480,7 +1614,8 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
           if (head) pts.push(head.getBoundingClientRect().top + scrollY - NAVH - 24);
           fr.forEach(f => pts.push(pin.start + (pin.end - pin.start) * f));
         } else {
-          pts.push(sec.getBoundingClientRect().top + scrollY - NAVH + (sec.id === 'contact' ? 0 : 8));
+          const head = q('.sec-head', sec);
+          pts.push(head ? head.getBoundingClientRect().top + scrollY - NAVH - 28 : sec.getBoundingClientRect().top + scrollY - NAVH + 8);
         }
       });
       const max = ScrollTrigger.maxScroll(window);
@@ -1572,6 +1707,39 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
   gsap.from('.core-list span', { scale: .6, opacity: 0, duration: .6, stagger: .06, ease: 'back.out(2)', scrollTrigger: { trigger: '.core', start: 'top 85%', once: true } });
   /* parallax drift on the big phase words */
   qa('.ph-word').forEach(w => gsap.to(w, { yPercent: -8, ease: 'none', scrollTrigger: { trigger: w, start: 'top bottom', end: 'bottom top', scrub: true } }));
+
+  /* founders: each portrait is drafted, then developed like a print */
+  qa('.fd').forEach((fd, i) => {
+    const fr = q('.fd-frame', fd), lines = q('.fd-print .fd-lines', fd), corners = q('.fd-corners', fd), labels = qa('.fd-fig, .fd-dim', fd), meta = q('.fd-meta', fd), h = q('h3', fd);
+    gsap.set(fr, { '--dev': 0 }); gsap.set(lines, { clipPath: 'inset(0 100% 0 0)' }); gsap.set(corners, { opacity: 0, scale: 1.12 }); gsap.set(labels, { opacity: 0 });
+    gsap.set([q('.fd-no', fd), q('.fd-title', fd), h], { opacity: 0, y: 24 }); gsap.set(qa('.fd-roles li', fd), { opacity: 0, x: -14 });
+    const tl = gsap.timeline({ paused: true })
+      .to(corners, { opacity: 1, scale: 1, duration: .7, ease: 'expo.out' })
+      .to(labels, { opacity: 1, duration: .4, stagger: .1 }, '<.1')
+      .add(() => labels.forEach(l => gsap.to(l, { duration: .9, scrambleText: { text: l.textContent, chars: '0123456789×', speed: .5 } })), '<')
+      .to(lines, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power2.inOut' }, '<')
+      .add(() => fr.classList.add('developing'), '+=.3')
+      .to(fr, { '--dev': 1, duration: 1.9, ease: 'power2.inOut' })
+      .add(() => fr.classList.remove('developing'))
+      .to([q('.fd-no', fd), q('.fd-title', fd), h], { opacity: 1, y: 0, duration: .9, stagger: .08, ease: 'power3.out' }, '-=1.1')
+      .add(() => gsap.to(h, { duration: 1.1, scrambleText: { text: h.textContent, chars: 'upperCase', speed: .55 } }), '<')
+      .to(qa('.fd-roles li', fd), { opacity: 1, x: 0, duration: .7, stagger: .14, ease: 'power3.out' }, '<.25');
+    ScrollTrigger.create({ trigger: fr, start: 'top 80%', once: true, onEnter: () => gsap.delayedCall(i * .55, () => tl.play()) });
+  });
+  /* the two founders connect, then the sum resolves */
+  (() => {
+    const path = q('#fdLink > path'), node = q('#fdLink .fd-node'), sum = qa('.fd-sum > *');
+    gsap.set(node, { scale: 0, transformOrigin: '50% 50%' }); gsap.set(sum, { opacity: 0, y: 16 });
+    ScrollTrigger.create({ trigger: '#fdGrid', start: 'top 70%', once: true, onEnter: () => {
+      const L = +(fdLink.dataset.len || 600);
+      gsap.timeline({ delay: 3.4 })
+        .fromTo(path, { strokeDasharray: `${L} ${L}`, strokeDashoffset: L }, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut', onComplete: () => { path.style.strokeDasharray = ''; } })
+        .to(node, { scale: 1, duration: .7, ease: 'back.out(2.4)' }, '-=.6')
+        .to(node, { rotate: 90, duration: .8, ease: 'power3.inOut' }, '<.2')
+        .to(sum, { opacity: 1, y: 0, duration: .6, stagger: .09, ease: 'power3.out' }, '-=.4');
+      gsap.to(path, { strokeDashoffset: -40, duration: 2.4, ease: 'none', repeat: -1, delay: 4.9 });
+    } });
+  })();
 
   /* section reveals: short, from a visible state */
   qa('.sec-head > *:not(.eyebrow):not(h2), .slot, .old, .reason, .cmp-row, .faq details, .cta-card, .cycle-legend > div').forEach(el => {

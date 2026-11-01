@@ -36,6 +36,12 @@ home-screen icon (`proposal-icon.png`) for a full-screen view. The dock in the b
 previous and next; next/previous step through every scene, and a keyboard or Bluetooth clicker works too
 (arrows, space, Page Up/Down, F for present mode).
 
+## APEX logo concepts
+
+`apex.html` presents six minimal, chromatic logo directions for APEX, each shown with its wordmark, app icon, light
+version and a 16px test. Choosing one restyles the "in use" mockups (business card, app icon, website, social profile,
+engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
+
 ## Notes
 
 - Mock site: prices, charts, account data and forms are samples. Demo forms collect no payment details.
