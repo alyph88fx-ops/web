@@ -644,8 +644,8 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
         <p>Concise, illustrated guides with worked chart examples. Download as PDF or EPUB and keep them forever.</p>
       </div>
       <div class="shelf" id="shelf">
-        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c1 photo"><img src="ebook-01.webp" alt="The Pip Primer cover" width="900" height="1260" loading="lazy" decoding="async"></div><div class="spine s1"></div><div class="pages"></div></div></div>
-          <div class="book-info"><h4>The Pip Primer</h4><p>Pips, lots, margin and leverage, explained with a calculator you can follow by hand.</p><span class="mono">64 pages · PDF + EPUB</span></div></div>
+        <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c1 photo"><img src="ebook-01.webp" alt="Headline and Storyline cover" width="900" height="1260" loading="lazy" decoding="async"></div><div class="spine s1"></div><div class="pages"></div></div></div>
+          <div class="book-info"><h4>Headline and Storyline</h4><p>Pips, lots, margin and leverage, explained with a calculator you can follow by hand.</p><span class="mono">64 pages · PDF + EPUB</span></div></div>
         <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c2"><span class="brand">1% CLUB</span><span class="big">02</span><div><h3>Candles in Context</h3><div class="vol">VOL. 02 · PRICE ACTION</div></div></div><div class="spine s2"></div><div class="pages"></div></div></div>
           <div class="book-info"><h4>Candles in Context</h4><p>Why the same pin bar means different things at support, in a range and mid-trend.</p><span class="mono">128 pages · PDF + EPUB</span></div></div>
         <div class="book-wrap" tabindex="0"><div class="book-tilt"><div class="book"><div class="cover c3"><span class="brand">1% CLUB</span><span class="big">03</span><div><h3>Risk Before Reward</h3><div class="vol">VOL. 03 · STRATEGY &amp; RISK</div></div></div><div class="spine s3"></div><div class="pages"></div></div></div>
@@ -724,7 +724,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
           <div class="amount"><span class="val">$0</span><span class="per">forever</span></div>
           <ul>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>24 Foundations lessons</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>The Pip Primer ebook</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Headline and Storyline ebook</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Trend Ribbon Lite indicator</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>Position size calculator</li>
           </ul>
@@ -763,7 +763,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
         <img class="big-88" src="1pc-logo.webp" alt="" aria-hidden="true" width="821" height="322">
         <div>
           <h2 id="joinTitle"><span class="chrome">Start where you are.</span> We'll take it from there.</h2>
-          <p>Get the free Foundations track and The Pip Primer today.</p>
+          <p>Get the free Foundations track and Headline and Storyline today.</p>
         </div>
         <form class="signup" id="signup" novalidate>
           <label for="email">Email address</label>
@@ -1172,7 +1172,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
   $('#playerClose').addEventListener('click', () => dlg.close()); dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
   dlg.addEventListener('close', () => { setPlaying(false); if (lenis) lenis.start(); });
 
-  // ---------- 3D chrome "1%" ----------
+  // ---------- 3D logo with motion graphics ----------
   const three = { ok: false, mx: 0, my: 0, scroll: 0, visible: true };
   (function initThree() {
     const cv = $('#chrome3d'); const fail = () => { $('#chromeFallback').hidden = false; cv.hidden = true; };
@@ -1192,13 +1192,13 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0.14, envMapIntensity: 1.25 });
     const group = new THREE.Group(); scene.add(group);
     // The logo in 3D: the outlined crimson "1" and the white neon "PERCENT CLUB", traced from the logo artwork
-    // (logo pixel coordinates), extruded, with the 1's crimson glow behind it as light added over the photo.
+    // (logo pixel coordinates), extruded, with the 1's crimson glow behind it.
     const S = .0078, P = (x, y) => new THREE.Vector2((x - 599.5) * S, -(y - 430) * S);
-    const LETTERS = [{"o":[[684.0,557.5],[623.0,557.5],[620.5,556.0],[618.5,490.0],[619.5,449.0],[621.0,446.5],[678.0,445.5],[682.0,447.5],[695.5,462.0],[695.5,489.0],[691.5,497.0],[701.5,511.0],[701.5,540.0],[697.5,546.0]],"h":[[[677.5,543.0],[684.5,537.0],[686.5,529.0],[685.5,515.0],[679.0,507.5],[640.0,506.5],[636.5,509.0],[635.5,540.0],[638.0,542.5]],[[667.5,491.0],[675.0,489.5],[679.5,483.0],[679.5,468.0],[673.0,460.5],[642.0,459.5],[636.5,462.0],[635.5,486.0],[639.0,490.5]]]},{"o":[[594.0,417.5],[582.5,416.0],[565.5,380.0],[558.0,374.5],[542.0,374.5],[534.5,377.0],[532.5,415.0],[528.0,417.5],[522.0,417.5],[518.5,415.0],[517.5,311.0],[520.0,306.5],[577.0,305.5],[581.0,307.5],[594.5,321.0],[595.5,356.0],[581.5,374.0],[585.5,387.0],[597.5,414.0]],"h":[[[570.5,359.0],[574.0,357.5],[579.5,350.0],[579.5,329.0],[575.5,323.0],[569.0,319.5],[536.0,320.5],[533.5,325.0],[534.5,357.0],[540.0,359.5]]]},{"o":[[344.0,417.5],[338.0,417.5],[333.5,414.0],[333.5,309.0],[338.0,305.5],[391.0,305.5],[407.5,320.0],[409.5,325.0],[408.5,361.0],[392.0,376.5],[363.0,376.5],[351.0,378.5],[348.5,387.0],[348.5,414.0]],"h":[[[384.5,362.0],[392.5,355.0],[393.5,351.0],[393.5,331.0],[391.5,326.0],[384.0,319.5],[352.0,320.5],[349.5,323.0],[348.5,332.0],[350.5,360.0],[357.0,362.5]]]},{"o":[[890.0,417.5],[878.0,417.5],[874.5,415.0],[842.5,358.0],[830.0,340.5],[826.5,345.0],[825.5,412.0],[824.5,415.0],[820.0,417.5],[811.5,416.0],[809.5,319.0],[810.5,308.0],[812.0,306.5],[827.0,305.5],[833.5,311.0],[860.5,360.0],[873.0,378.5],[875.5,378.0],[877.5,371.0],[878.5,309.0],[880.0,306.5],[891.0,306.5],[892.5,308.0],[893.5,412.0]],"h":[]},{"o":[[495.0,417.5],[427.0,417.5],[424.5,415.0],[423.5,312.0],[426.0,306.5],[492.0,305.5],[497.5,308.0],[497.5,318.0],[495.0,319.5],[445.0,320.5],[440.5,324.0],[439.5,329.0],[439.5,341.0],[442.0,349.5],[450.0,351.5],[484.0,351.5],[490.0,352.5],[491.5,355.0],[491.5,363.0],[489.0,365.5],[443.0,367.5],[440.5,370.0],[439.5,375.0],[440.5,401.0],[447.0,403.5],[493.0,403.5],[497.5,406.0],[497.5,415.0]],"h":[]},{"o":[[787.0,417.5],[720.0,417.5],[717.5,416.0],[716.5,309.0],[718.0,306.5],[785.0,305.5],[789.5,307.0],[790.5,317.0],[788.0,319.5],[738.0,320.5],[732.5,324.0],[732.5,346.0],[736.0,350.5],[777.0,351.5],[782.0,352.5],[784.5,358.0],[782.0,365.5],[735.0,367.5],[732.5,371.0],[732.5,400.0],[735.0,402.5],[740.0,403.5],[789.0,404.5],[790.5,414.0]],"h":[]},{"o":[[578.0,557.5],[529.0,557.5],[526.0,556.5],[511.5,542.0],[510.5,458.0],[511.5,448.0],[513.0,446.5],[524.0,446.5],[525.5,448.0],[526.5,534.0],[528.5,538.0],[536.0,543.5],[571.0,543.5],[579.5,536.0],[581.5,448.0],[587.0,445.5],[591.0,445.5],[595.5,448.0],[596.5,537.0],[594.5,543.0],[582.0,555.5]],"h":[]},{"o":[[683.0,417.5],[634.0,417.5],[622.0,407.5],[616.5,400.0],[616.5,323.0],[631.0,307.5],[635.0,305.5],[681.0,305.5],[684.0,306.5],[697.5,321.0],[697.5,323.0],[691.0,329.5],[688.0,329.5],[676.0,319.5],[643.0,319.5],[638.0,321.5],[632.5,328.0],[631.5,386.0],[633.5,397.0],[641.0,403.5],[678.0,403.5],[690.0,393.5],[692.0,393.5],[698.5,400.0],[698.5,403.0],[688.0,414.5]],"h":[]},{"o":[[396.0,557.5],[349.0,557.5],[346.0,556.5],[330.5,540.0],[330.5,463.0],[348.0,445.5],[395.0,445.5],[398.0,446.5],[411.5,461.0],[410.5,464.0],[403.0,469.5],[390.0,459.5],[356.0,459.5],[347.5,466.0],[345.5,472.0],[346.5,536.0],[356.0,543.5],[392.0,543.5],[402.0,534.5],[406.0,533.5],[412.5,540.0],[412.5,543.0],[399.0,556.5]],"h":[]},{"o":[[950.0,417.5],[942.0,416.5],[940.5,414.0],[938.5,323.0],[934.0,320.5],[910.0,319.5],[907.5,317.0],[907.5,309.0],[909.0,306.5],[981.0,305.5],[986.0,306.5],[987.5,309.0],[987.5,317.0],[985.0,319.5],[961.0,320.5],[956.5,323.0],[955.5,410.0],[954.5,415.0]],"h":[]},{"o":[[497.0,557.5],[434.0,557.5],[431.5,556.0],[430.5,449.0],[432.0,446.5],[440.0,445.5],[443.0,446.5],[445.5,450.0],[446.5,540.0],[449.0,542.5],[454.0,543.5],[497.0,543.5],[500.5,546.0],[500.5,555.0]],"h":[]}];
+    const LETTERS = [{"o":[[683.25,555.75],[623.5,555.75],[622.25,555.0],[620.25,490.0],[621.25,449.5],[622.0,448.25],[677.5,447.25],[681.0,449.0],[693.75,462.75],[693.75,488.5],[689.5,497.25],[699.75,511.5],[699.75,539.5],[696.25,544.75]],"h":[[[678.0,544.75],[686.0,538.0],[688.25,529.25],[687.25,514.25],[679.75,505.75],[639.5,504.75],[634.75,508.0],[633.75,540.75],[637.25,544.25]],[[667.75,492.75],[676.0,491.0],[681.25,483.5],[681.25,467.25],[673.75,458.75],[641.75,457.75],[634.75,461.0],[633.75,486.5],[638.25,492.25]]]},{"o":[[593.5,415.75],[583.75,414.5],[566.75,379.0],[558.5,372.75],[541.75,372.75],[532.75,375.75],[530.75,414.0],[527.5,415.75],[522.5,415.75],[520.25,414.0],[519.25,311.5],[521.0,308.25],[576.5,307.25],[580.0,309.0],[592.75,321.75],[593.75,355.5],[579.5,373.75],[584.0,387.5],[595.5,413.5]],"h":[[[570.75,360.75],[575.0,359.0],[581.25,350.5],[581.25,328.5],[576.75,321.75],[569.5,317.75],[535.0,318.75],[531.75,324.5],[532.75,358.0],[539.75,361.25]]]},{"o":[[343.5,415.75],[338.5,415.75],[335.25,413.25],[335.25,309.75],[338.5,307.25],[390.25,307.25],[406.0,321.0],[407.75,325.25],[406.75,360.25],[391.25,374.75],[362.75,374.75],[349.75,377.0],[346.75,386.75],[346.75,413.25]],"h":[[[385.25,363.75],[394.0,356.0],[395.25,351.25],[395.25,330.75],[393.0,325.0],[384.5,317.75],[351.25,318.75],[348.0,322.25],[346.75,332.0],[349.0,361.25],[356.75,364.25]]]},{"o":[[889.0,415.75],[878.5,415.75],[875.75,413.75],[844.0,357.0],[830.0,337.75],[824.75,344.5],[823.75,411.75],[823.0,413.75],[819.75,415.75],[813.25,414.5],[811.25,319.0],[812.25,308.75],[812.75,308.25],[826.5,307.25],[832.25,312.0],[859.0,361.0],[872.25,380.5],[876.75,379.5],[879.25,371.25],[880.25,309.5],[881.0,308.25],[890.25,308.25],[890.75,308.75],[891.75,411.5]],"h":[]},{"o":[[494.25,415.75],[427.75,415.75],[426.25,414.25],[425.25,312.25],[427.0,308.25],[491.75,307.25],[495.75,309.0],[495.75,317.0],[494.5,317.75],[444.5,318.75],[439.0,323.0],[437.75,328.75],[437.75,341.25],[440.75,351.0],[449.75,353.25],[483.75,353.25],[489.0,354.0],[489.75,355.5],[489.75,362.25],[488.25,363.75],[442.25,365.75],[439.0,369.25],[437.75,374.75],[438.75,402.25],[446.75,405.25],[492.5,405.25],[495.75,407.0],[495.75,414.25]],"h":[]},{"o":[[786.25,415.75],[720.5,415.75],[719.25,415.0],[718.25,309.5],[719.0,308.25],[784.75,307.25],[788.0,308.25],[788.75,316.25],[787.25,317.75],[737.5,318.75],[730.75,323.0],[730.75,346.5],[735.25,352.25],[776.75,353.25],[780.75,354.0],[782.75,358.0],[780.75,363.75],[734.0,365.75],[730.75,370.5],[730.75,400.75],[734.25,404.0],[739.75,405.25],[787.5,406.25],[788.75,413.5]],"h":[]},{"o":[[577.5,555.75],[529.25,555.75],[527.0,555.0],[513.25,541.25],[512.25,458.0],[513.25,448.75],[513.75,448.25],[523.25,448.25],[523.75,448.75],[524.75,534.5],[527.25,539.25],[535.5,545.25],[571.75,545.25],[581.25,536.75],[583.25,449.0],[587.25,447.25],[590.5,447.25],[593.75,449.0],[594.75,536.75],[593.0,542.0],[581.0,554.0]],"h":[]},{"o":[[682.5,415.75],[634.5,415.75],[623.25,406.25],[618.25,399.5],[618.25,323.75],[632.0,309.0],[635.5,307.25],[680.75,307.25],[683.0,308.0],[695.75,321.75],[695.75,322.25],[690.25,327.75],[688.5,327.75],[676.5,317.75],[642.75,317.75],[637.0,320.0],[630.75,327.25],[629.75,386.25],[632.0,398.0],[640.25,405.25],[678.5,405.25],[690.5,395.25],[691.25,395.25],[696.75,400.75],[696.75,402.25],[687.0,413.25]],"h":[]},{"o":[[395.75,555.75],[349.25,555.75],[347.0,555.0],[332.25,539.25],[332.25,463.75],[348.75,447.25],[394.75,447.25],[397.0,448.0],[409.5,461.5],[409.0,463.0],[403.0,467.25],[390.5,457.75],[355.5,457.75],[346.0,465.0],[343.75,471.75],[344.75,536.75],[355.5,545.25],[392.75,545.25],[402.75,536.0],[405.5,535.5],[410.75,540.75],[410.75,542.25],[398.0,555.0]],"h":[]},{"o":[[949.75,415.75],[943.0,415.0],[942.25,413.5],[940.25,322.0],[934.5,318.75],[910.75,317.75],[909.25,316.25],[909.25,309.5],[910.0,308.25],[980.75,307.25],[985.0,308.0],[985.75,309.5],[985.75,316.25],[984.25,317.75],[960.5,318.75],[954.75,322.0],[953.75,409.75],[953.0,414.0]],"h":[]},{"o":[[496.5,555.75],[434.5,555.75],[433.25,555.0],[432.25,449.5],[433.0,448.0],[439.75,447.25],[442.0,448.0],[443.75,450.5],[444.75,540.75],[448.25,544.0],[453.75,545.25],[496.5,545.25],[498.75,546.75],[498.75,554.25]],"h":[]}];   // strokes inset 1.7px (20% lighter than the artwork)
     const shapeOf = (o, holes) => { const sh = new THREE.Shape(o.map(([x, y]) => P(x, y)));
       holes.forEach(h => sh.holes.push(new THREE.Path(h.map(([x, y]) => P(x, y))))); return sh; };
     const ext = (shapes, depth) => { const g = new THREE.ExtrudeGeometry(shapes, { depth, bevelEnabled: true, bevelThickness: .025, bevelSize: .014, bevelSegments: 3, curveSegments: 2 }); g.translate(0, 0, -depth / 2); g.computeVertexNormals(); return g; };
-    const oneShape = shapeOf([[227.5, 305], [305, 305], [305, 570], [225, 570], [225, 369], [197.5, 369]], [[[243.5, 321], [288, 321], [288, 553], [242, 553], [242, 353], [222, 353]].reverse()]);
+    const oneShape = shapeOf([[228.5,306.75],[303.25,306.75],[303.25,568.25],[226.75,568.25],[226.75,367.25],[200.25,367.25]], [[[242.5,319.25],[218.75,354.75],[240.25,354.75],[240.25,554.75],[289.75,554.75],[289.75,319.25]]]);
     const redMat = new THREE.MeshStandardMaterial({ color: 0xdc143c, emissive: 0x7a0519, emissiveIntensity: .8, metalness: .45, roughness: .26, envMapIntensity: .5 });
     const one = new THREE.Mesh(ext(oneShape, .3), redMat);
     // "PERCENT CLUB" in chrome: the site's chrome gradient mapped down each line (front-face UVs are shape x/y),
@@ -1210,25 +1210,111 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
     chromeTex.repeat.set(.01, 1 / 1.13); chromeTex.offset.set(0, 1 - .975 / 1.13);   // one gradient per line: PERCENT top at .975, CLUB top 1.13 lower
     const chromeMat = new THREE.MeshStandardMaterial({ map: chromeTex, emissive: 0xffffff, emissiveMap: chromeTex, emissiveIntensity: .5, metalness: .5, roughness: .26, envMapIntensity: .9 });
     const word = new THREE.Mesh(ext(LETTERS.map(l => shapeOf(l.o, l.h)), .24), chromeMat);
-    const halo = new THREE.Mesh(new THREE.PlaneGeometry(961 * S, 462 * S), new THREE.MeshBasicMaterial({ transparent: true, opacity: .85, depthWrite: false, toneMapped: false, blending: THREE.CustomBlending, blendSrc: THREE.SrcAlphaFactor, blendDst: THREE.OneFactor, blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor }));
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(961 * S, 462 * S), new THREE.MeshBasicMaterial({ transparent: true, opacity: .9, depthWrite: false, toneMapped: false }));
     halo.position.z = -.2; halo.visible = false;
     new THREE.TextureLoader().load('1pc-glow.webp', tx => { tx.encoding = THREE.sRGBEncoding; halo.material.map = tx; halo.material.needsUpdate = true; halo.visible = true; });
     const mark = new THREE.Group(); mark.add(halo, one, word); group.add(mark); mark.scale.setScalar(.98); mark.position.y = -.62;   // sits below the face in the photo
-    const N = 1400, pos = new Float32Array(N * 3); const pr = rng(9);
-    for (let i = 0; i < N; i++) { const a = pr() * Math.PI * 2, r = 3.1 + pr() * 1.2; pos[i * 3] = Math.cos(a) * r; pos[i * 3 + 1] = (pr() - .5) * .35; pos[i * 3 + 2] = Math.sin(a) * r; }
-    const pg = new THREE.BufferGeometry(); pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xff6281, size: .035, transparent: true, opacity: .85, blending: THREE.AdditiveBlending, depthWrite: false }));
-    const orbit = new THREE.Group(); orbit.rotation.set(1.15, 0, -.3); scene.add(orbit); orbit.add(pts);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(3.6, .008, 8, 220), new THREE.MeshBasicMaterial({ color: 0xe72d52, transparent: true, opacity: .5 })); ring.rotation.x = Math.PI / 2; orbit.add(ring);
+    // ---------- motion graphics around the logo ----------
+    // Fades live in alpha (RGBA vertex colours), not in darker colour: the canvas runs through an SVG filter that
+    // drops any colour drawn at zero alpha, and dark-but-opaque pixels would smudge the photo.
+    const LIGHT = { transparent: true, depthWrite: false, toneMapped: false };
+    const lightMat = (Ctor, o) => new Ctor(Object.assign({}, LIGHT, o));
+    const C_RED = new THREE.Color(0xff1f4b), C_CHR = new THREE.Color(0xdfe2ea), CY = -.62;
+    const dc = document.createElement('canvas'); dc.width = dc.height = 64; const dx = dc.getContext('2d'), dg = dx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    dg.addColorStop(0, 'rgba(255,255,255,1)'); dg.addColorStop(.25, 'rgba(255,255,255,.55)'); dg.addColorStop(1, 'rgba(255,255,255,0)'); dx.fillStyle = dg; dx.fillRect(0, 0, 64, 64);
+    const dot = new THREE.CanvasTexture(dc);
+    const geo = (attrs) => { const g = new THREE.BufferGeometry(); for (const k in attrs) g.setAttribute(k, new THREE.BufferAttribute(attrs[k], k === 'color' ? 4 : 3)); return g; };
+    const stage = new THREE.Group(); scene.add(stage);
+    const fr = rng(21);
+
+    // 1) live price orbit: a closed price path wrapped round the logo; a comet head draws it, the trail fades behind
+    const PN = 900, PR = 3.45, pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 4), pY = [];
+    let pv = 0, pd = 0; for (let i = 0; i < PN; i++) { pd += (fr() - .5) * .05; pd *= .97; pv += pd; pY.push(pv); }
+    const pMin = Math.min(...pY), pMax = Math.max(...pY);
+    for (let i = 0; i < PN; i++) { const a = i / PN * Math.PI * 2, y = ((pY[i] - pY[0]) - (pY[PN - 1] - pY[0]) * i / (PN - 1)) / (pMax - pMin) * .9;
+      pPos.set([Math.cos(a) * PR, y, Math.sin(a) * PR], i * 3); }
+    const orbit = new THREE.Group(); orbit.position.y = CY; orbit.rotation.set(.32, 0, -.12); stage.add(orbit);
+    const priceGeo = geo({ position: pPos, color: pCol });
+    orbit.add(new THREE.LineLoop(priceGeo, lightMat(THREE.LineBasicMaterial, { vertexColors: true, opacity: 1 })));
+    orbit.add(new THREE.Points(priceGeo, lightMat(THREE.PointsMaterial, { vertexColors: true, map: dot, size: .085, opacity: .9 })));   // soft glow along the trail
+    orbit.add(new THREE.LineLoop(geo({ position: pPos }), lightMat(THREE.LineBasicMaterial, { color: C_CHR, opacity: .1 })));
+    const headPos = new Float32Array(3), head = new THREE.Points(geo({ position: headPos }), lightMat(THREE.PointsMaterial, { color: 0xff5c7a, size: .42, map: dot, opacity: 1 }));
+    orbit.add(head);
+
+    // 2) HUD dial behind the logo: tick ring, a crimson scanner sweep, chrome arcs and a dashed ring, each on its own clock
+    const dial = new THREE.Group(); dial.position.set(0, CY, -1.3); stage.add(dial);
+    function arc(r, w, len, color, fade = 0, start = 0, seg = 96) {
+      const n = seg + 1, pos = new Float32Array(n * 6), col = new Float32Array(n * 8), idx = [];
+      for (let i = 0; i < n; i++) { const u = i / seg, a = start + u * len, c = Math.cos(a), s = Math.sin(a), k = fade ? Math.pow(1 - u, fade) : 1;
+        pos.set([c * (r - w / 2), s * (r - w / 2), 0, c * (r + w / 2), s * (r + w / 2), 0], i * 6);
+        col.set([color.r, color.g, color.b, k, color.r, color.g, color.b, k], i * 8);
+        if (i < seg) { const j = i * 2; idx.push(j, j + 1, j + 2, j + 1, j + 3, j + 2); } }
+      const g = geo({ position: pos, color: col }); g.setIndex(idx); return g; }
+    const arcMat = (o) => lightMat(THREE.MeshBasicMaterial, Object.assign({ vertexColors: true, side: THREE.DoubleSide }, o));
+    const tk = []; for (let i = 0; i < 144; i++) { const a = i / 144 * Math.PI * 2, L = i % 12 ? .07 : .2, r0 = 2.92; tk.push(Math.cos(a) * r0, Math.sin(a) * r0, 0, Math.cos(a) * (r0 + L), Math.sin(a) * (r0 + L), 0); }
+    const ticks = new THREE.LineSegments(geo({ position: new Float32Array(tk) }), lightMat(THREE.LineBasicMaterial, { color: C_CHR, opacity: .3 }));
+    const sweep = new THREE.Mesh(arc(2.78, .05, 1.9, C_RED, 1.6), arcMat({ opacity: .95 }));
+    const chromeArcs = new THREE.Group();
+    [[0, .9], [1.3, .45], [2.3, 1.5], [4.4, .7]].forEach(([s, l]) => chromeArcs.add(new THREE.Mesh(arc(3.24, .014, l, C_CHR, 0, s), arcMat({ opacity: .5 }))));
+    const dashes = new THREE.Group(); for (let i = 0; i < 48; i++) dashes.add(new THREE.Mesh(arc(2.56, .03, .07, C_RED, 0, i / 48 * Math.PI * 2, 6), arcMat({ opacity: .45 })));
+    const inner = new THREE.Mesh(arc(2.4, .008, Math.PI * 2, C_CHR, 0, 0, 160), arcMat({ opacity: .18 }));
+    dial.add(ticks, sweep, chromeArcs, dashes, inner);
+
+    // 3) heartbeat: a crimson shockwave leaves the logo every 3.2s and the "1" flashes with it
+    const pulses = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.RingGeometry(1, 1.014, 160), lightMat(THREE.MeshBasicMaterial, { color: C_RED, opacity: 0, side: THREE.DoubleSide })); m.position.set(0, CY, -.45); stage.add(m); return m; });
+
+    // 4) candlesticks rising through the scene behind the logo: chrome for up candles, crimson for down
+    const CN = 54, plane = new THREE.PlaneGeometry(1, 1);
+    const bodies = new THREE.InstancedMesh(plane, lightMat(THREE.MeshBasicMaterial, { opacity: .42, side: THREE.DoubleSide }), CN);
+    const wicks = new THREE.InstancedMesh(plane, lightMat(THREE.MeshBasicMaterial, { opacity: .38, side: THREE.DoubleSide }), CN);
+    const cd = Array.from({ length: CN }, () => ({ x: (fr() - .5) * 8.6, y: -4.3 + fr() * 7.8, z: -1.7 - fr() * 2.4, h: .1 + fr() * .38, v: .1 + fr() * .26, up: fr() > .45 }));
+    cd.forEach((c, i) => { const col = c.up ? C_CHR.clone().multiplyScalar(.75) : C_RED; bodies.setColorAt(i, col); wicks.setColorAt(i, col); });
+    stage.add(bodies, wicks);
+    const m4 = new THREE.Matrix4(), q0 = new THREE.Quaternion(), vS = new THREE.Vector3(), vP = new THREE.Vector3();
+    function candles(dt) {
+      cd.forEach((c, i) => { c.y += c.v * dt; if (c.y > 3.5) { c.y = -4.3; c.x = (fr() - .5) * 8.6; }
+        const s = Math.max(.001, Math.sin(Math.PI * (c.y + 4.3) / 7.8)); vP.set(c.x, c.y, c.z);
+        vS.set(.085 * s, c.h * s, 1); m4.compose(vP, q0, vS); bodies.setMatrixAt(i, m4);
+        vS.set(.014 * s, c.h * 1.9 * s, 1); m4.compose(vP, q0, vS); wicks.setMatrixAt(i, m4); });
+      bodies.instanceMatrix.needsUpdate = wicks.instanceMatrix.needsUpdate = true; }
+
+    // 5) sparks thrown outward from the logo, crimson and chrome, fading as they travel
+    const SN = 240, sPos = new Float32Array(SN * 3), sCol = new Float32Array(SN * 4);
+    const sd = Array.from({ length: SN }, () => ({ a: fr() * Math.PI * 2, v: .12 + fr() * .22, o: fr(), red: fr() < .62, z: -.5 + fr() * .9 }));
+    const sGeo = geo({ position: sPos, color: sCol });
+    stage.add(new THREE.Points(sGeo, lightMat(THREE.PointsMaterial, { size: .1, map: dot, vertexColors: true, opacity: .95 })));
+    function sparks(t) {
+      sd.forEach((s, i) => { const u = (t * s.v + s.o) % 1, r = .8 + u * 3.3, b = Math.sin(Math.PI * u) * (1 - u * .4), c = s.red ? C_RED : C_CHR;
+        sPos.set([Math.cos(s.a) * r * 1.3, CY + Math.sin(s.a) * r * .8, s.z], i * 3); sCol.set([c.r, c.g, c.b, b], i * 4); });
+      sGeo.attributes.position.needsUpdate = sGeo.attributes.color.needsUpdate = true; }
+    const chromeBase = chromeTex.offset.y;
     function size() { const r = cv.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.position.z = r.width < 560 ? 15 : 12; camera.updateProjectionMatrix(); }
     size(); window.addEventListener('resize', size);
-    const cur = { rx: 0, ry: 0 }; const clock = new THREE.Clock();
-    three.render = () => { const t = clock.getElapsedTime();
+    const cur = { rx: 0, ry: 0 }; const clock = new THREE.Clock(); let lastT = 0;
+    const ease = x => 1 - Math.pow(1 - Math.min(1, Math.max(0, x)), 3);
+    candles(0);
+    three.render = () => { const t = clock.getElapsedTime(), dt = Math.min(.05, t - lastT); lastT = t;
+      const k = reduce ? 1 : ease((t - .15) / 1.8);                                    // intro: the logo swings in, the graphics open out
       const tx = three.my * .35 + three.scroll * 1.1, ty = three.mx * .7 + Math.sin(t * .45) * .35;
       cur.rx += (tx - cur.rx) * .06; cur.ry += (ty - cur.ry) * .06;
-      group.rotation.set(cur.rx, cur.ry, Math.sin(t * .3) * .05); group.position.y = Math.sin(t * .9) * .12 + three.scroll * 1.6; group.scale.setScalar(1 - three.scroll * .25);
-      mark.rotation.y = Math.sin(t * .6) * .12;
-      pts.rotation.y = t * .08; ring.rotation.z = -t * .05; renderer.render(scene, camera); };
+      const gy = Math.sin(t * .9) * .12 + three.scroll * 1.6, gs = 1 - three.scroll * .25;
+      group.rotation.set(cur.rx, cur.ry, Math.sin(t * .3) * .05); group.position.y = gy; group.scale.setScalar(gs);
+      mark.rotation.y = Math.sin(t * .6) * .12 - (1 - k) * 1.4; mark.scale.setScalar(.98 * (.82 + .18 * k));
+      stage.rotation.set(cur.rx * .3, cur.ry * .3, 0); stage.position.y = gy; stage.scale.setScalar(gs * (.55 + .45 * k));
+      chromeTex.offset.y = chromeBase + Math.sin(t * .5) * .06;                          // reflections slide across the chrome
+      // price orbit: head runs round once every ~14s, trail fades over the last 70% of the loop
+      const hp = (t * .072) % 1, hi = Math.floor(hp * PN);
+      for (let i = 0; i < PN; i++) { const back = ((hi - i + PN) % PN) / PN, f = back < .7 ? Math.pow(1 - back / .7, 2.2) * k : 0; pCol[i * 4] = C_RED.r; pCol[i * 4 + 1] = C_RED.g; pCol[i * 4 + 2] = C_RED.b; pCol[i * 4 + 3] = f; }
+      priceGeo.attributes.color.needsUpdate = true; headPos.set(pPos.subarray(hi * 3, hi * 3 + 3)); head.geometry.attributes.position.needsUpdate = true;
+      // dial clocks
+      ticks.rotation.z = t * .035; sweep.rotation.z = -t * 1.1; chromeArcs.rotation.z = t * .16 + Math.sin(t * .7) * .25; dashes.rotation.z = -t * .07;
+      // heartbeat
+      let flash = 0;
+      pulses.forEach((p, j) => { const age = (t + j * 1.6) % 3.2, e = ease(age / 2.4); p.visible = age < 2.4 && k > .9;
+        p.scale.set((1.4 + e * 2.8) * 1.25, 1.4 + e * 2.8, 1); p.material.opacity = Math.pow(1 - e, 1.6) * .85; flash = Math.max(flash, Math.exp(-age * 5)); });
+      redMat.emissiveIntensity = .8 + flash * 1.1 * k;
+      candles(dt); sparks(t);
+      renderer.render(scene, camera); };
     three.render(); three.ok = true;
     new IntersectionObserver(es => { three.visible = es[0].isIntersecting; }).observe(cv);
   })();
