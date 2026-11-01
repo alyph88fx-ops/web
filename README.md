@@ -26,10 +26,10 @@ One-time setup on GitHub:
 
 ## Proposal
 
-`proposal.html` is the Trading Brand Blueprint: a pitch for a new IB business structure (one shared trading
-ecosystem with a portfolio of trading brands on top), with 88FX and 1 Percent Club as the portfolio brands.
-It opens in a neutral blueprint skin; the switch in the nav re-skins it as 88FX or 1 Percent Club, and
-`proposal.html#88fx` or `proposal.html#1pc` opens it in that skin. Published at `/proposal.html`.
+`proposal.html` is the Trading Brand Blueprint, a launch-style page pitching a new IB business structure: one shared
+trading ecosystem with a portfolio of trading brands on top. 88FX and 1 Percent Club appear as its two "finishes";
+the colour picker (nav dots or the Finishes section) recolours the page, and `proposal.html#88fx` or
+`proposal.html#1pc` opens it in that finish. Published at `/proposal.html`.
 
 ## Notes
 
