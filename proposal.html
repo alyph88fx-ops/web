@@ -830,6 +830,35 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 .hero .cue { display: none; }
 .hero { padding-top: calc(env(safe-area-inset-top, 0px) + 104px); }
 
+/* founder business cards, dealt under each portrait */
+.bcard { position: relative; z-index: 3; width: 92%; aspect-ratio: 1.75; max-width: 100%; margin-top: -15%; padding: 7% 7.5%; display: flex; flex-direction: column; justify-content: space-between; border-radius: 12px; overflow: hidden; isolation: isolate;
+  background: radial-gradient(120% 90% at 100% 0%, rgba(255,255,255,.07), transparent 55%), linear-gradient(150deg, #1c1c22, #070709 72%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.09) inset, 0 1px 0 rgba(255,255,255,.14) inset, 0 40px 70px -30px #000, 0 12px 30px -18px rgba(0,0,0,.9);
+  transform-origin: 50% 0%; will-change: transform; }
+.fd[data-i="1"] .bcard { margin-left: auto; margin-right: -6%; }
+.fd[data-i="2"] .bcard { margin-left: -6%; }
+.bcard::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 80% at 0% 100%, rgba(111,243,255,.06), transparent 60%), radial-gradient(50% 70% at 100% 100%, rgba(255,111,216,.05), transparent 60%); }
+.bcard::after { content: ""; position: absolute; inset: 0; background: linear-gradient(112deg, transparent 34%, rgba(255,255,255,.09) 47%, rgba(111,243,255,.05) 52%, transparent 64%); transform: translateX(-70%); animation: bcsheen 7.5s ease-in-out infinite; pointer-events: none; }
+.fd[data-i="2"] .bcard::after { animation-delay: 2.4s; }
+@keyframes bcsheen { 0%, 45% { transform: translateX(-70%); } 100% { transform: translateX(70%); } }
+.bc-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bc-brand { display: inline-flex; align-items: center; gap: 9px; color: #e9e9ee; }
+.bc-mk { width: clamp(16px, 1.7vw, 22px); height: auto; overflow: visible; }
+.bc-brand b { font: 400 clamp(9.5px, .9vw, 12px)/1 "Michroma", sans-serif; letter-spacing: .4em; }
+.bc-no { font: 500 10px/1 var(--f-mono); letter-spacing: .18em; color: #66666f; }
+.bc-body { display: grid; gap: 4px; }
+.bcard h3 { font: 560 clamp(18px, 1.9vw, 26px)/1.05 "Geist", system-ui, sans-serif; letter-spacing: -.025em; color: #f4f4f6; text-transform: none; }
+.bc-title { margin-top: 2px; font: 500 clamp(9.5px, .85vw, 11px)/1.3 var(--f-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--accent); }
+.bc-roles { font: 400 clamp(9.5px, .85vw, 11px)/1.4 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: #8a8a93; padding-top: 8px; margin-top: 6px; border-top: 1px solid rgba(255,255,255,.08); }
+:root[data-brand="1pc"] .bcard { border-radius: 0; --cut: 14px; clip-path: var(--chamfer); }
+@media (min-width: 721px) {
+  .fd-grid .fd { width: min(100%, calc(46vh * .75), 420px); width: min(100%, calc(46svh * .75), 420px); }
+}
+@media (max-width: 720px) {
+  .bcard, .fd[data-i="1"] .bcard, .fd[data-i="2"] .bcard { width: 86%; margin: -16% auto 0; }
+  .bc-mk { width: 20px; } .bc-brand b { font-size: 11px; } .bcard h3 { font-size: 22px; } .bc-title, .bc-roles { font-size: 10.5px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
@@ -951,9 +980,9 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
             <i class="fd-corners" aria-hidden="true"></i>
             <span class="fd-fig" aria-hidden="true">FIG. 01</span><span class="fd-dim" aria-hidden="true">900 × 1200</span>
           </div>
-          <div class="fd-meta">
-            <span class="fd-no" aria-hidden="true">01</span>
-            <div><span class="fd-title">Founder</span><h3>Alyph Farhan</h3><ul class="fd-roles"><li>Strategist</li><li>Brand coordinator</li></ul></div>
+          <div class="bcard">
+            <div class="bc-top"><span class="bc-brand"><svg class="bc-mk" viewBox="0 0 120 120" aria-hidden="true"><path d="M20 100 L60 30 L100 100" fill="none" stroke="url(#apexChrome)" stroke-width="9" stroke-linecap="square"/><circle cx="60" cy="13" r="7" fill="url(#apexChrome)"/></svg><b>APEX</b></span><span class="bc-no" aria-hidden="true">01</span></div>
+            <div class="bc-body"><h3>Alyph Farhan</h3><p class="bc-title">Founder</p><p class="bc-roles">Strategist · Brand coordinator</p></div>
           </div>
         </article>
         <article class="fd" data-i="2">
@@ -966,9 +995,9 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
             <i class="fd-corners" aria-hidden="true"></i>
             <span class="fd-fig" aria-hidden="true">FIG. 02</span><span class="fd-dim" aria-hidden="true">900 × 1200</span>
           </div>
-          <div class="fd-meta">
-            <span class="fd-no" aria-hidden="true">02</span>
-            <div><span class="fd-title">Co-Founder</span><h3>Haqim Izaaq</h3><ul class="fd-roles"><li>Strategist</li><li>Creative director</li></ul></div>
+          <div class="bcard">
+            <div class="bc-top"><span class="bc-brand"><svg class="bc-mk" viewBox="0 0 120 120" aria-hidden="true"><path d="M20 100 L60 30 L100 100" fill="none" stroke="url(#apexChrome)" stroke-width="9" stroke-linecap="square"/><circle cx="60" cy="13" r="7" fill="url(#apexChrome)"/></svg><b>APEX</b></span><span class="bc-no" aria-hidden="true">02</span></div>
+            <div class="bc-body"><h3>Haqim Izaaq</h3><p class="bc-title">Co-Founder</p><p class="bc-roles">Strategist · Creative director</p></div>
           </div>
         </article>
       </div>
@@ -1794,9 +1823,9 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
 
   /* founders: each portrait is drafted, then developed like a print */
   qa('.fd').forEach((fd, i) => {
-    const fr = q('.fd-frame', fd), lines = q('.fd-print .fd-lines', fd), corners = q('.fd-corners', fd), labels = qa('.fd-fig, .fd-dim', fd), meta = q('.fd-meta', fd), h = q('h3', fd);
+    const fr = q('.fd-frame', fd), lines = q('.fd-print .fd-lines', fd), corners = q('.fd-corners', fd), labels = qa('.fd-fig, .fd-dim', fd), card = q('.bcard', fd), h = q('h3', fd);
     gsap.set(fr, { '--dev': 0 }); gsap.set(lines, { clipPath: 'inset(0 100% 0 0)' }); gsap.set(corners, { opacity: 0, scale: 1.12 }); gsap.set(labels, { opacity: 0 });
-    gsap.set([q('.fd-no', fd), q('.fd-title', fd), h], { opacity: 0, y: 24 }); gsap.set(qa('.fd-roles li', fd), { opacity: 0, x: -14 });
+    gsap.set(card, { opacity: 0, y: 70, rotateX: -62, rotateZ: i ? 3 : -3, transformPerspective: 1000 }); gsap.set(qa('.bc-body > *, .bc-top > *', fd), { opacity: 0 });
     const tl = gsap.timeline({ paused: true })
       .to(corners, { opacity: 1, scale: 1, duration: .7, ease: 'expo.out' })
       .to(labels, { opacity: 1, duration: .4, stagger: .1 }, '<.1')
@@ -1805,9 +1834,10 @@ html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%;
       .add(() => fr.classList.add('developing'), '+=.3')
       .to(fr, { '--dev': 1, duration: 1.9, ease: 'power2.inOut' })
       .add(() => fr.classList.remove('developing'))
-      .to([q('.fd-no', fd), q('.fd-title', fd), h], { opacity: 1, y: 0, duration: .9, stagger: .08, ease: 'power3.out' }, '-=1.1')
-      .add(() => gsap.to(h, { duration: 1.1, scrambleText: { text: h.textContent, chars: 'upperCase', speed: .55 } }), '<')
-      .to(qa('.fd-roles li', fd), { opacity: 1, x: 0, duration: .7, stagger: .14, ease: 'power3.out' }, '<.25');
+      .to(card, { opacity: 1, y: 0, rotateX: 0, rotateZ: 0, duration: 1.3, ease: 'expo.out' }, '-=1.2')
+      .to(qa('.bc-top > *', fd), { opacity: 1, duration: .6, stagger: .1 }, '-=.7')
+      .to(qa('.bc-body > *', fd), { opacity: 1, duration: .6, stagger: .12 }, '<.15')
+      .add(() => gsap.to(h, { duration: 1.1, scrambleText: { text: h.textContent, chars: 'upperCase', speed: .55 } }), '<');
     ScrollTrigger.create({ trigger: fr, start: 'top 80%', once: true, onEnter: () => gsap.delayedCall(i * .55, () => tl.play()) });
   });
   /* the two founders connect, then the sum resolves */
