@@ -1,0 +1,338 @@
+<title>APEX Logo Concepts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="APEX brand mark exploration: six minimal, chromatic logo directions shown in use, to choose from.">
+<meta name="theme-color" content="#07070a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Michroma&family=Archivo:wdth,wght@100..125,400..700&family=Unbounded:wght@300..500&family=Syne:wght@600..800&family=Italiana&display=swap">
+<style>
+/* Layout concept: a quiet presentation board for the APEX mark. Near-black paper, chrome as the only material,
+   colour appears only as a faint chromatic split (cyan / magenta fringe) and a slow sheen, like light on polished
+   metal. Six concepts in a grid; choosing one restyles the "in use" mockups below. Deliberately single dark look. */
+:root {
+  color-scheme: dark;
+  --bg: #07070a;
+  --bg-2: #0d0d11;
+  --tile: #111116;
+  --line: rgba(255, 255, 255, .08);
+  --line-2: rgba(255, 255, 255, .16);
+  --fg: #ededf0;
+  --muted: #8b8b94;
+  --dim: #5a5a63;
+  --cy: #6ff3ff;
+  --mg: #ff6fd8;
+  --f-ui: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --gl: max(16px, env(safe-area-inset-left, 0px));
+  --gr: max(16px, env(safe-area-inset-right, 0px));
+  /* the selected concept's wordmark (set by script) */
+  --wm-font: "Michroma", sans-serif; --wm-weight: 400; --wm-track: .32em; --wm-stretch: 100%;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 16px/1.55 var(--f-ui); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 50; background: var(--bg); }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+:focus-visible { outline: 1.5px solid var(--fg); outline-offset: 4px; border-radius: 8px; }
+.wrap { width: 100%; max-width: 1200px; margin: 0 auto; padding-left: var(--gl); padding-right: var(--gr); }
+@media (min-width: 760px) { .wrap { padding-left: max(36px, env(safe-area-inset-left, 0px)); padding-right: max(36px, env(safe-area-inset-right, 0px)); } }
+.mono { font: 500 11px/1.2 var(--f-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+.chrome { background: linear-gradient(180deg, #fff 0%, #dcdee6 26%, #80838f 48%, #f6f7fa 56%, #a9acb9 72%, #5f6271 90%, #cfd2dc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* mark symbols: strokes and fills read their colour from custom properties, so one symbol serves chrome and flat versions */
+.st { fill: none; stroke: var(--mark, url(#chrome)); stroke-linecap: square; stroke-linejoin: miter; }
+.fl { fill: var(--mark, url(#chrome)); }
+.fl2 { fill: var(--mark2, url(#chromeDark)); }
+.cy, .mg { fill: none; mix-blend-mode: screen; opacity: var(--chroma, .55); }
+.cy { stroke: var(--cy); } .mg { stroke: var(--mg); }
+.mk { display: block; overflow: visible; }
+
+/* top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: color-mix(in srgb, var(--bg) 80%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 56px; }
+.bar b { font: 400 13px/1 "Michroma", sans-serif; letter-spacing: .38em; }
+.bar .mono { color: var(--dim); }
+
+/* hero */
+.hero { padding-block: clamp(90px, 14vw, 170px) clamp(60px, 9vw, 110px); text-align: center; position: relative; overflow: clip; }
+.hero::before { content: ""; position: absolute; left: 50%; top: 52%; width: min(900px, 140vw); aspect-ratio: 2 / 1; transform: translate(-50%, -50%); background: conic-gradient(from 200deg, rgba(111,243,255,.10), rgba(255,111,216,.08), rgba(255,236,150,.06), rgba(111,243,255,.10)); filter: blur(70px); border-radius: 50%; pointer-events: none; animation: drift 14s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translate(-50%, -50%) rotate(25deg) scale(1.08); } }
+.hero .mono { position: relative; }
+.word { position: relative; display: inline-block; margin-top: 26px; font: 300 clamp(64px, 15vw, 210px)/.9 var(--f-ui); letter-spacing: .28em; margin-right: -.28em; }
+.word span { display: block; }
+.word .ab { position: absolute; inset: 0; mix-blend-mode: screen; opacity: .5; pointer-events: none; }
+.word .ab.c { color: var(--cy); transform: translateX(var(--ab, -2px)); }
+.word .ab.m { color: var(--mg); transform: translateX(calc(var(--ab, -2px) * -1)); }
+.hero p.lede { position: relative; margin: 28px auto 0; max-width: 34ch; color: var(--muted); font-size: clamp(17px, 1.6vw, 20px); }
+
+/* concepts */
+.concepts { padding-block: 0 clamp(90px, 12vw, 150px); }
+.sec-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: 28px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+.sec-head h2 { font: 400 clamp(22px, 2.4vw, 30px)/1.1 var(--f-ui); letter-spacing: -.01em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 18px; }
+.cc { position: relative; border: 1px solid var(--line); border-radius: 20px; background: var(--bg-2); overflow: hidden; display: grid; transition: border-color .4s, transform .5s cubic-bezier(.2,.8,.2,1); }
+.cc:hover { border-color: var(--line-2); }
+.cc.sel { border-color: rgba(255,255,255,.55); box-shadow: 0 0 0 1px rgba(255,255,255,.12), 0 30px 80px -40px rgba(111,243,255,.35); }
+.stage { position: relative; aspect-ratio: 4 / 3; display: grid; place-items: center; background: radial-gradient(70% 70% at 50% 45%, #15151b, var(--bg-2) 70%); border-bottom: 1px solid var(--line); overflow: hidden; }
+.stage::before { content: ""; position: absolute; inset: 15%; border-radius: 50%; background: conic-gradient(from var(--r, 0deg), rgba(111,243,255,.0), rgba(111,243,255,.14), rgba(255,111,216,.12), rgba(111,243,255,0)); filter: blur(34px); opacity: .35; transition: opacity .6s; }
+.cc:hover .stage::before, .cc.sel .stage::before { opacity: 1; }
+.stage .mk { width: 38%; height: auto; position: relative; transition: filter .5s, transform .8s cubic-bezier(.2,.8,.2,1); }
+.cc:hover .stage .mk { filter: drop-shadow(-1.5px 0 0 rgba(111,243,255,.55)) drop-shadow(1.5px 0 0 rgba(255,111,216,.5)); transform: scale(1.04); }
+.stage .no { position: absolute; left: 16px; top: 14px; }
+.stage .tag { position: absolute; right: 16px; top: 14px; color: var(--dim); }
+.info { padding: 18px 18px 18px; display: grid; gap: 14px; }
+.info-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.lock { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lock .mk { width: 26px; height: 26px; flex: none; }
+.wm { font-family: var(--f); font-weight: var(--w, 400); letter-spacing: var(--t, .3em); font-stretch: var(--s, 100%); font-size: 16px; white-space: nowrap; }
+.info p { color: var(--muted); font-size: 14.5px; }
+.tests { display: flex; align-items: center; gap: 10px; }
+.tests > * { flex: none; }
+.ico { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(160deg, #1d1d24, #09090c); border: 1px solid var(--line-2); }
+.ico .mk { width: 58%; height: 58%; }
+.ico.light { background: #f2f2f4; border-color: transparent; --mark: #121216; --mark2: #5d5d66; --chroma: 0; }
+.fav { width: 16px; height: 16px; }
+.fav .mk { width: 16px; height: 16px; }
+.tests .mono { margin-left: auto; color: var(--dim); font-size: 10px; }
+.choose { height: 38px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-2); font-size: 13.5px; font-weight: 500; transition: background .3s, color .3s, border-color .3s; white-space: nowrap; }
+.choose:hover { border-color: var(--fg); }
+.cc.sel .choose { background: var(--fg); color: #000; border-color: var(--fg); }
+@media (pointer: coarse) { .choose { height: 44px; } }
+
+/* in use */
+.use { padding-block: clamp(80px, 11vw, 140px); border-top: 1px solid var(--line); background: linear-gradient(180deg, var(--bg), #050507); }
+.pick { display: flex; gap: 8px; flex-wrap: wrap; }
+.pick button { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); display: grid; place-items: center; background: var(--bg-2); transition: border-color .3s; }
+.pick button .mk { width: 22px; height: 22px; }
+.pick button[aria-pressed="true"] { border-color: var(--fg); }
+.mocks { display: grid; gap: 18px; grid-template-columns: repeat(6, minmax(0, 1fr)); margin-top: 28px; }
+.mock { border: 1px solid var(--line); border-radius: 20px; background: var(--bg-2); padding: 22px; display: grid; gap: 14px; align-content: start; min-width: 0; overflow: hidden; position: relative; }
+.mock > .mono { color: var(--dim); }
+.m-card { grid-column: span 4; }
+.m-app { grid-column: span 2; }
+.m-web { grid-column: span 3; }
+.m-social { grid-column: span 3; }
+.m-plate { grid-column: span 6; }
+@media (max-width: 980px) { .mocks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .m-card, .m-web, .m-social, .m-plate { grid-column: span 2; } .m-app { grid-column: span 2; } }
+.wmk { font-family: var(--wm-font); font-weight: var(--wm-weight); letter-spacing: var(--wm-track); font-stretch: var(--wm-stretch); white-space: nowrap; }
+/* business card */
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; perspective: 1200px; }
+@media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+.bc { aspect-ratio: 1.75; border-radius: 10px; position: relative; display: grid; place-items: center; overflow: hidden; background: linear-gradient(150deg, #1a1a20, #050507 70%); box-shadow: 0 30px 60px -30px #000, 0 0 0 1px rgba(255,255,255,.06) inset; transform: rotateX(8deg) rotateY(-10deg); transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.bc:nth-child(2) { transform: rotateX(8deg) rotateY(10deg); }
+.mock:hover .bc { transform: none; }
+.bc::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.08) 48%, rgba(111,243,255,.06) 52%, transparent 62%); transform: translateX(-60%); animation: sheen 7s ease-in-out infinite; }
+@keyframes sheen { 0%, 40% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+.bc .mk { width: 26%; height: auto; }
+.bc.back { place-items: stretch; padding: 9% 9%; }
+.bc.back .in { display: grid; align-content: space-between; height: 100%; }
+.bc.back .wmk { font-size: clamp(13px, 1.5vw, 18px); }
+.bc.back .ln { font: 400 11px/1.6 var(--f-mono); letter-spacing: .14em; color: var(--muted); text-transform: uppercase; }
+/* app icon */
+.home { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; justify-items: center; padding: 10px 0; }
+.app { display: grid; justify-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.app i { width: 84px; height: 84px; border-radius: 22px; display: grid; place-items: center; background: linear-gradient(160deg, #23232b, #060608); box-shadow: 0 16px 30px -16px #000, 0 0 0 1px rgba(255,255,255,.08) inset; }
+.app i .mk { width: 54%; height: 54%; }
+.app.lt i { background: linear-gradient(160deg, #ffffff, #dcdce2); --mark: #111116; --mark2: #55555e; --chroma: 0; }
+/* website */
+.browser { border-radius: 12px; border: 1px solid var(--line-2); overflow: hidden; background: #000; }
+.browser .chrome-bar { height: 26px; display: flex; align-items: center; gap: 6px; padding: 0 10px; background: #15151a; }
+.browser .chrome-bar i { width: 8px; height: 8px; border-radius: 50%; background: #2a2a31; }
+.browser nav { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.browser nav .lk { display: flex; align-items: center; gap: 10px; color: var(--fg); margin-right: auto; }
+.browser nav .lk .mk { width: 22px; height: 22px; }
+.browser nav .lk .wmk { font-size: 12px; }
+.browser nav b { font-weight: 500; color: #000; background: var(--fg); padding: 6px 10px; border-radius: 999px; }
+.browser .hero-mini { padding: 30px 16px 34px; text-align: center; display: grid; gap: 8px; justify-items: center; }
+.browser .hero-mini .mk { width: 48px; height: 48px; }
+.browser .hero-mini p { color: var(--muted); font-size: 12px; }
+@media (max-width: 420px) { .browser nav span { display: none; } }
+/* social */
+.prof { display: grid; gap: 14px; }
+.cover { height: 92px; border-radius: 12px; background: radial-gradient(60% 120% at 30% 0%, rgba(111,243,255,.14), transparent 60%), radial-gradient(60% 120% at 80% 100%, rgba(255,111,216,.12), transparent 60%), #0a0a0e; border: 1px solid var(--line); }
+.prof-row { display: flex; align-items: center; gap: 14px; margin-top: -44px; padding-left: 14px; }
+.ava { width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(160deg, #1f1f26, #050507); border: 3px solid var(--bg-2); box-shadow: 0 0 0 1px var(--line-2); flex: none; }
+.ava .mk { width: 50%; height: 50%; }
+.prof-row div { padding-top: 40px; display: grid; gap: 2px; min-width: 0; }
+.prof-row .wmk { font-size: 15px; }
+.prof-row small { color: var(--muted); }
+/* metal plate */
+.plate { height: clamp(200px, 26vw, 300px); border-radius: 14px; display: grid; place-items: center; gap: 18px; grid-auto-flow: column; position: relative; overflow: hidden;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 3px), linear-gradient(180deg, #3a3b42, #1c1d22 55%, #2b2c33); box-shadow: inset 0 1px 0 rgba(255,255,255,.18), inset 0 -1px 0 rgba(0,0,0,.6), 0 30px 60px -30px #000; }
+.plate::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.10) 50%, transparent 70%); animation: sheen 9s ease-in-out infinite; }
+.plate .eng { --mark: #17181c; --mark2: #121317; --chroma: 0; display: flex; align-items: center; gap: clamp(14px, 2vw, 26px); filter: drop-shadow(0 1.5px 0 rgba(255,255,255,.3)) drop-shadow(0 -1px 0 rgba(0,0,0,.7)); }
+.plate .eng .mk { width: clamp(54px, 7vw, 86px); height: auto; }
+.plate .eng .wmk { font-size: clamp(22px, 3.4vw, 44px); color: #17181c; }
+
+/* pick bar */
+.pickbar { position: fixed; z-index: 45; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 140%); display: flex; align-items: center; gap: 14px; padding: 8px 8px 8px 16px; border-radius: 999px; background: color-mix(in srgb, var(--tile) 82%, transparent); border: 1px solid var(--line-2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 20px 50px -20px #000; transition: transform .6s cubic-bezier(.2,.8,.2,1); max-width: calc(100% - 32px); }
+.pickbar.on { transform: translate(-50%, 0); }
+.pickbar .mk { width: 22px; height: 22px; flex: none; }
+.pickbar span { font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pickbar button { height: 38px; padding: 0 16px; border-radius: 999px; background: var(--fg); color: #000; font-weight: 500; font-size: 13.5px; white-space: nowrap; flex: none; }
+footer { border-top: 1px solid var(--line); padding-block: 26px calc(90px + env(safe-area-inset-bottom, 0px)); color: var(--dim); font-size: 12px; }
+
+.rv { will-change: transform, opacity; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition-duration: .001ms !important; } }
+</style>
+
+<!-- shared defs + marks -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="chrome" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="18" y2="120">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".26" stop-color="#dcdee6"/><stop offset=".47" stop-color="#7f828f"/><stop offset=".55" stop-color="#f7f8fb"/><stop offset=".72" stop-color="#a9acb9"/><stop offset=".9" stop-color="#5e6170"/><stop offset="1" stop-color="#d2d5df"/>
+      <animate attributeName="y1" values="-30;20;-30" dur="9s" repeatCount="indefinite"/><animate attributeName="y2" values="90;150;90" dur="9s" repeatCount="indefinite"/>
+    </linearGradient>
+    <linearGradient id="chromeDark" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="120">
+      <stop offset="0" stop-color="#8a8d9a"/><stop offset=".5" stop-color="#3b3d47"/><stop offset="1" stop-color="#6d7080"/>
+    </linearGradient>
+    <!-- 01 Summit: a bare peak and the point above it -->
+    <symbol id="m1" viewBox="0 0 120 120"><path class="st" stroke-width="7" d="M20 100 L60 30 L100 100"/><circle class="fl" cx="60" cy="13" r="5"/></symbol>
+    <!-- 02 Breakout: an A drawn as a price line, crossbar as the level it breaks -->
+    <symbol id="m2" viewBox="0 0 120 120"><path class="st" stroke-width="6.5" d="M14 102 L36 62 L46 72 L66 22 L106 102"/><path class="st" stroke-width="3" d="M34 80 H96" stroke-dasharray="6 5"/></symbol>
+    <!-- 03 Prism: a triangle with a quiet chromatic split -->
+    <symbol id="m3" viewBox="0 0 120 120"><path class="cy" stroke-width="5" d="M57.5 20 L101.5 98 H13.5 Z"/><path class="mg" stroke-width="5" d="M62.5 20 L106.5 98 H18.5 Z"/><path class="st" stroke-width="5" d="M60 20 L104 98 H16 Z"/><path class="fl" d="M60 62 L72 84 H48 Z"/></symbol>
+    <!-- 04 Strata: three rising layers -->
+    <symbol id="m4" viewBox="0 0 120 120"><path class="st" stroke-width="7" opacity=".38" d="M20 100 L60 66 L100 100"/><path class="st" stroke-width="7" opacity=".68" d="M20 78 L60 44 L100 78"/><path class="st" stroke-width="7" d="M20 56 L60 22 L100 56"/></symbol>
+    <!-- 05 Orbit: the cycle, and the apex at its top -->
+    <symbol id="m5" viewBox="0 0 120 120"><circle class="st" stroke-width="2.6" cx="60" cy="64" r="42"/><path class="fl" d="M60 8 L72 30 H48 Z"/><circle class="fl" cx="60" cy="106" r="2.6" opacity=".6"/></symbol>
+    <!-- 06 Facet: a solid peak in two chrome facets -->
+    <symbol id="m6" viewBox="0 0 120 120"><path class="fl" d="M60 16 L60 102 L12 102 Z"/><path class="fl2" d="M60 16 L108 102 L60 102 Z"/></symbol>
+  </defs>
+</svg>
+
+<header class="bar">
+  <div class="wrap"><b>APEX</b><span class="mono">Logo concepts · Round 01</span></div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="h1">
+    <div class="wrap">
+      <p class="mono">Brand mark exploration</p>
+      <h1 id="h1" class="word"><span class="chrome">APEX</span><span class="ab c" aria-hidden="true">APEX</span><span class="ab m" aria-hidden="true">APEX</span></h1>
+      <p class="lede">Six directions. Minimal, chromatic, quiet. Choose the one that feels like the top.</p>
+    </div>
+  </section>
+
+  <section class="concepts" aria-labelledby="hc">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="hc">Concepts</h2><span class="mono">Hover for light · Choose one</span></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="use" id="use" aria-labelledby="hu">
+    <div class="wrap">
+      <div class="sec-head"><h2 id="hu">In use · <span id="useName">01 Summit</span></h2><div class="pick" id="pick" role="group" aria-label="Preview a concept"></div></div>
+      <div class="mocks">
+        <div class="mock m-card"><span class="mono">Business card</span>
+          <div class="cards">
+            <div class="bc"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg></div>
+            <div class="bc back"><div class="in"><span class="wmk chrome">APEX</span><span class="ln"><b style="color:var(--fg);font-weight:500">Alyph Farhan</b><br>Founder · Strategist</span></div></div>
+          </div>
+        </div>
+        <div class="mock m-app"><span class="mono">App icon</span>
+          <div class="home">
+            <div class="app"><i><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg></i>APEX</div>
+            <div class="app lt"><i><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg></i>Light</div>
+          </div>
+        </div>
+        <div class="mock m-web"><span class="mono">Website</span>
+          <div class="browser"><div class="chrome-bar"><i></i><i></i><i></i></div>
+            <nav><span class="lk"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg><span class="wmk">APEX</span></span><span>Structure</span><span>Brands</span><b>Join</b></nav>
+            <div class="hero-mini"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg><span class="wmk chrome" style="font-size:20px">APEX</span><p>A blueprint for trading brand growth.</p></div>
+          </div>
+        </div>
+        <div class="mock m-social"><span class="mono">Social profile</span>
+          <div class="prof"><div class="cover"></div>
+            <div class="prof-row"><span class="ava"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg></span><div><span class="wmk">APEX</span><small>Trading brand growth</small></div></div>
+          </div>
+        </div>
+        <div class="mock m-plate"><span class="mono">Engraved plate</span>
+          <div class="plate"><div class="eng"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg><span class="wmk">APEX</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="pickbar" id="pickbar" aria-live="polite"><svg class="mk" viewBox="0 0 120 120"><use class="u" href="#m1"/></svg><span id="pickText">Your pick: 01 Summit</span><button type="button" id="copyBtn">Copy pick</button></div>
+
+<footer><div class="wrap">APEX · Logo concepts, round 01. Proposal draft.</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script>
+(() => {
+  const q = (s, r = document) => r.querySelector(s), qa = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const C = [
+    { id: 1, name: 'Summit', idea: 'A bare peak and the point above it. The simplest way to say "top".', f: '"Michroma", sans-serif', w: 400, t: '.32em', s: '100%', tag: 'Line' },
+    { id: 2, name: 'Breakout', idea: 'An A drawn as a price line. The crossbar is the level it breaks.', f: '"Archivo", sans-serif', w: 600, t: '.22em', s: '125%', tag: 'Trading' },
+    { id: 3, name: 'Prism', idea: 'A triangle with a quiet chromatic split. Light, refracted.', f: '"Unbounded", sans-serif', w: 300, t: '.26em', s: '100%', tag: 'Chromatic' },
+    { id: 4, name: 'Strata', idea: 'Three rising layers: partners, ecosystem, brands. Growth, stacked.', f: '"Syne", sans-serif', w: 700, t: '.2em', s: '100%', tag: 'Structure' },
+    { id: 5, name: 'Orbit', idea: 'The three-year cycle, and the apex at its top.', f: '"Italiana", serif', w: 400, t: '.34em', s: '100%', tag: 'Luxury' },
+    { id: 6, name: 'Facet', idea: 'A solid peak cut into two chrome facets. Weight and calm.', f: '"Geist", sans-serif', w: 600, t: '.42em', s: '100%', tag: 'Solid' } ];
+  const svg = (id, cls = 'mk') => `<svg class="${cls}" viewBox="0 0 120 120" aria-hidden="true"><use href="#m${id}"/></svg>`;
+  q('#grid').innerHTML = C.map(c => `
+    <article class="cc" data-id="${c.id}">
+      <div class="stage">${svg(c.id)}<span class="mono no">0${c.id}</span><span class="mono tag">${c.tag}</span></div>
+      <div class="info">
+        <div class="info-top"><span class="lock">${svg(c.id)}<span class="wm" style="--f:${c.f.replace(/"/g, '&quot;')};--w:${c.w};--t:${c.t};--s:${c.s}">APEX</span></span><button type="button" class="choose" data-id="${c.id}" aria-pressed="false">Choose</button></div>
+        <p><b style="color:var(--fg);font-weight:500">${c.name}.</b> ${c.idea}</p>
+        <div class="tests"><span class="ico">${svg(c.id)}</span><span class="ico light">${svg(c.id)}</span><span class="fav">${svg(c.id)}</span><span class="mono">Icon · Light · 16px</span></div>
+      </div>
+    </article>`).join('');
+  q('#pick').innerHTML = C.map(c => `<button type="button" data-id="${c.id}" aria-label="Preview ${c.name}" aria-pressed="false">${svg(c.id)}</button>`).join('');
+
+  const root = document.documentElement, bar = q('#pickbar');
+  let chosen = null;
+  try { const v = +localStorage.getItem('apex-pick'); if (C.find(c => c.id === v)) chosen = v; } catch (e) {}
+  function preview(id) {
+    const c = C.find(x => x.id === id);
+    qa('use.u').forEach(u => u.setAttribute('href', '#m' + id));
+    root.style.setProperty('--wm-font', c.f); root.style.setProperty('--wm-weight', c.w); root.style.setProperty('--wm-track', c.t); root.style.setProperty('--wm-stretch', c.s);
+    q('#useName').textContent = `0${id} ${c.name}`;
+    qa('#pick button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.id === id)));
+    if (!reduced && window.gsap) gsap.fromTo('.mocks .mk, .mocks .wmk', { opacity: 0, y: 6, filter: 'blur(4px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: .6, stagger: .03, ease: 'power3.out', overwrite: true });
+  }
+  function choose(id, scroll) {
+    chosen = id; const c = C.find(x => x.id === id);
+    qa('.cc').forEach(el => el.classList.toggle('sel', +el.dataset.id === id));
+    qa('.choose').forEach(b => { const on = +b.dataset.id === id; b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'Chosen' : 'Choose'; });
+    q('#pickText').textContent = `Your pick: 0${id} ${c.name}`; bar.classList.add('on');
+    try { localStorage.setItem('apex-pick', id); } catch (e) {}
+    preview(id);
+    if (scroll) q('#use').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  }
+  qa('.choose').forEach(b => b.addEventListener('click', () => choose(+b.dataset.id, true)));
+  qa('#pick button').forEach(b => b.addEventListener('click', () => preview(+b.dataset.id)));
+  q('#copyBtn').addEventListener('click', async () => {
+    const c = C.find(x => x.id === chosen); const txt = `APEX logo pick: 0${c.id} ${c.name}`; const btn = q('#copyBtn');
+    try { await navigator.clipboard.writeText(txt); btn.textContent = 'Copied'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents(q('#pickText')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected'; }
+    setTimeout(() => btn.textContent = 'Copy pick', 1800);
+  });
+  if (chosen) choose(chosen, false); else preview(1);
+
+  /* the stage glow follows the pointer around each card */
+  qa('.cc').forEach(el => el.addEventListener('pointermove', e => { const r = el.getBoundingClientRect(); el.style.setProperty('--r', `${Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2) * 57.3 + 90}deg`); }));
+
+  if (reduced || !window.gsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  /* hero: letters arrive, the chromatic split settles to a hairline and breathes */
+  gsap.from('.word span', { y: 40, opacity: 0, filter: 'blur(14px)', duration: 1.8, ease: 'power3.out' });
+  gsap.fromTo('.word', { '--ab': '-14px' }, { '--ab': '-2px', duration: 2.4, ease: 'expo.out', delay: .2 });
+  gsap.to('.word', { '--ab': '-3.5px', duration: 3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.6 });
+  gsap.from('.hero .mono, .hero .lede', { opacity: 0, y: 14, duration: 1.2, stagger: .15, delay: .5, ease: 'power3.out' });
+  /* concepts: marks draw themselves in as cards arrive */
+  qa('.cc').forEach((el, i) => {
+    gsap.from(el, { y: 50, opacity: 0, duration: 1.1, ease: 'power3.out', delay: (i % 3) * .08, scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+    const big = q('.stage .mk', el);
+    gsap.from(big, { scale: .85, opacity: 0, filter: 'blur(10px)', duration: 1.4, ease: 'expo.out', delay: .25 + (i % 3) * .08, scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+  });
+  gsap.from('.mock', { y: 40, opacity: 0, duration: 1, stagger: .08, ease: 'power3.out', scrollTrigger: { trigger: '.mocks', start: 'top 85%', once: true } });
+})();
+</script>

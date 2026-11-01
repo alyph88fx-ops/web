@@ -26,15 +26,21 @@ One-time setup on GitHub:
 
 ## Proposal
 
-`proposal.html` is the Trading Brand Blueprint: a pitch for a new IB business structure (one shared trading
+`proposal.html` is the APEX proposal (a blueprint for trading brand growth): a pitch for a new IB business structure (one shared trading
 ecosystem with a portfolio of trading brands on top), with 88FX and 1 Percent Club as the portfolio brands.
-It opens in a blueprint skin; the switch in the nav re-skins it as 88FX or 1 Percent Club, and
-`proposal.html#88fx` or `proposal.html#1pc` opens it in that skin. Published at `/proposal.html`.
+It opens on the APEX Summit mark and runs in the APEX chrome skin; the switch in the nav re-skins it as 88FX or
+1 Percent Club, and `proposal.html#88fx` or `proposal.html#1pc` opens it in that skin. Published at `/proposal.html`.
 
 Presenting on iPad: open the published page in Safari, tap Share → Add to Home Screen, then launch it from the
 home-screen icon (`proposal-icon.png`) for a full-screen view. The dock in the bottom-right corner has Present,
 previous and next; next/previous step through every scene, and a keyboard or Bluetooth clicker works too
 (arrows, space, Page Up/Down, F for present mode).
+
+## APEX logo concepts
+
+`apex.html` presents six minimal, chromatic logo directions for APEX, each shown with its wordmark, app icon, light
+version and a 16px test. Choosing one restyles the "in use" mockups (business card, app icon, website, social profile,
+engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
 
 ## Notes
 
