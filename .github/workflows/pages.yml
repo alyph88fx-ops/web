@@ -34,6 +34,8 @@ jobs:
           # index.html is written as a page body (it is also previewed on claude.ai, which supplies the
           # document head). Give the published copy its doctype, charset and mobile viewport.
           { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat index.html; } > _site/index.html
+          # proposal.html (the trading brand blueprint) uses the same body-only convention.
+          { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat proposal.html; } > _site/proposal.html
           if [ -f CNAME ]; then cp CNAME _site/; fi
           # Second site: 1 Percent Club, served from /1percentclub/ (same body-only index.html convention).
           mkdir -p _site/1percentclub
