@@ -222,7 +222,12 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; bo
 .cal-row .cd { font: 500 13px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .cal-row.next .cd { color: var(--violet-2); }
 .cal-row .ccy { font: 500 11px/1 var(--mono); padding: 5px 0; text-align: center; border-radius: 6px; border: 1px solid var(--line-2); color: var(--fg); }
-.cal-row .ev { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-row .ev { min-width: 0; display: grid; gap: 2px; }
+.cal-row .ev-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-row .ev small { font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.impact.l i:first-child { background: var(--muted); }
+#calTag { display: inline-flex; align-items: center; gap: 6px; }
+#calTag a { color: var(--violet-2); border-bottom: 1px solid currentColor; }
 .impact { display: inline-flex; gap: 3px; }
 .impact i { width: 4px; height: 14px; border-radius: 2px; background: var(--line-2); }
 .impact.m i:nth-child(-n+2) { background: var(--violet); }
@@ -542,7 +547,7 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
         </article>
 
         <article class="tile spot t-cal">
-          <div class="tile-head"><div><div class="tile-title">Economic calendar</div><div class="tile-sub">Countdown to release</div></div><span class="sample">Sample schedule</span></div>
+          <div class="tile-head"><div><div class="tile-title">Economic calendar</div><div class="tile-sub" id="calSub">Countdown to release</div></div><span class="sample" id="calTag">Sample schedule</span></div>
           <ul class="cal-list" id="calList"></ul>
         </article>
 
@@ -971,15 +976,39 @@ dialog.player::backdrop { background: rgba(0,0,0,.82); backdrop-filter: blur(8px
   }
   [bal, risk, stop].forEach(el => el.addEventListener('input', calc)); calc();
 
-  // ---------- desk: calendar ----------
-  const events = [['USD', 'Non-Farm Payrolls', 'h', 8073], ['EUR', 'ECB Rate Decision', 'h', 18130], ['GBP', 'CPI y/y', 'm', 34805], ['USD', 'FOMC Minutes', 'h', 94260], ['AUD', 'Employment Change', 'm', 113100]];
-  const calList = $('#calList');
-  calList.innerHTML = events.map((e, i) => `<li class="cal-row${i === 0 ? ' next' : ''}"><span class="cd" data-cd="${i}"></span><span class="ccy">${e[0]}</span><span class="ev">${e[1]}</span><span class="impact ${e[2]}" aria-label="${e[2] === 'h' ? 'High' : 'Medium'} impact"><i></i><i></i><i></i></span></li>`).join('');
-  const t0 = Date.now();
-  function tickCal() { const el = (Date.now() - t0) / 1000;
-    events.forEach((e, i) => { const s = Math.max(0, Math.round(e[3] - el)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60;
-      $(`[data-cd="${i}"]`).textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}`; }); }
-  tickCal(); setInterval(tickCal, 1000);
+  // ---------- desk: economic calendar ----------
+  // Live on the published site: the Pages workflow downloads ForexFactory's weekly feed into calendar.json
+  // every hour (same origin, so the browser can read it). Anywhere it is missing, the sample schedule shows.
+  const calList = $('#calList'), calTag = $('#calTag'), calSub = $('#calSub');
+  const escH = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const IMPACT = { High: 'h', Medium: 'm', Low: 'l' }, IMPACT_NAME = { h: 'High', m: 'Medium', l: 'Low' };
+  const calT0 = Date.now();
+  let calEvents = [['USD', 'Non-Farm Payrolls', 'h', 8073], ['EUR', 'ECB Rate Decision', 'h', 18130], ['GBP', 'CPI y/y', 'm', 34805], ['USD', 'FOMC Minutes', 'h', 94260], ['AUD', 'Employment Change', 'm', 113100]]
+    .map(([ccy, title, imp, secs]) => ({ ccy, title, imp, at: calT0 + secs * 1000, fc: '', pv: '' }));
+  function renderCal() {
+    calList.innerHTML = calEvents.map((e, i) => `<li class="cal-row${i === 0 ? ' next' : ''}"><span class="cd" data-at="${e.at}"></span><span class="ccy">${escH(e.ccy)}</span>`
+      + `<span class="ev"><span class="ev-t">${escH(e.title)}</span>${e.fc || e.pv ? `<small>Forecast ${escH(e.fc || '–')} · Previous ${escH(e.pv || '–')}</small>` : ''}</span>`
+      + `<span class="impact ${e.imp}" aria-label="${IMPACT_NAME[e.imp]} impact"><i></i><i></i><i></i></span></li>`).join('');
+    tickCal();
+  }
+  function tickCal() {
+    $$('.cd', calList).forEach(el => { const s = Math.round((+el.dataset.at - Date.now()) / 1000);
+      if (s <= 0) { el.textContent = 'Released'; return; }
+      const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60, p2 = n => String(n).padStart(2, '0');
+      el.textContent = d ? `${d}d ${p2(h)}h ${p2(m)}m` : `${p2(h)}:${p2(m)}:${p2(ss)}`; });
+  }
+  renderCal(); setInterval(tickCal, 1000);
+  fetch('calendar.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(list => {
+    if (!Array.isArray(list)) return;
+    const soon = Date.now() - 30 * 60e3, upcoming = list.filter(e => IMPACT[e.impact] && Date.parse(e.date) > soon).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    // high and medium impact first; low impact only fills in late in the week
+    const pick = [...upcoming.filter(e => e.impact !== 'Low'), ...upcoming.filter(e => e.impact === 'Low')].slice(0, 5).sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+    if (!pick.length) return;
+    calEvents = pick.map(e => ({ ccy: e.country, title: e.title, imp: IMPACT[e.impact], at: Date.parse(e.date), fc: e.forecast, pv: e.previous }));
+    renderCal();
+    calTag.innerHTML = '<span class="dot-live"></span>Live · <a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener">ForexFactory</a>';
+    calSub.textContent = 'Next releases · your local time';
+  }).catch(() => {});
 
   // ---------- desk: alerts feed ----------
   const sigList = $('#sigList'); const sr = rng(41);
