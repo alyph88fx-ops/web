@@ -1,5 +1,12 @@
 <title>Trading Brand Blueprint</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Blueprint">
+<meta name="theme-color" content="#080b11">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="proposal-icon.png">
 <meta name="description" content="A blueprint for trading brand growth: a new IB business structure built on one shared trading ecosystem, with 88FX and 1 Percent Club as its first portfolio brands.">
 <script>
   /* pick the skin before first paint: #88fx or #1pc in the link, else the last one viewed, else the blueprint */
@@ -156,7 +163,7 @@ section { position: relative; }
 .nav-links a { font-size: 14px; color: var(--muted); padding: 8px 12px; border-radius: 999px; transition: color .2s, background .2s; }
 .nav-links a:hover { color: var(--fg); background: var(--panel-2); }
 .nav .btn { height: 40px; padding: 0 16px; font-size: 14px; margin-left: auto; }
-@media (min-width: 980px) { .nav-links { display: flex; } .nav .btn { margin-left: 8px; } }
+@media (min-width: 1100px) { .nav-links { display: flex; } .nav .btn { margin-left: 8px; } }
 @media (max-width: 480px) { .logo .tag { display: none; } }
 
 /* hero */
@@ -254,7 +261,7 @@ section { position: relative; }
 .ph-viz .vh b { color: var(--fg); font-weight: 500; }
 @media (min-width: 900px) {
   .ph-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; }
-  .phases.pinned { height: 100vh; }
+  .phases.pinned { height: 100vh; height: 100svh; }
   .phases.pinned .ph-track { flex-direction: row; width: max-content; height: 100%; }
   .phases.pinned .ph { width: 100vw; height: 100%; display: flex; align-items: center; padding-block: 120px 40px; }
   .phases.pinned .ph-word { font-size: min(10vw, 17vh); }
@@ -493,7 +500,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px calc(40px + env(
 
 /* structure: isometric layers */
 .st-grid { display: grid; gap: 40px; align-items: center; }
-@media (min-width: 1000px) { .st-grid { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 56px; } .structure.pinning .st-grid { min-height: calc(100vh - 140px); } }
+@media (min-width: 1000px) { .st-grid { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 56px; } .structure.pinning .st-grid { min-height: calc(100vh - 140px); min-height: calc(100svh - 140px); } }
 .old { border: 1px dashed var(--line-2); border-radius: var(--radius); padding: 18px; display: grid; gap: 12px; margin-bottom: 28px; }
 .old .mono { color: var(--dim); font-size: 11px; }
 .old-chain { display: flex; align-items: center; gap: 8px; }
@@ -550,7 +557,7 @@ footer { border-top: 1px solid var(--line); padding-block: 40px calc(40px + env(
 :root[data-brand="1pc"] .slot { border-radius: 0; }
 .nav-in > .btn { margin-left: 0; }
 .nav-in .bswitch { margin-left: auto; }
-@media (min-width: 980px) { .nav-in .bswitch { margin-left: 12px; } }
+@media (min-width: 1100px) { .nav-in .bswitch { margin-left: 12px; } }
 @media (max-width: 520px) { .nav-in > .btn { display: none; } }
 .brand-hint { font-family: var(--f-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
 .brand-hint b { color: var(--fg); font-weight: 500; }
@@ -679,6 +686,50 @@ main, footer { position: relative; z-index: 1; }
 .cue::after { content: ""; position: absolute; left: 50%; top: 7px; width: 2px; height: 7px; margin-left: -1px; border-radius: 2px; background: var(--accent); animation: cue 1.8s ease-in-out infinite; }
 @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(10px); opacity: 0; } 100% { opacity: 0; } }
 @media (max-width: 899px) { .cue { display: none; } }
+
+/* ---------- iPad and touch presenting ---------- */
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+@media (pointer: coarse) {
+  .bswitch button { height: 40px; padding: 0 14px; }
+  .brand-hint button { padding: 8px 2px; }
+  .btn { height: 52px; }
+}
+/* tablet portrait: give the hero and panels room */
+@media (min-width: 740px) and (max-width: 1099px) {
+  .hero-grid { gap: 44px; }
+  .hero h1 { font-size: clamp(56px, 9vw, 100px); }
+  .console { max-width: 640px; }
+  .eco { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reasons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .brands { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .brands .core { grid-column: 1 / -1; order: 3; }
+}
+/* tablet landscape: pinned scenes fit a shorter screen */
+@media (min-width: 900px) and (max-height: 900px) {
+  .phases.pinned .ph { padding-block: 104px 28px; }
+  .phases.pinned .ph-word { font-size: min(9vw, 15vh); }
+  .phases.pinned .ph-copy { gap: 14px; }
+  .phases.pinned .feed { height: 270px; }
+  .phases.pinned .term { height: 110px; }
+  .ph-bar { top: calc(env(safe-area-inset-top, 0px) + 76px); }
+  .iso { height: min(560px, 70svh); }
+}
+/* presenter dock */
+.dock { position: fixed; z-index: 93; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 4px; padding: 5px; border-radius: 999px; background: color-mix(in srgb, var(--panel) 72%, transparent); border: 1px solid var(--line-2); backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%); box-shadow: 0 20px 50px -20px #000; transition: opacity .4s, transform .4s; }
+.dock button { height: 40px; min-width: 40px; padding: 0 12px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; color: var(--fg); font: 600 13px/1 var(--f-ui); transition: background .25s, color .25s; }
+.dock button:hover, .dock button:focus-visible { background: var(--panel-2); }
+.dock button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dock .pres { background: var(--accent); color: var(--accent-ink); }
+.dock .pres:hover { background: var(--accent-2); }
+.dock .count { font: 500 12px/1 var(--f-mono); letter-spacing: .08em; color: var(--muted); padding: 0 6px; min-width: 64px; text-align: center; font-variant-numeric: tabular-nums; }
+.dock.idle { opacity: .35; }
+.dock.idle:hover { opacity: 1; }
+@media (pointer: coarse) { .dock button { height: 46px; min-width: 46px; } }
+@media (max-width: 560px) { .dock .count, .dock .pres span { display: none; } }
+:root[data-brand="1pc"] .dock, :root[data-brand="1pc"] .dock button { border-radius: 0; }
+/* while presenting: hide the nav chrome a little */
+.presenting .nav:not(:hover) { opacity: .0; pointer-events: none; transition: opacity .5s; }
+.presenting #progress { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
@@ -1144,6 +1195,12 @@ main, footer { position: relative; z-index: 1; }
     </div>
   </section>
 </main>
+<div class="dock" id="dock" role="toolbar" aria-label="Presentation controls">
+  <button type="button" class="pres" id="presBtn" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Present</span></button>
+  <button type="button" id="prevBtn" aria-label="Previous slide"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>
+  <span class="count" id="slideCount" aria-live="polite">01 / 01</span>
+  <button type="button" id="nextBtn" aria-label="Next slide"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
 <div class="wipe" id="wipe" aria-hidden="true"><img alt="" src="88fx-logo.webp"><b class="wtxt" hidden>Blueprint</b></div>
 
 <footer>
@@ -1391,6 +1448,7 @@ main, footer { position: relative; z-index: 1; }
 
   if (!hasGsap) { boot(); place(1); return; }
   gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   /* smooth scroll */
   let lenis = null;
@@ -1403,6 +1461,65 @@ main, footer { position: relative; z-index: 1; }
 
   /* page progress */
   gsap.to('#progress', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
+
+  /* ---------- presenter: slides, dock, keys, full screen ---------- */
+  (() => {
+    const dock = q('#dock'), prevB = q('#prevBtn'), nextB = q('#nextBtn'), cnt = q('#slideCount'), pres = q('#presBtn');
+    let stops = [];
+    const NAVH = 68;
+    const buildStops = () => {
+      const pins = ScrollTrigger.getAll().filter(t => t.pin);
+      const pts = [0];
+      qa('main section').filter(x => !x.parentElement.closest('section')).forEach(sec => {
+        if (sec.classList.contains('hero') || sec.classList.contains('marquee')) return;
+        const pin = pins.find(t => t.trigger === sec || sec.contains(t.trigger));
+        if (pin) {
+          /* one stop per beat of the pinned scene: each phase, each structure layer, scattered then joined */
+          const fr = sec.id === 'phases' ? [0, .5, 1] : sec.id === 'structure' ? [.22, .42, .6, .78, .97] : [0, 1];
+          const head = q('.sec-head', sec);
+          if (head) pts.push(head.getBoundingClientRect().top + scrollY - NAVH - 24);
+          fr.forEach(f => pts.push(pin.start + (pin.end - pin.start) * f));
+        } else {
+          pts.push(sec.getBoundingClientRect().top + scrollY - NAVH + (sec.id === 'contact' ? 0 : 8));
+        }
+      });
+      const max = ScrollTrigger.maxScroll(window);
+      stops = pts.map(v => Math.max(0, Math.min(max, Math.round(v)))).sort((a, b) => a - b).filter((v, i, a) => !i || v - a[i - 1] > 60);
+      update();
+    };
+    const current = () => { const y = scrollY + 4; let i = 0; stops.forEach((v, k) => { if (v <= y) i = k; }); return i; };
+    const update = () => { const i = current(); cnt.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(stops.length).padStart(2, '0'); prevB.disabled = i === 0; nextB.disabled = i >= stops.length - 1; };
+    const go = i => { i = Math.max(0, Math.min(stops.length - 1, i)); const y = stops[i]; if (lenis) lenis.scrollTo(y, { duration: 1.4, easing: t => 1 - Math.pow(1 - t, 4) }); else scrollTo({ top: y, behavior: reduced ? 'auto' : 'smooth' }); };
+    const step = d => { const y = scrollY; if (d > 0) { const n = stops.findIndex(v => v > y + 8); go(n === -1 ? stops.length - 1 : n); } else { let n = -1; stops.forEach((v, k) => { if (v < y - 8) n = k; }); go(Math.max(0, n)); } };
+    nextB.addEventListener('click', () => step(1)); prevB.addEventListener('click', () => step(-1));
+    addEventListener('keydown', e => {
+      if (e.target.closest('input, textarea, [contenteditable]')) return;
+      if (['ArrowDown', 'ArrowRight', 'PageDown', ' '].includes(e.key) && !e.shiftKey) { e.preventDefault(); step(1); }
+      else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey)) { e.preventDefault(); step(-1); }
+      else if (e.key === 'Home') { e.preventDefault(); go(0); } else if (e.key === 'End') { e.preventDefault(); go(stops.length - 1); }
+      else if (e.key === 'f' || e.key === 'F') togglePresent();
+    });
+    addEventListener('scroll', update, { passive: true });
+    ScrollTrigger.addEventListener('refresh', buildStops);
+    /* full screen where the device allows it; presenting mode either way */
+    const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+    function togglePresent() {
+      const on = !root.classList.contains('presenting');
+      root.classList.toggle('presenting', on); pres.setAttribute('aria-pressed', String(on)); pres.querySelector('span').textContent = on ? 'Exit' : 'Present';
+      try {
+        if (on && !fsEl()) { const r = root.requestFullscreen ? root.requestFullscreen() : root.webkitRequestFullscreen && root.webkitRequestFullscreen(); if (r && r.catch) r.catch(() => {}); }
+        else if (!on && fsEl()) { const r = document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen && document.webkitExitFullscreen(); if (r && r.catch) r.catch(() => {}); }
+      } catch (e) {}
+      if (on && scrollY < 10) step(1);
+    }
+    pres.addEventListener('click', togglePresent);
+    const fsChange = () => { if (!fsEl() && root.classList.contains('presenting') && pres.dataset.fs === '1') togglePresent(); pres.dataset.fs = fsEl() ? '1' : ''; setTimeout(() => ScrollTrigger.refresh(), 300); };
+    document.addEventListener('fullscreenchange', fsChange); document.addEventListener('webkitfullscreenchange', fsChange);
+    /* dock fades back when idle */
+    let idleT; const wake = () => { dock.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => dock.classList.add('idle'), 3500); };
+    ['pointermove', 'pointerdown', 'keydown', 'scroll'].forEach(ev => addEventListener(ev, wake, { passive: true })); wake();
+    buildStops();
+  })();
 
   if (reduced) { boot(); place(1); qa('.ph-word').forEach(w => w.style.setProperty('--reveal', '0%')); return; }
 
@@ -1466,9 +1583,9 @@ main, footer { position: relative; z-index: 1; }
   const wave = q('#wave'); const wl = wave.getTotalLength();
   gsap.set(wave, { strokeDasharray: wl, strokeDashoffset: wl });
   const nodes = qa('#cycle .node'); gsap.set(nodes, { scale: 0, transformOrigin: 'center', transformBox: 'fill-box' });
-  ScrollTrigger.create({ trigger: '#cycle', start: 'top 80%', end: 'bottom 55%', scrub: .6, onUpdate: s => {
-    wave.style.strokeDashoffset = wl * (1 - s.progress);
-    nodes.forEach(n => gsap.to(n, { scale: s.progress >= +n.dataset.at ? 1 : 0, duration: .4, ease: 'back.out(2.5)', overwrite: true }));
+  ScrollTrigger.create({ trigger: '#cycle', start: 'top 82%', once: true, onEnter: () => {
+    gsap.to(wave, { strokeDashoffset: 0, duration: 2.2, ease: 'power2.inOut' });
+    nodes.forEach(n => gsap.to(n, { scale: 1, duration: .6, ease: 'back.out(2.5)', delay: 2.2 * (+n.dataset.at) }));
   } });
 
   /* phases: pinned sideways scroll on desktop, stacked on mobile */
@@ -1549,6 +1666,9 @@ main, footer { position: relative; z-index: 1; }
     b.addEventListener('pointerleave', () => gsap.to(b, { x: 0, y: 0, duration: .6, ease: 'elastic.out(1, .4)' }));
   });
 
+
+  /* pins were created out of page order (structure sits above the hub stage): sort so each start accounts for the pins above it */
+  ScrollTrigger.sort(); ScrollTrigger.refresh();
   addEventListener('load', () => ScrollTrigger.refresh());
 })();
 </script>

@@ -30,7 +30,7 @@ jobs:
       - name: Collect site files
         run: |
           mkdir -p _site
-          cp *.html *.webp .nojekyll _site/
+          cp *.html *.webp *.png .nojekyll _site/
           # index.html is written as a page body (it is also previewed on claude.ai, which supplies the
           # document head). Give the published copy its doctype, charset and mobile viewport.
           { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat index.html; } > _site/index.html
