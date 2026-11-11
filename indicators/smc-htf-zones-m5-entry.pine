@@ -42,8 +42,11 @@ showChoch = input.bool(true, "Show M5 CHoCH line", group = grpS)
 grpE = "Entry signals (M5 CHoCH)"
 sigTiming = input.string("Live at CMP", "Signal timing", options = ["Live at CMP", "M5 candle close"], group = grpE, tooltip = "Live at CMP: the signal fires the moment the current market price breaks the M5 CHoCH level, entry = that price. M5 candle close: waits for the M5 candle to close beyond the level (fewer false breaks, later entry).")
 showTrig  = input.bool(true, "Show live CHoCH trigger levels", group = grpE)
-entryMode = input.string("Every M5 CHoCH", "Show entries", options = ["Every M5 CHoCH", "After H1/H4 zone tap", "With H4 & H1 trend", "Zone tap + trend"], group = grpE)
-tapMem    = input.int(60, "Zone tap counts for (chart bars)", minval = 1, maxval = 500, group = grpE, tooltip = "How long after price touches an H1/H4 zone a CHoCH still counts as coming from that zone.")
+entryMode = input.string("Zone reaction", "Show entries", options = ["Zone reaction", "Zone reaction + trend (A+ only)", "Every M5 CHoCH"], group = grpE, tooltip = "Zone reaction: the M5 low (buy) / high (sell) that the CHoCH starts from must sit inside an H1/H4 zone of the same direction. Each zone gives one signal only. Every M5 CHoCH: no zone filter (many signals).")
+zoneTol   = input.float(0.25, "Zone tolerance (× M5 ATR)", minval = 0.0, step = 0.05, group = grpE, tooltip = "How far the M5 low / high may poke outside the zone and still count.")
+brkBuf    = input.float(0.1, "Break buffer (× M5 ATR)", minval = 0.0, step = 0.05, group = grpE, tooltip = "Price must clear the CHoCH level by this much, so a one-tick touch does not trigger.")
+maxRisk   = input.float(3.0, "Max stop size (× M5 ATR, 0 = off)", minval = 0.0, step = 0.5, group = grpE, tooltip = "Skip the signal when the stop would be wider than this.")
+coolBars  = input.int(10, "Min bars between signals (same side)", minval = 0, maxval = 500, group = grpE)
 showRR    = input.bool(true, "Show entry / SL / TP", group = grpE)
 rr        = input.float(2.0, "Take profit (R multiple)", minval = 0.5, step = 0.5, group = grpE)
 
@@ -56,6 +59,7 @@ bullCol  = input.color(#089981, "Bullish", group = grpD)
 bearCol  = input.color(#F23645, "Bearish", group = grpD)
 
 int  barMs  = timeframe.in_seconds() * 1000
+int  tapMem = 30   // dashboard: a zone tap counts as "recent" for this many bars
 bool recent = bar_index >= last_bar_index - histBars
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -216,15 +220,15 @@ f_engine(simple int len, simple int shift) =>
     float dnLvl = trend == 1 and loLive ? loP : na
 
     // trigger fields always read the previous bar, so they hold for the whole live bar
-    [trend[shift], brk[shift], brkLvl[shift], brkT[shift], slLvl[shift], zDir[shift], zFTop[shift], zFBtm[shift], zFT[shift], zOTop[shift], zOBtm[shift], zOT[shift], evT[shift], upLvl[1], dnLvl[1], legLo[1], legHi[1]]
+    [trend[shift], brk[shift], brkLvl[shift], brkT[shift], slLvl[shift], zDir[shift], zFTop[shift], zFBtm[shift], zFT[shift], zOTop[shift], zOBtm[shift], zOT[shift], evT[shift], upLvl[1], dnLvl[1], legLo[1], legHi[1], a[1]]
 
 shH4 = timeframe.in_seconds(tfH4) > timeframe.in_seconds() ? 1 : 0
 shH1 = timeframe.in_seconds(tfH1) > timeframe.in_seconds() ? 1 : 0
 shM5 = timeframe.in_seconds(tfM5) > timeframe.in_seconds() ? 1 : 0
 
-[h4Trend, h4Brk, h4BrkLvl, h4BrkT, h4Sl, h4ZDir, h4FTop, h4FBtm, h4FT, h4OTop, h4OBtm, h4OT, h4EvT, h4UpLvl, h4DnLvl, h4LegLo, h4LegHi] = request.security(syminfo.tickerid, tfH4, f_engine(htfLen, shH4), lookahead = shH4 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
-[h1Trend, h1Brk, h1BrkLvl, h1BrkT, h1Sl, h1ZDir, h1FTop, h1FBtm, h1FT, h1OTop, h1OBtm, h1OT, h1EvT, h1UpLvl, h1DnLvl, h1LegLo, h1LegHi] = request.security(syminfo.tickerid, tfH1, f_engine(htfLen, shH1), lookahead = shH1 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
-[m5Trend, m5Brk, m5BrkLvl, m5BrkT, m5Sl, m5ZDir, m5FTop, m5FBtm, m5FT, m5OTop, m5OBtm, m5OT, m5EvT, m5UpLvl, m5DnLvl, m5LegLo, m5LegHi] = request.security(syminfo.tickerid, tfM5, f_engine(m5Len, shM5), lookahead = shM5 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
+[h4Trend, h4Brk, h4BrkLvl, h4BrkT, h4Sl, h4ZDir, h4FTop, h4FBtm, h4FT, h4OTop, h4OBtm, h4OT, h4EvT, h4UpLvl, h4DnLvl, h4LegLo, h4LegHi, h4Atr] = request.security(syminfo.tickerid, tfH4, f_engine(htfLen, shH4), lookahead = shH4 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
+[h1Trend, h1Brk, h1BrkLvl, h1BrkT, h1Sl, h1ZDir, h1FTop, h1FBtm, h1FT, h1OTop, h1OBtm, h1OT, h1EvT, h1UpLvl, h1DnLvl, h1LegLo, h1LegHi, h1Atr] = request.security(syminfo.tickerid, tfH1, f_engine(htfLen, shH1), lookahead = shH1 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
+[m5Trend, m5Brk, m5BrkLvl, m5BrkT, m5Sl, m5ZDir, m5FTop, m5FBtm, m5FT, m5OTop, m5OBtm, m5OT, m5EvT, m5UpLvl, m5DnLvl, m5LegLo, m5LegHi, m5Atr] = request.security(syminfo.tickerid, tfM5, f_engine(m5Len, shM5), lookahead = shM5 == 1 ? barmerge.lookahead_on : barmerge.lookahead_off)
 
 // When the chart is on the same timeframe, wait for the bar to close
 bool okH4 = shH4 == 1 or barstate.isconfirmed
@@ -244,6 +248,7 @@ type HZone
     color col
     int   alpha
     bool  hidden = false
+    bool  used   = false
 
 method kill(HZone z) =>
     if not na(z.obBx)
@@ -309,6 +314,22 @@ f_updZones(array<HZone> list) =>
                             z.fvgBx.set_text_color(tx)
     [bt, st]
 
+// First unused zone of this direction that contains the M5 swing extreme; returns its id or na
+f_findZone(array<HZone> list, int dir, float ext, float tol) =>
+    int id = na
+    if list.size() > 0 and not na(ext)
+        for z in list
+            if z.dir == dir and not z.used and ext >= z.btm - tol and ext <= z.top + tol
+                id := z.id
+                break
+    id
+
+f_markUsed(array<HZone> list, int id) =>
+    if list.size() > 0 and not na(id)
+        for z in list
+            if z.id == id
+                z.used := true
+
 var array<HZone> h4Zones = array.new<HZone>()
 var array<HZone> h1Zones = array.new<HZone>()
 var array<HZone> m5Zones = array.new<HZone>()
@@ -364,50 +385,92 @@ bool m5Roll = m5EvT != m5EvT[1]
 curLo := m5Roll or na(curLo) ? low : math.min(curLo, low)
 curHi := m5Roll or na(curHi) ? high : math.max(curHi, high)
 
-// Live: price breaks the M5 CHoCH level right now (realtime: current price, history: the bar's high / low)
+float m5A  = nz(m5Atr)
+float buf  = brkBuf * m5A
+float tol  = zoneTol * m5A
+
+// Live: price clears the M5 CHoCH level right now (realtime: current price, history: the bar's high / low)
 varip float usedUp = na
 varip float usedDn = na
-bool crossUp = liveMode and not na(m5UpLvl) and (na(usedUp) or m5UpLvl != usedUp) and (barstate.isrealtime ? close > m5UpLvl : high > m5UpLvl)
-bool crossDn = liveMode and not na(m5DnLvl) and (na(usedDn) or m5DnLvl != usedDn) and (barstate.isrealtime ? close < m5DnLvl : low < m5DnLvl)
+bool crossUp = liveMode and not na(m5UpLvl) and (na(usedUp) or m5UpLvl != usedUp) and (barstate.isrealtime ? close > m5UpLvl + buf : high > m5UpLvl + buf)
+bool crossDn = liveMode and not na(m5DnLvl) and (na(usedDn) or m5DnLvl != usedDn) and (barstate.isrealtime ? close < m5DnLvl - buf : low < m5DnLvl - buf)
 
 bool buyCh  = liveMode ? crossUp : m5New and m5Brk == 2
 bool sellCh = liveMode ? crossDn : m5New and m5Brk == -2
 
-bool buyOk = switch entryMode
-    "Every M5 CHoCH"       => true
-    "After H1/H4 zone tap" => bullTapOk
-    "With H4 & H1 trend"   => upTrend
-    => bullTapOk and upTrend
-bool sellOk = switch entryMode
-    "Every M5 CHoCH"       => true
-    "After H1/H4 zone tap" => bearTapOk
-    "With H4 & H1 trend"   => dnTrend
-    => bearTapOk and dnTrend
+// candidate entry and stop (stop = the M5 swing low / high the CHoCH starts from)
+float bPx = liveMode ? (barstate.isrealtime ? close : math.max(open, m5UpLvl + buf)) : close
+float sPx = liveMode ? (barstate.isrealtime ? close : math.min(open, m5DnLvl - buf)) : close
+float bSl = liveMode ? math.min(nz(m5LegLo, curLo), curLo) : m5Sl
+float sSl = liveMode ? math.max(nz(m5LegHi, curHi), curHi) : m5Sl
 
-// latch live signals so they stay on the chart for the rest of the bar
-varip int   buyBar  = na
-varip float buyPx   = na
-varip float buySl   = na
-varip int   sellBar = na
-varip float sellPx  = na
-varip float sellSl  = na
+// which H1/H4 zone did the move start from? (H4 first)
+int    bH4   = f_findZone(h4Zones, 1, bSl, tol)
+int    bH1   = f_findZone(h1Zones, 1, bSl, tol)
+int    sH4   = f_findZone(h4Zones, -1, sSl, tol)
+int    sH1   = f_findZone(h1Zones, -1, sSl, tol)
+string bZone = not na(bH4) ? "H4" : not na(bH1) ? "H1" : ""
+string sZone = not na(sH4) ? "H4" : not na(sH1) ? "H1" : ""
+
+varip int    buyBar   = na
+varip float  buyPx    = na
+varip float  buySl    = na
+varip string buyZone  = ""
+varip int    buyZid   = na
+varip bool   buyAp    = false
+varip int    sellBar  = na
+varip float  sellPx   = na
+varip float  sellSl   = na
+varip string sellZone = ""
+varip int    sellZid  = na
+varip bool   sellAp   = false
+
+bool riskB = not na(bSl) and bSl < bPx and (maxRisk == 0 or m5A == 0 or bPx - bSl <= maxRisk * m5A)
+bool riskS = not na(sSl) and sSl > sPx and (maxRisk == 0 or m5A == 0 or sSl - sPx <= maxRisk * m5A)
+bool coolB = na(buyBar) or bar_index - buyBar >= coolBars
+bool coolS = na(sellBar) or bar_index - sellBar >= coolBars
+
+bool modeB = switch entryMode
+    "Zone reaction"                   => bZone != ""
+    "Zone reaction + trend (A+ only)" => bZone != "" and upTrend
+    => true
+bool modeS = switch entryMode
+    "Zone reaction"                   => sZone != ""
+    "Zone reaction + trend (A+ only)" => sZone != "" and dnTrend
+    => true
+bool buyOk  = riskB and coolB and modeB
+bool sellOk = riskS and coolS and modeS
+
+// a level fires once, whether or not it passes the filters
 if crossUp
     usedUp := m5UpLvl
 if crossDn
     usedDn := m5DnLvl
 if buyCh and buyOk
-    buyBar := bar_index
-    buyPx  := liveMode ? (barstate.isrealtime ? close : math.max(open, m5UpLvl)) : close
-    buySl  := liveMode ? math.min(nz(m5LegLo, curLo), curLo) : m5Sl
+    buyBar  := bar_index
+    buyPx   := bPx
+    buySl   := bSl
+    buyZone := bZone
+    buyZid  := bZone == "H4" ? bH4 : bZone == "H1" ? bH1 : na
+    buyAp   := bZone != "" and upTrend
 if sellCh and sellOk
-    sellBar := bar_index
-    sellPx  := liveMode ? (barstate.isrealtime ? close : math.min(open, m5DnLvl)) : close
-    sellSl  := liveMode ? math.max(nz(m5LegHi, curHi), curHi) : m5Sl
+    sellBar  := bar_index
+    sellPx   := sPx
+    sellSl   := sSl
+    sellZone := sZone
+    sellZid  := sZone == "H4" ? sH4 : sZone == "H1" ? sH1 : na
+    sellAp   := sZone != "" and dnTrend
 
 bool buyEntry  = buyBar == bar_index
 bool sellEntry = sellBar == bar_index
-bool buyAplus  = buyEntry and bullTapOk and upTrend
-bool sellAplus = sellEntry and bearTapOk and dnTrend
+bool buyAplus  = buyEntry and buyAp
+bool sellAplus = sellEntry and sellAp
+
+// each zone gives one signal only
+if buyEntry
+    f_markUsed(buyZone == "H4" ? h4Zones : h1Zones, buyZid)
+if sellEntry
+    f_markUsed(sellZone == "H4" ? h4Zones : h1Zones, sellZid)
 
 f_ck(bool b) => b ? "✔" : "✘"
 f_arrow(int t) => t == 1 ? "Bullish ▲" : t == -1 ? "Bearish ▼" : "—"
@@ -445,8 +508,8 @@ var color  lastSigCol = color.gray
 string tStamp = str.format_time(time, "dd MMM HH:mm", syminfo.timezone)
 
 if buyEntry and recent
-    string tx  = (buyAplus ? "BUY A+" : "BUY") + " @ " + str.tostring(buyPx, format.mintick) + "\nM5 CHoCH"
-    string tip = "H1/H4 bullish zone tapped " + f_ck(bullTapOk) + "\nH4 bullish " + f_ck(h4Trend == 1) + "\nH1 bullish " + f_ck(h1Trend == 1)
+    string tx  = (buyAplus ? "BUY A+" : "BUY") + " @ " + str.tostring(buyPx, format.mintick) + "\n" + (buyZone != "" ? buyZone + " zone · " : "") + "M5 CHoCH"
+    string tip = "From H1/H4 bullish zone " + f_ck(buyZone != "") + (buyZone != "" ? " (" + buyZone + ")" : "") + "\nH4 bullish " + f_ck(h4Trend == 1) + "\nH1 bullish " + f_ck(h1Trend == 1) + "\nSL " + str.tostring(buySl, format.mintick)
     label.new(bar_index, low, tx, yloc = yloc.belowbar, color = buyAplus ? bullCol : color.new(bullCol, 45), textcolor = color.white, style = label.style_label_up, size = size.small, tooltip = tip)
     f_rr(buyPx, buySl, 1)
     lastSig    := (buyAplus ? "BUY A+ @ " : "BUY @ ") + str.tostring(buyPx, format.mintick) + " · " + tStamp
@@ -454,8 +517,8 @@ if buyEntry and recent
     alert("SMC: " + (buyAplus ? "BUY A+" : "BUY") + " (M5 CHoCH) on " + syminfo.ticker + " at " + str.tostring(buyPx, format.mintick) + " SL " + str.tostring(buySl, format.mintick), liveMode ? alert.freq_once_per_bar : alert.freq_once_per_bar_close)
 
 if sellEntry and recent
-    string tx  = (sellAplus ? "SELL A+" : "SELL") + " @ " + str.tostring(sellPx, format.mintick) + "\nM5 CHoCH"
-    string tip = "H1/H4 bearish zone tapped " + f_ck(bearTapOk) + "\nH4 bearish " + f_ck(h4Trend == -1) + "\nH1 bearish " + f_ck(h1Trend == -1)
+    string tx  = (sellAplus ? "SELL A+" : "SELL") + " @ " + str.tostring(sellPx, format.mintick) + "\n" + (sellZone != "" ? sellZone + " zone · " : "") + "M5 CHoCH"
+    string tip = "From H1/H4 bearish zone " + f_ck(sellZone != "") + (sellZone != "" ? " (" + sellZone + ")" : "") + "\nH4 bearish " + f_ck(h4Trend == -1) + "\nH1 bearish " + f_ck(h1Trend == -1) + "\nSL " + str.tostring(sellSl, format.mintick)
     label.new(bar_index, high, tx, yloc = yloc.abovebar, color = sellAplus ? bearCol : color.new(bearCol, 45), textcolor = color.white, style = label.style_label_down, size = size.small, tooltip = tip)
     f_rr(sellPx, sellSl, -1)
     lastSig    := (sellAplus ? "SELL A+ @ " : "SELL @ ") + str.tostring(sellPx, format.mintick) + " · " + tStamp
