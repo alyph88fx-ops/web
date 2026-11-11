@@ -54,6 +54,6 @@ member desk `account.html`). The Pages workflow publishes it at `/1percentclub/`
 
 ## Indicators
 
-`indicators/smc-liquidity-mtf.pine` is a TradingView (Pine Script v6) SMC indicator: CHoCH/BOS, order blocks, FVGs
-near order blocks that flip to IFVGs, BSL/SSL liquidity lines, H4/H1 trend with M15 reversal and M5 confirmation, and
-M1 RSI buy/sell signals. Setup and usage: `indicators/README.md`.
+`indicators/smc-htf-zones-m5-entry.pine` is a TradingView (Pine Script v6) SMC indicator: H1/H4 FVGs near order
+blocks, M5 BOS, M5 FVGs near order blocks, and entry signals on M5 CHoCH (A+ after an H1/H4 zone tap with the H4/H1
+trend). Setup and usage: `indicators/README.md`.
