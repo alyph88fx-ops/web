@@ -34,16 +34,17 @@ shows where the level was crossed (entry at the level).
 
 ## How an entry is chosen (precise mode)
 
-With **Show entries = Zone reaction** (the default) a BUY needs all of these:
+With **Show entries = Zone reaction + trend (A+ only)** (the default) a BUY needs all of these:
 
 1. Price reacts from a bullish **H1 or H4** FVG + OB zone: the M5 swing low that the move starts from sits inside the
    zone (within 0.25 × M5 ATR).
 2. Price then breaks the M5 CHoCH level by at least 0.1 × M5 ATR (no one-tick touches).
 3. The stop (that M5 swing low) is no wider than 3 × M5 ATR.
 4. **Each zone gives one signal only**, each CHoCH level fires once, and same-side signals are at least 10 bars apart.
+5. H4 and H1 trend are both bullish.
 
-SELL is the mirror image. `Zone reaction + trend (A+ only)` also needs H4 and H1 to agree. `Every M5 CHoCH` drops the
-zone rule (many more signals).
+SELL is the mirror image. `Zone reaction` drops rule 5 (more signals, also counter-trend). `Every M5 CHoCH` drops
+the zone rule too (many more signals).
 
 ## Focus on recent prices
 
@@ -52,7 +53,7 @@ Only the last **300 bars** get zones, structure lines and signals (*Draw only th
 
 ## Settings worth knowing
 
-- **Show entries**: `Zone reaction` (default), `Zone reaction + trend (A+ only)`, or `Every M5 CHoCH`.
+- **Show entries**: `Zone reaction + trend (A+ only)` (default), `Zone reaction`, or `Every M5 CHoCH`.
 - **Zone tolerance**, **Break buffer**, **Max stop size**, **Min bars between signals**: tighten or loosen the entry
   rules above.
 - **Max distance FVG ↔ OB**: 0 means the FVG must touch the OB. Raise it to see more zones.
