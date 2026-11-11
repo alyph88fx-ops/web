@@ -51,3 +51,9 @@ engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
 
 A second site built from the same template, in black, red and chrome: `1percentclub/` (main page `index.html`,
 member desk `account.html`). The Pages workflow publishes it at `/1percentclub/` next to 88FX.
+
+## Indicators
+
+`indicators/smc-liquidity-mtf.pine` is a TradingView (Pine Script v6) SMC indicator: CHoCH/BOS, order blocks, FVGs
+near order blocks that flip to IFVGs, BSL/SSL liquidity lines, H4/H1 trend with M15 reversal and M5 confirmation, and
+M1 RSI buy/sell signals. Setup and usage: `indicators/README.md`.
