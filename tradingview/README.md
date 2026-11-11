@@ -10,13 +10,16 @@
    - **Breakout → grey:** when an H4 candle closes through a zone, the zone turns grey and switches role
      (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
      If price closes back through a grey zone, the zone is removed.
-2. **Confirmation on M30, fresh zones only.** Each zone has a status:
-   - **FRESH:** price hasn't come back to the zone yet.
-   - **IN PLAY:** price is on its first approach. The approach starts when price first reaches the zone, and ends when price moves 1 × H4 ATR away from it.
-   - **✓ VALID:** a double top (red zone, **SELL**) or double bottom (blue zone, **BUY**) formed during that first approach,
-     with both peaks inside the zone. This is the entry. The zone gets a bold border and gives no more signals.
-   - **TESTED:** the first approach ended with no pattern. The zone fades with a dotted border and is ignored from then on.
-   - Patterns are only scanned when the chart is on **30m**.
+2. **Confirmation on M15 or M30, fresh zones only.** On price's **first approach** to a zone, the indicator watches for one of two patterns:
+   - **M (double top)** in a red or grey sell zone. The second top can be lower than the first, but must climb back at least 50% of the dip.
+   - **W (double bottom)** in a blue or grey buy zone.
+
+   Both tops or bottoms must be inside the zone. The low between the two tops of an M (the high between the two bottoms of a W) is the **neckline**.
+   - **PREPARE** signal: a candle closes through the neckline. Place a limit order at the neckline, with SL and TP shown.
+   - **ENTRY** signal: price comes back to retest the neckline. That's your fill. The zone then turns **✓ VALID** and gives no more signals.
+   - If the pattern fails (price closes beyond the tops or bottoms, or nothing happens in time), the zone stays **IN PLAY** for the next pattern.
+     When price moves 1 × H4 ATR away from the zone without an entry, the zone becomes **TESTED** and is ignored.
+   - Under **Entry**, choose **Neckline break** to enter on the break itself, or **Second top** to enter as soon as the pattern forms.
 3. **Risk**: the indicator draws **600-point SL** and **1000-point TP** boxes from the entry (the signal candle's close),
    marks each trade "TP ✓" or "SL ✗" when one is hit, and shows wins, losses and win rate in a table.
 
@@ -24,12 +27,15 @@
 
 1. In TradingView, open **Pine Editor** (bottom panel), then **New → Indicator**.
 2. Delete the template code, paste in the full contents of `kz-pattern-entry.pine`, and click **Add to chart**.
-3. Switch the chart to **30m**.
+3. Switch the chart to **15m** or **30m**.
 
 ## Alerts
 
-Create Alert → Condition: **KZ-DTB** → choose **KZ Buy**, **KZ Sell**, or **Any alert() function call**.
-The last option sends the full message: side, zone, entry, SL and TP.
+Create Alert → Condition: **KZ-DTB** → **Any alert() function call**. That sends both messages, each with zone, price, SL and TP:
+- `PREPARE SELL XAUUSD (M / double top in H4 SNR · RBR · BRK zone, neckline broken) | SELL LIMIT 4055.00 | SL 4061.00 | TP 4045.00`
+- `ENTRY SELL XAUUSD (...) | Entry 4055.00 | SL 4061.00 | TP 4045.00`
+
+There are also separate conditions: **KZ Prepare Buy / Sell** and **KZ Buy / Sell** (entry).
 
 ## Settings worth knowing
 
@@ -41,11 +47,13 @@ The last option sends the full message: side, zone, entry, SL and TP.
 | H4 swing strength | 3 | Bars on each side for an H4 swing high or low. |
 | Min zone height | 1 × H4 ATR | Lower it for thinner zones. |
 | Fresh zone: approach ends | 1 × H4 ATR | How far price must move away from a zone before its first approach is over. |
-| Signal trigger | Second peak confirmed | Choose **Neckline break** for a stricter signal, which waits for a close through the neckline. |
+| Entry | Neckline retest | **Neckline break** enters on the close through the neckline; **Second top** enters as soon as the pattern forms. |
+| Retest within | 16 bars | After the break, price must retest the neckline within this many candles. |
 | Only show zones from the last | 30 days | Keeps only the nearest zones on the left. |
 | Max zones per type | 3 | At most 3 red and 3 blue zones; the newest are kept. |
-| Pattern pivot left / right bars | 5 / 3 | Signals appear `right bars` candles after the second peak (they don't repaint). |
-| Peak equality tolerance | 0.5 × ATR | Sets how close the two tops/bottoms must be. |
+| Pattern pivot left / right bars | 3 / 2 | A top is confirmed `right bars` candles after it forms (no repainting). |
+| 2nd top may be higher by | 0.5 × ATR | The second top can be lower than the first, or higher by at most this. |
+| 2nd top must climb back | 50% | Share of the dip to the neckline the second top must climb back. |
 | Zone touch tolerance | 0.25 × ATR | Allows wicks that poke slightly outside a zone. |
 | One trade at a time | on | Skips new signals while a trade is still open. |
 

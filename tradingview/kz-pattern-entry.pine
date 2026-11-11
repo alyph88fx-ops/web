@@ -12,13 +12,14 @@
 //                    -> blue zone at the swing low (support / buy zone)
 //        Breakout    an H4 close through a zone turns it grey and flips its role
 //                    (broken resistance -> support, broken support -> resistance); its retest is fresh.
-//   2. Confirmation (M30 chart only), on FRESH zones only: when price makes its first approach
-//      to a zone and forms a double top (sell zone) = SELL, or a double bottom (buy zone) = BUY,
-//      the zone becomes VALID and that is the entry. If the first approach forms no pattern,
-//      the zone is marked TESTED and ignored.
+//   2. Confirmation (M15 or M30 chart), on FRESH zones only: on price's first approach to a
+//      zone, an M (double top) in a sell zone or a W (double bottom) in a buy zone makes the
+//      zone VALID. When a candle closes through the neckline -> PREPARE signal (limit order at
+//      the neckline). When price comes back to retest the neckline -> ENTRY signal.
+//      If the first approach forms no pattern, the zone is marked TESTED and ignored.
 //   3. Risk: fixed stop loss / take profit in points (default 600 / 1000).
 //
-indicator("KZ Pattern Entry (H4 SNR Zones + M30 DT/DB)", shorttitle = "KZ-DTB", overlay = true,
+indicator("KZ Pattern Entry (H4 SNR Zones + M15/M30 M/W)", shorttitle = "KZ-DTB", overlay = true,
      max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -47,20 +48,27 @@ colSup       = input.color(color.new(color.blue, 80), "Support (SNR + RBR)", gro
 colBrk       = input.color(color.new(color.gray, 75), "Breakout", group = grpC)
 showZoneText = input.bool(true, "Show zone labels", group = grpC)
 
-grpP = "2 · M30 confirmation (double top / bottom)"
-showEntries = input.bool(false, "Show M30 entries (patterns, SL/TP)", group = grpP,
-     tooltip = "Off = zones only. On = also track zone freshness, find M30 double tops / bottoms and draw SL/TP.")
-pL          = input.int(5, "Pattern pivot left bars", minval = 1, group = grpP)
-pR          = input.int(3, "Pattern pivot right bars", minval = 1, group = grpP)
-minGap      = input.int(5, "Min bars between the two peaks", minval = 2, group = grpP)
-maxGap      = input.int(60, "Max bars between the two peaks", minval = 3, maxval = 300, group = grpP)
-eqTolAtr    = input.float(0.5, "Peak equality tolerance (× ATR)", minval = 0.05, step = 0.05, group = grpP)
-minDepthAtr = input.float(1.0, "Min pattern depth to neckline (× ATR)", minval = 0.0, step = 0.1, group = grpP)
-zoneTolAtr  = input.float(0.25, "Zone touch tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP)
-leaveAtr    = input.float(1.0, "Fresh zone: approach ends when price moves away (× H4 ATR)", minval = 0.25, step = 0.25, group = grpP,
-     tooltip = "A zone only counts on its first approach. The approach starts when price first reaches the zone and ends when price moves this far away from it. Both peaks of the pattern must form during that approach. If none forms, the zone is marked TESTED and gives no more signals.")
-trigger     = input.string("Second peak confirmed", "Signal trigger", options = ["Second peak confirmed", "Neckline break"], group = grpP)
-neckExpiry  = input.int(20, "Neckline break must happen within (bars)", minval = 1, group = grpP)
+grpP = "2 · M15 / M30 confirmation (M = sell, W = buy)"
+showEntries  = input.bool(true, "Show entries (patterns, signals, SL/TP)", group = grpP,
+     tooltip = "Off = zones only. On = also track zone freshness, find M / W patterns on M15 or M30 and send signals.")
+pL           = input.int(3, "Pattern pivot left bars", minval = 1, group = grpP)
+pR           = input.int(2, "Pattern pivot right bars", minval = 1, group = grpP)
+minGap       = input.int(2, "Min bars between the two tops", minval = 2, group = grpP)
+maxGap       = input.int(40, "Max bars between the two tops", minval = 3, maxval = 300, group = grpP)
+eqTolAtr     = input.float(0.5, "2nd top may be higher than the 1st by (× ATR)", minval = 0.0, step = 0.05, group = grpP,
+     tooltip = "M: the second top can be lower than the first, or higher by at most this much. W: the same for bottoms.")
+recoverPct   = input.float(0.5, "2nd top must climb back at least (of the dip)", minval = 0.1, maxval = 1.0, step = 0.05, group = grpP,
+     tooltip = "M: from the neckline, the second top must climb back at least this fraction of the first top's height above the neckline.")
+minDepthAtr  = input.float(0.75, "Min height of 1st top above neckline (× ATR)", minval = 0.0, step = 0.05, group = grpP)
+zoneTolAtr   = input.float(0.25, "Zone touch tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP)
+leaveAtr     = input.float(1.0, "Fresh zone: approach ends when price moves away (× H4 ATR)", minval = 0.25, step = 0.25, group = grpP,
+     tooltip = "A zone only counts on its first approach. The approach starts when price first reaches the zone and ends when price moves this far away from it. Both tops of the pattern must form during that approach. If none forms, the zone is marked TESTED and gives no more signals.")
+trigger      = input.string("Neckline retest", "Entry", options = ["Neckline retest", "Neckline break", "Second top"], group = grpP,
+     tooltip = "Neckline retest: PREPARE signal when a candle closes through the neckline, ENTRY when price comes back to the neckline (limit entry at the neckline).")
+neckExpiry   = input.int(20, "Neckline break must happen within (bars)", minval = 1, group = grpP)
+retestExpiry = input.int(16, "Retest must happen within (bars after the break)", minval = 1, group = grpP)
+retestTolAtr = input.float(0.15, "Retest tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP,
+     tooltip = "The retest counts if price gets this close to the neckline.")
 allowBrk    = input.bool(true, "Allow entries at breakout (grey) zones", group = grpP)
 
 grpR = "3 · Risk management"
@@ -330,19 +338,25 @@ if array.size(zones) > 0 and not na(h4C)
                 box.delete(z.bx)
             array.remove(zones, i)
 
-// Pattern check: both peaks inside the zone and both formed during the zone's FIRST approach
-// (after first touch, before price moved away). Every matching zone becomes VALID.
-validateZones(float a, float b, int role, float tol, int i1, int i2) =>
-    string names = ""
+// Pattern check: both tops inside the zone and both formed during the zone's FIRST approach
+// (after first touch, before price moved away). The zone only becomes VALID when a trade
+// triggers; a pattern that fails leaves the zone in play for the next one.
+findZone(float a, float b, int role, float tol, int i1, int i2) =>
+    Zone found = na
     for z in zones
         if z.state == 1 and z.role == role and (allowBrk or not z.broken) and i1 >= z.firstTouch and (na(z.leaveBar) or i2 <= z.leaveBar)
             float lo = z.bot - tol
             float hi = z.top + tol
             if a >= lo and a <= hi and b >= lo and b <= hi
-                z.state := 3
-                styleZone(z)
-                names := names == "" ? zoneName(z) : names + " + " + zoneName(z)
-    names
+                found := z
+                break
+    found
+
+markValid(Zone z) =>
+    if not na(z)
+        z.state := 3
+        styleZone(z)
+    true
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Trades (risk management)
@@ -389,9 +403,9 @@ if array.size(trades) > 100 and not array.get(trades, 0).open
     array.shift(trades)
 
 // ─────────────────────────────────────────────────────────────────────────────
-// M30 double top / double bottom
+// M15 / M30 double top (M) / double bottom (W)
 // ─────────────────────────────────────────────────────────────────────────────
-isM30 = timeframe.period == "30"
+isPatTF = timeframe.period == "15" or timeframe.period == "30"
 atrM  = ta.atr(14)
 ph    = ta.pivothigh(high, pL, pR)
 pl    = ta.pivotlow(low, pL, pR)
@@ -400,11 +414,15 @@ var float  lastPH   = na
 var int    lastPHi  = na
 var float  lastPL   = na
 var int    lastPLi  = na
-var int    pendDir  = 0
-var float  pendNeck = na
-var float  pendInv  = na
-var int    pendExp  = na
-var string pendZone = ""
+// Pattern waiting for its neckline break (stage 1) or neckline retest (stage 2)
+var int    pendDir   = 0
+var int    pendStage = 0
+var float  pendNeck  = na
+var float  pendInv   = na
+var int    pendExp   = na
+var int    pendBrkI  = na
+var string pendZone  = ""
+var Zone   pendZ     = na
 
 drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
     color c = dir == -1 ? color.red : color.blue
@@ -415,8 +433,10 @@ drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
          color = color.new(color.white, 100), textcolor = c, size = size.small)
     true
 
-int    sig     = 0
-string sigZone = ""
+int    sig      = 0
+string sigZone  = ""
+float  entryPx  = na
+int    setupDir = 0      // PREPARE signal fired on this bar (neckline broken, waiting for retest)
 
 // Zone freshness: FRESH until price first reaches it (-> IN PLAY). The first approach ends when
 // price moves leaveAtr × H4 ATR away from the zone; if no M30 pattern formed by then, the zone
@@ -442,16 +462,37 @@ if showEntries and array.size(zones) > 0
             else
                 styleZone(z)
 
-if showEntries and isM30 and barstate.isconfirmed
-    // Neckline-break trigger for a pattern found earlier
+float rTol = retestTolAtr * atrM
+
+if showEntries and isPatTF and barstate.isconfirmed
+    // Stage 1: wait for a close through the neckline. Stage 2: wait for the retest of the neckline.
     if pendDir != 0
-        bool failed = pendDir == -1 ? high > pendInv : low < pendInv
-        if failed or bar_index > pendExp
-            pendDir := 0
-        else if (pendDir == -1 and close < pendNeck) or (pendDir == 1 and close > pendNeck)
-            sig     := pendDir
-            sigZone := pendZone
-            pendDir := 0
+        bool failed = pendDir == -1 ? close > pendInv : close < pendInv
+        if pendStage == 1
+            if failed or bar_index > pendExp
+                pendDir := 0
+            else if (pendDir == -1 and close < pendNeck) or (pendDir == 1 and close > pendNeck)
+                if trigger == "Neckline break"
+                    sig     := pendDir
+                    sigZone := pendZone
+                    entryPx := close
+                    pendDir := 0
+                    markValid(pendZ)
+                else
+                    pendStage := 2
+                    pendBrkI  := bar_index
+                    pendExp   := bar_index + retestExpiry
+                    setupDir  := pendDir
+        else
+            bool ranAway = pendDir == -1 ? low <= pendNeck - tpPts * pt : high >= pendNeck + tpPts * pt
+            if failed or ranAway or bar_index > pendExp
+                pendDir := 0
+            else if bar_index > pendBrkI and ((pendDir == -1 and high >= pendNeck - rTol) or (pendDir == 1 and low <= pendNeck + rTol))
+                sig     := pendDir
+                sigZone := pendZone
+                entryPx := pendDir == -1 ? math.min(pendNeck, high) : math.max(pendNeck, low)
+                pendDir := 0
+                markValid(pendZ)
 
     // Double top -> SELL (both peaks inside a sell zone)
     if not na(ph)
@@ -460,7 +501,7 @@ if showEntries and isM30 and barstate.isconfirmed
         if not na(lastPH)
             int   gap = i2 - lastPHi
             float p1  = lastPH
-            if gap >= minGap and gap <= maxGap and math.abs(p2 - p1) <= eqTolAtr * atrM
+            if gap >= minGap and gap <= maxGap and p2 <= p1 + eqTolAtr * atrM
                 float neck    = low[pR + 1]
                 int   neckOff = pR + 1
                 float maxMid  = high[pR + 1]
@@ -470,19 +511,32 @@ if showEntries and isM30 and barstate.isconfirmed
                         neckOff := k
                     maxMid := math.max(maxMid, high[k])
                 float top2 = math.max(p1, p2)
-                if maxMid <= top2 and math.min(p1, p2) - neck >= minDepthAtr * atrM
-                    string zn = validateZones(p1, p2, -1, zTol, lastPHi, i2)
-                    if zn != ""
+                if maxMid <= top2 and p1 - neck >= minDepthAtr * atrM and p2 - neck >= recoverPct * (p1 - neck)
+                    Zone zf = findZone(p1, p2, -1, zTol, lastPHi, i2)
+                    if not na(zf)
+                        string zn = zoneName(zf)
                         drawPattern(lastPHi, p1, bar_index - neckOff, neck, i2, p2, -1)
-                        if trigger == "Second peak confirmed"
+                        // the neckline may already be broken in the pR candles after the 2nd top
+                        bool brk = false
+                        for k = 0 to pR - 1
+                            if close[k] < neck
+                                brk := true
+                        if trigger == "Second top" or (brk and trigger == "Neckline break")
                             sig     := -1
                             sigZone := zn
+                            entryPx := close
+                            markValid(zf)
                         else
-                            pendDir  := -1
-                            pendNeck := neck
-                            pendInv  := top2
-                            pendExp  := bar_index + neckExpiry
-                            pendZone := zn
+                            pendZ     := zf
+                            pendDir   := -1
+                            pendNeck  := neck
+                            pendInv   := top2
+                            pendZone  := zn
+                            pendStage := brk ? 2 : 1
+                            pendBrkI  := bar_index
+                            pendExp   := bar_index + (brk ? retestExpiry : neckExpiry)
+                            if brk
+                                setupDir := -1
         lastPH  := p2
         lastPHi := i2
 
@@ -493,7 +547,7 @@ if showEntries and isM30 and barstate.isconfirmed
         if not na(lastPL)
             int   gap = j2 - lastPLi
             float q1  = lastPL
-            if gap >= minGap and gap <= maxGap and math.abs(q2 - q1) <= eqTolAtr * atrM
+            if gap >= minGap and gap <= maxGap and q2 >= q1 - eqTolAtr * atrM
                 float neck    = high[pR + 1]
                 int   neckOff = pR + 1
                 float minMid  = low[pR + 1]
@@ -503,30 +557,56 @@ if showEntries and isM30 and barstate.isconfirmed
                         neckOff := k
                     minMid := math.min(minMid, low[k])
                 float bot2 = math.min(q1, q2)
-                if minMid >= bot2 and neck - math.max(q1, q2) >= minDepthAtr * atrM
-                    string zn = validateZones(q1, q2, 1, zTol, lastPLi, j2)
-                    if zn != ""
+                if minMid >= bot2 and neck - q1 >= minDepthAtr * atrM and neck - q2 >= recoverPct * (neck - q1)
+                    Zone zf = findZone(q1, q2, 1, zTol, lastPLi, j2)
+                    if not na(zf)
+                        string zn = zoneName(zf)
                         drawPattern(lastPLi, q1, bar_index - neckOff, neck, j2, q2, 1)
-                        if trigger == "Second peak confirmed"
+                        bool brk = false
+                        for k = 0 to pR - 1
+                            if close[k] > neck
+                                brk := true
+                        if trigger == "Second top" or (brk and trigger == "Neckline break")
                             sig     := 1
                             sigZone := zn
+                            entryPx := close
+                            markValid(zf)
                         else
-                            pendDir  := 1
-                            pendNeck := neck
-                            pendInv  := bot2
-                            pendExp  := bar_index + neckExpiry
-                            pendZone := zn
+                            pendZ     := zf
+                            pendDir   := 1
+                            pendNeck  := neck
+                            pendInv   := bot2
+                            pendZone  := zn
+                            pendStage := brk ? 2 : 1
+                            pendBrkI  := bar_index
+                            pendExp   := bar_index + (brk ? retestExpiry : neckExpiry)
+                            if brk
+                                setupDir := 1
         lastPL  := q2
         lastPLi := j2
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Entry: SL / TP boxes, labels, alerts
 // ─────────────────────────────────────────────────────────────────────────────
-bool buyFired  = false
-bool sellFired = false
+bool buyFired   = false
+bool sellFired  = false
+bool prepBuy    = setupDir == 1
+bool prepSell   = setupDir == -1
+
+// PREPARE: neckline broken, place a limit order at the neckline and wait for the retest
+if setupDir != 0
+    float lim = pendNeck
+    float psl = lim - setupDir * slPts * pt
+    float ptp = lim + setupDir * tpPts * pt
+    string pside = setupDir == 1 ? "BUY" : "SELL"
+    label.new(bar_index, lim, "PREPARE " + pside + "\nlimit " + str.tostring(lim, format.mintick),
+         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small)
+    alert("PREPARE " + pside + " " + syminfo.ticker + " (" + (setupDir == 1 ? "W / double bottom" : "M / double top") + " in " + pendZone +
+         " zone, neckline broken) | " + pside + " LIMIT " + str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) +
+         " | TP " + str.tostring(ptp, format.mintick), alert.freq_once_per_bar_close)
 
 if sig != 0 and not (oneTrade and openCount > 0)
-    float entry = close
+    float entry = nz(entryPx, close)
     float sl    = entry - sig * slPts * pt
     float tp    = entry + sig * tpPts * pt
     box rb = box.new(bar_index, math.max(entry, sl), bar_index + 1, math.min(entry, sl),
@@ -539,22 +619,24 @@ if sig != 0 and not (oneTrade and openCount > 0)
          text_size = size.small, text_halign = text.align_left)
     array.push(trades, Trade.new(sig, entry, sl, tp, bar_index, rb, wb))
     string side = sig == 1 ? "BUY" : "SELL"
-    label.new(bar_index, sig == 1 ? low : high,
+    label.new(bar_index, entry,
          side + " · " + sigZone + "\nEntry " + str.tostring(entry, format.mintick) +
          "\nSL " + str.tostring(sl, format.mintick) + "\nTP " + str.tostring(tp, format.mintick),
          style = sig == 1 ? label.style_label_up : label.style_label_down,
          color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small)
     buyFired  := sig == 1
     sellFired := sig == -1
-    alert(syminfo.ticker + " " + side + " (" + (sig == 1 ? "double bottom" : "double top") + " in " + sigZone + " zone)" +
+    alert("ENTRY " + side + " " + syminfo.ticker + " (" + (sig == 1 ? "W / double bottom" : "M / double top") + " in " + sigZone + " zone)" +
          " | Entry " + str.tostring(entry, format.mintick) + " | SL " + str.tostring(sl, format.mintick) +
          " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
 
 plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny)
 plotshape(sellFired, "Sell signal", shape.triangledown, location.abovebar, color.red, size = size.tiny)
 
-alertcondition(buyFired, "KZ Buy", "Double bottom in buy zone — BUY {{ticker}} @ {{close}}")
-alertcondition(sellFired, "KZ Sell", "Double top in sell zone — SELL {{ticker}} @ {{close}}")
+alertcondition(prepBuy, "KZ Prepare Buy", "PREPARE BUY {{ticker}}: W in buy zone, neckline broken — wait for the retest")
+alertcondition(prepSell, "KZ Prepare Sell", "PREPARE SELL {{ticker}}: M in sell zone, neckline broken — wait for the retest")
+alertcondition(buyFired, "KZ Buy", "ENTRY BUY {{ticker}}: W in buy zone, neckline retested")
+alertcondition(sellFired, "KZ Sell", "ENTRY SELL {{ticker}}: M in sell zone, neckline retested")
 
 // Keep live zones extended to the current bar
 if barstate.islast
@@ -574,7 +656,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 0, "KZ Pattern Entry", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 0, "", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 1, isM30 ? "M30 ✓" : "Switch chart to M30", text_color = isM30 ? color.lime : color.orange, text_size = size.small)
+    table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Switch chart to M15 or M30", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 2, "Red SNR+DBD · Blue SNR+RBR · Grey BRK", text_color = tc, text_size = size.small)
     int nFresh = 0
