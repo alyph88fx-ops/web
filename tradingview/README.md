@@ -2,14 +2,14 @@
 
 `kz-pattern-entry.pine` (Pine Script v6). Three steps:
 
-1. **Key zones (rectangles) from D1 and H4.** A zone is only marked where an **SNR** swing level (swing high or swing low)
-   overlaps a **DBD** or **RBR** base. The rectangle covers both.
+1. **Key zones (rectangles).** **SNR** levels come from **H4 only** (swing highs and swing lows). **DBD/RBR** bases come from D1 and H4.
+   A zone is only marked where an H4 SNR level overlaps a DBD or RBR base. The rectangle covers both, for example "H4 SNR + D1 DBD".
    - **SNR + DBD** (drop-base-drop): **red**, resistance / sell zone.
    - **SNR + RBR** (rally-base-rally): **blue**, support / buy zone.
    - **Breakout (grey)**: when a D1/H4 candle closes through a zone, the zone turns grey and switches role
      (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
      If price closes back through a grey zone, the zone is removed.
-   - To see every SNR and DBD/RBR on its own, set *Zones to mark* to **All SNR and DBD/RBR**.
+   - To see every H4 SNR and D1/H4 DBD/RBR on its own, set *Zones to mark* to **All SNR and DBD/RBR**.
 2. **Confirmation on M30, fresh zones only.** Each zone has a status:
    - **FRESH**: price hasn't come back to the zone yet.
    - **IN PLAY**: price is making its first approach to the zone.
@@ -40,7 +40,7 @@ The last option sends the full message: side, zone, entry, SL and TP.
 | Zones to mark | SNR + DBD/RBR only | Choose **All SNR and DBD/RBR** to draw every level on its own. |
 | Fresh zone window | 12 bars | How soon after price first reaches a zone the first peak must form. |
 | Signal trigger | Second peak confirmed | Choose **Neckline break** for a stricter signal, which waits for a close through the neckline. |
-| SNR swing strength | 5 | A higher value gives fewer, stronger D1/H4 levels. |
+| H4 SNR swing strength | 5 | A higher value gives fewer, stronger H4 levels. |
 | Max zones per timeframe | 8 | Older zones are removed after this. |
 | Pattern pivot left / right bars | 5 / 3 | Signals appear `right bars` candles after the second peak (they don't repaint). |
 | Peak equality tolerance | 0.5 × ATR | Sets how close the two tops/bottoms must be. |

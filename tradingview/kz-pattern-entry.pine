@@ -4,8 +4,8 @@
 // KZ Pattern Entry — D1/H4 key zones + M30 double top / double bottom entries
 //
 // Flow
-//   1. Key zones (rectangles) from D1 and H4. By default a zone is only marked where an
-//      SNR swing level overlaps a supply/demand base:
+//   1. Key zones (rectangles). SNR levels come from H4 only; DBD/RBR bases from D1 and H4.
+//      By default a zone is only marked where an H4 SNR level overlaps a DBD/RBR base:
 //        SNR + DBD   drop-base-drop at an SNR level   -> red  (resistance / sell zone)
 //        SNR + RBR   rally-base-rally at an SNR level -> blue (support / buy zone)
 //        Breakout    a zone that a D1/H4 candle closed through turns grey and flips role
@@ -23,12 +23,12 @@ indicator("KZ Pattern Entry (D1/H4 Zones + M30 DT/DB)", shorttitle = "KZ-DTB", o
 // Inputs
 // ─────────────────────────────────────────────────────────────────────────────
 grpZ = "1 · D1 / H4 key zones"
-useD1        = input.bool(true, "D1 zones", inline = "tf", group = grpZ)
-useH4        = input.bool(true, "H4 zones", inline = "tf", group = grpZ)
+useD1        = input.bool(true, "D1 DBD/RBR", inline = "tf", group = grpZ)
+useH4        = input.bool(true, "H4 DBD/RBR", inline = "tf", group = grpZ)
 zoneMode     = input.string("SNR + DBD/RBR only", "Zones to mark", options = ["SNR + DBD/RBR only", "All SNR and DBD/RBR"], group = grpZ,
-     tooltip = "SNR + DBD/RBR only: a zone is drawn only where a D1/H4 swing level (SNR) overlaps a drop-base-drop (red, sell) or rally-base-rally (blue, buy) base.")
-snrMemory    = input.int(30, "Levels remembered for matching (per TF)", minval = 5, maxval = 100, group = grpZ)
-pivLen       = input.int(5, "SNR swing strength (bars each side)", minval = 2, maxval = 20, group = grpZ)
+     tooltip = "SNR levels come from H4 only. SNR + DBD/RBR only: a zone is drawn only where an H4 swing level (SNR) overlaps a drop-base-drop (red, sell) or rally-base-rally (blue, buy) base.")
+snrMemory    = input.int(30, "Levels remembered for matching", minval = 5, maxval = 100, group = grpZ)
+pivLen       = input.int(5, "H4 SNR swing strength (bars each side)", minval = 2, maxval = 20, group = grpZ)
 legMult      = input.float(1.0, "DBD/RBR leg candle min body (× ATR)", minval = 0.1, step = 0.1, group = grpZ)
 baseRatio    = input.float(0.5, "Base candle max body / range", minval = 0.1, maxval = 1.0, step = 0.05, group = grpZ)
 maxBase      = input.int(3, "Max base candles", minval = 1, maxval = 6, group = grpZ)
@@ -160,7 +160,7 @@ type Zone
 var array<Zone>      zones = array.new<Zone>()
 var map<string, int> seen  = map.new<string, int>()
 
-zoneName(Zone z) => z.tf + " " + (z.broken ? "BRK" : z.kind)
+zoneName(Zone z) => z.kind + (z.broken ? " · BRK" : "")
 
 styleZone(Zone z) =>
     color base = z.broken ? colBrk : z.role == 1 ? colSup : colRes
@@ -235,12 +235,12 @@ capPool(array<Cand> pool, string tf, int maxN) =>
 // SNR level + DBD/RBR base -> one zone covering both; colour/direction from the DBD (sell) or RBR (buy)
 addConfluence(Cand s, Cand d) =>
     addZone(math.max(s.top, d.top), math.min(s.bot, d.bot), math.min(s.t, d.t), d.role, d.tf,
-         s.kind + "+" + d.kind, d.tf + d.kind + str.tostring(d.t))
+         "H4 SNR + " + d.tf + " " + d.kind, d.tf + d.kind + str.tostring(d.t))
 
 onSNR(string key, float top, float bot, int t, int role, string tf, string kind) =>
     if not na(top) and not na(bot) and isNew(key, t)
         if allZones
-            addZone(top, bot, t, role, tf, kind, key + str.tostring(t))
+            addZone(top, bot, t, role, tf, tf + " " + kind, key + str.tostring(t))
         else
             Cand s = Cand.new(top, bot, t, role, tf, kind)
             array.push(snrPool, s)
@@ -248,7 +248,7 @@ onSNR(string key, float top, float bot, int t, int role, string tf, string kind)
             if array.size(sdPool) > 0
                 for i = array.size(sdPool) - 1 to 0
                     Cand d = array.get(sdPool, i)
-                    if d.tf == tf and top >= d.bot and bot <= d.top
+                    if top >= d.bot and bot <= d.top
                         addConfluence(s, d)
                         array.remove(sdPool, i)
     true
@@ -256,14 +256,14 @@ onSNR(string key, float top, float bot, int t, int role, string tf, string kind)
 onSD(string key, float top, float bot, int t, int role, string tf, string kind) =>
     if not na(top) and not na(bot) and isNew(key, t)
         if allZones
-            addZone(top, bot, t, role, tf, kind, key + str.tostring(t))
+            addZone(top, bot, t, role, tf, tf + " " + kind, key + str.tostring(t))
         else
             Cand d = Cand.new(top, bot, t, role, tf, kind)
             bool matched = false
             if array.size(snrPool) > 0
                 for i = array.size(snrPool) - 1 to 0
                     Cand s = array.get(snrPool, i)
-                    if s.tf == tf and top >= s.bot and bot <= s.top
+                    if top >= s.bot and bot <= s.top
                         addConfluence(s, d)
                         matched := true
                         break
@@ -273,8 +273,6 @@ onSD(string key, float top, float bot, int t, int role, string tf, string kind) 
     true
 
 if d1Ok
-    onSNR("D1R", d1RTop, d1RBot, d1RT, -1, "D1", "RES")
-    onSNR("D1S", d1STop, d1SBot, d1ST,  1, "D1", "SUP")
     onSD("D1D", d1DTop, d1DBot, d1DT, -1, "D1", "DBD")
     onSD("D1U", d1UTop, d1UBot, d1UT,  1, "D1", "RBR")
 if h4Ok
