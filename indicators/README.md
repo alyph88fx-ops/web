@@ -32,6 +32,21 @@ level instead (fewer false breaks, later entry).
 Because live signals fire inside the candle, a break can still fail if price closes back. On past bars the indicator
 shows where the level was crossed (entry at the level).
 
+## NOW call at CMP
+
+On the latest bar a box sits next to the current price and says what the indicator sees **right now**:
+
+| Box | Meaning |
+|---|---|
+| `BUY NOW @ CMP` / `SELL NOW @ CMP` | H4 + H1 agree, M5 structure already turned the same way, price reacted from an H1/H4 zone of that direction in the last 30 bars, and the stop fits the max stop size. Shows entry (current price), SL (M5 swing low / high) and TP (2R), with dashed SL / TP lines |
+| `BUY OPEN` / `SELL OPEN` | The last signal is still running (neither SL nor TP hit). Shows the result so far in R |
+| `WAIT · BUY above X` / `WAIT · SELL below X` | Trend is set but M5 has not flipped yet. X is the price that would trigger the entry |
+| `WAIT · BUY bias` / `WAIT · SELL bias` | Trend is set; wait for price to come back to an H1/H4 zone |
+| `NO TRADE` | H4 and H1 disagree |
+
+The same text is in the dashboard (`NOW (CMP)`), and the alerts `NOW: BUY at CMP` / `NOW: SELL at CMP` fire when the
+box turns to BUY NOW / SELL NOW. The box updates with every tick.
+
 ## How an entry is chosen (precise mode)
 
 With **Show entries = Zone reaction + trend (A+ only)** (the default) a BUY needs all of these:

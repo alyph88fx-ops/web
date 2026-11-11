@@ -48,6 +48,7 @@ brkBuf    = input.float(0.1, "Break buffer (× M5 ATR)", minval = 0.0, step = 0.
 maxRisk   = input.float(3.0, "Max stop size (× M5 ATR, 0 = off)", minval = 0.0, step = 0.5, group = grpE, tooltip = "Skip the signal when the stop would be wider than this.")
 coolBars  = input.int(10, "Min bars between signals (same side)", minval = 0, maxval = 500, group = grpE)
 showRR    = input.bool(true, "Show entry / SL / TP", group = grpE)
+showNow   = input.bool(true, "Show NOW call at CMP (latest bar)", group = grpE, tooltip = "A live box next to the current price: BUY NOW / SELL NOW, the open trade with its result so far, or WAIT with the price to watch.")
 rr        = input.float(2.0, "Take profit (R multiple)", minval = 0.5, step = 0.5, group = grpE)
 
 grpD = "Display"
@@ -526,6 +527,96 @@ if sellEntry and recent
     alert("SMC: " + (sellAplus ? "SELL A+" : "SELL") + " (M5 CHoCH) on " + syminfo.ticker + " at " + str.tostring(sellPx, format.mintick) + " SL " + str.tostring(sellSl, format.mintick), liveMode ? alert.freq_once_per_bar : alert.freq_once_per_bar_close)
 
 // ═════════════════════════════════════════════════════════════════════════════
+// NOW: what the indicator says at the current market price
+// ═════════════════════════════════════════════════════════════════════════════
+// open trade from the last signal, closed when SL or TP is hit
+var int    actDir  = 0
+var float  actPx   = na
+var float  actSl   = na
+var float  actTp   = na
+var string lastRes = ""
+if buyEntry
+    actDir := 1
+    actPx  := buyPx
+    actSl  := buySl
+    actTp  := buyPx + rr * (buyPx - buySl)
+if sellEntry
+    actDir := -1
+    actPx  := sellPx
+    actSl  := sellSl
+    actTp  := sellPx - rr * (sellSl - sellPx)
+if actDir == 1 and not buyEntry
+    if low <= actSl
+        actDir  := 0
+        lastRes := "last BUY: SL hit"
+    else if high >= actTp
+        actDir  := 0
+        lastRes := "last BUY: TP hit"
+if actDir == -1 and not sellEntry
+    if high >= actSl
+        actDir  := 0
+        lastRes := "last SELL: SL hit"
+    else if low <= actTp
+        actDir  := 0
+        lastRes := "last SELL: TP hit"
+
+// no open trade: is there a valid entry at CMP right now?
+// BUY NOW = H4 + H1 bullish, M5 already bullish, price reacted from a bullish H1/H4 zone, stop within limits
+float nowSl    = na
+int   nowState = 0      // 2 BUY open, 1 BUY NOW, 0 WAIT, -1 SELL NOW, -2 SELL open
+if actDir != 0
+    nowState := actDir * 2
+else if upTrend and m5Trend == 1 and bullTapOk
+    float sl = math.min(nz(m5LegLo, curLo), curLo)
+    if sl < close and (maxRisk == 0 or m5A == 0 or close - sl <= maxRisk * m5A)
+        nowState := 1
+        nowSl    := sl
+else if dnTrend and m5Trend == -1 and bearTapOk
+    float sl = math.max(nz(m5LegHi, curHi), curHi)
+    if sl > close and (maxRisk == 0 or m5A == 0 or sl - close <= maxRisk * m5A)
+        nowState := -1
+        nowSl    := sl
+
+f_p(float v) => str.tostring(v, format.mintick)
+
+string nowTxt = ""
+color  nowCol = color.gray
+if nowState == 2 or nowState == -2
+    float r = (close - actPx) / math.abs(actPx - actSl) * actDir
+    nowTxt := (actDir == 1 ? "BUY OPEN" : "SELL OPEN") + "  " + (r >= 0 ? "+" : "") + str.tostring(r, "#.##") + "R\nentry " + f_p(actPx) + "\nSL " + f_p(actSl) + "   TP " + f_p(actTp)
+    nowCol := actDir == 1 ? bullCol : bearCol
+else if nowState == 1 or nowState == -1
+    float tp = close + rr * (close - nowSl)
+    nowTxt := (nowState == 1 ? "BUY NOW @ CMP " : "SELL NOW @ CMP ") + f_p(close) + "\nSL " + f_p(nowSl) + "   TP " + f_p(tp)
+    nowCol := nowState == 1 ? bullCol : bearCol
+else if upTrend
+    nowTxt := not na(m5UpLvl) ? "WAIT · BUY above " + f_p(m5UpLvl + buf) + "\n(M5 CHoCH from an H1/H4 zone)" : "WAIT · BUY bias\nlet price come back to an H1/H4 bullish zone"
+    nowCol := color.new(bullCol, 50)
+else if dnTrend
+    nowTxt := not na(m5DnLvl) ? "WAIT · SELL below " + f_p(m5DnLvl - buf) + "\n(M5 CHoCH from an H1/H4 zone)" : "WAIT · SELL bias\nlet price come back to an H1/H4 bearish zone"
+    nowCol := color.new(bearCol, 50)
+else
+    nowTxt := "NO TRADE\nH4 and H1 disagree"
+    nowCol := color.gray
+if lastRes != "" and nowState != 2 and nowState != -2
+    nowTxt := nowTxt + "\n" + lastRes
+
+var label nowLb   = na
+var line  nowSlLn = na
+var line  nowTpLn = na
+if barstate.islast
+    label.delete(nowLb)
+    line.delete(nowSlLn)
+    line.delete(nowTpLn)
+    if showNow
+        nowLb := label.new(bar_index + 3, close, "NOW · " + nowTxt, color = nowCol, textcolor = color.white, style = label.style_label_left, size = size.normal, textalign = text.align_left)
+        float sl = nowState == 2 or nowState == -2 ? actSl : nowSl
+        float tp = nowState == 2 or nowState == -2 ? actTp : na(nowSl) ? na : close + rr * (close - nowSl)
+        if not na(sl)
+            nowSlLn := line.new(bar_index, sl, bar_index + 12, sl, color = bearCol, style = line.style_dashed, width = 2)
+            nowTpLn := line.new(bar_index, tp, bar_index + 12, tp, color = bullCol, style = line.style_dashed, width = 2)
+
+// ═════════════════════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═════════════════════════════════════════════════════════════════════════════
 string dashLoc = switch dashPos
@@ -534,7 +625,7 @@ string dashLoc = switch dashPos
     "Bottom Right" => position.bottom_right
     => position.bottom_left
 
-var table dash = table.new(dashLoc, 2, 7, bgcolor = color.new(#0E1320, 8), frame_color = color.new(color.gray, 60), frame_width = 1, border_color = color.new(color.gray, 85), border_width = 1)
+var table dash = table.new(dashLoc, 2, 8, bgcolor = color.new(#0E1320, 8), frame_color = color.new(color.gray, 60), frame_width = 1, border_color = color.new(color.gray, 85), border_width = 1)
 
 f_row(int r, string k, string v, color vc) =>
     table.cell(dash, 0, r, k, text_color = color.new(color.white, 25), text_size = size.small, text_halign = text.align_left)
@@ -551,6 +642,7 @@ if showDash and barstate.islast
     f_row(3, "Direction", dirTxt, upTrend ? bullCol : dnTrend ? bearCol : color.gray)
     f_row(4, "M5 structure", f_arrow(m5Trend), f_tCol(m5Trend))
     f_row(5, "H1/H4 zone tapped", tapTxt, tapCol)
+    f_row(7, "NOW (CMP)", str.replace_all(nowTxt, "\n", " · "), nowState > 0 ? bullCol : nowState < 0 ? bearCol : color.gray)
     f_row(6, "Last entry", timeframe.in_seconds() > timeframe.in_seconds(tfM5) ? "Use M5 or lower chart" : lastSig, timeframe.in_seconds() > timeframe.in_seconds(tfM5) ? color.orange : lastSigCol)
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -560,6 +652,8 @@ alertcondition(buyEntry, "BUY entry (M5 CHoCH)", "SMC BUY: M5 bullish CHoCH on {
 alertcondition(sellEntry, "SELL entry (M5 CHoCH)", "SMC SELL: M5 bearish CHoCH on {{ticker}} at {{close}} – set the alert to Once per bar for live CMP signals")
 alertcondition(buyAplus, "BUY A+ (zone + trend + M5 CHoCH)", "SMC BUY A+ on {{ticker}} at {{close}}")
 alertcondition(sellAplus, "SELL A+ (zone + trend + M5 CHoCH)", "SMC SELL A+ on {{ticker}} at {{close}}")
+alertcondition(nowState == 1 and nowState[1] != 1, "NOW: BUY at CMP", "SMC NOW: BUY at current price on {{ticker}} ({{close}})")
+alertcondition(nowState == -1 and nowState[1] != -1, "NOW: SELL at CMP", "SMC NOW: SELL at current price on {{ticker}} ({{close}})")
 alertcondition(m5New and not isCh, "M5 BOS", "M5 BOS on {{ticker}}")
 alertcondition(newH4Zone or newH1Zone, "New H1/H4 FVG + OB zone", "New H1/H4 high-potential zone on {{ticker}}")
 alertcondition(h4BullTap or h1BullTap, "Price in bullish H1/H4 zone", "Price tapped a bullish H1/H4 zone on {{ticker}}")
