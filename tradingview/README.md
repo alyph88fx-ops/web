@@ -1,6 +1,6 @@
-# KZ Pattern Entry — TradingView indicator
+# 1PC Headline & Storyline Indicator (TradingView)
 
-`kz-pattern-entry.pine` (Pine Script v6). Three steps:
+`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the H4 key zone; the **storyline** is what price does when it comes back to it. Three steps:
 
 1. **Key zones (rectangles), H4 only.** An SNR swing level is only marked when price left it with a DBD or RBR:
    - **SNR + DBD → red (resistance / sell zone):** swing high → first drop (≥ 2 × H4 ATR) → base
@@ -26,16 +26,16 @@
 ## Install
 
 1. In TradingView, open **Pine Editor** (bottom panel), then **New → Indicator**.
-2. Delete the template code, paste in the full contents of `kz-pattern-entry.pine`, and click **Add to chart**.
+2. Delete the template code, paste in the full contents of `1pc-headline-storyline.pine`, and click **Add to chart**.
 3. Switch the chart to **15m** or **30m**.
 
 ## Alerts
 
-Create Alert → Condition: **KZ-DTB** → **Any alert() function call**. That sends both messages, each with zone, price, SL and TP:
-- `PREPARE SELL XAUUSD (M / double top in H4 SNR · RBR · BRK zone, neckline broken) | SELL LIMIT 4055.00 | SL 4061.00 | TP 4045.00`
-- `ENTRY SELL XAUUSD (...) | Entry 4055.00 | SL 4061.00 | TP 4045.00`
+Create Alert → Condition: **1PC H&S** → **Any alert() function call**. That sends both messages, each with zone, price, SL and TP:
+- `1PC PREPARE SELL XAUUSD (M / double top in H4 SNR · RBR · BRK zone, neckline broken) | SELL LIMIT 4055.00 | SL 4061.00 | TP 4045.00`
+- `1PC ENTRY SELL XAUUSD (...) | Entry 4055.00 | SL 4061.00 | TP 4045.00`
 
-There are also separate conditions: **KZ Prepare Buy / Sell** and **KZ Buy / Sell** (entry).
+There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry Buy / Sell**.
 
 ## Settings worth knowing
 

@@ -1,7 +1,9 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 //@version=6
 //
-// KZ Pattern Entry — H4 SNR zones (with DBD / RBR) + M30 double top / double bottom entries
+// 1PC Headline & Storyline Indicator
+//   Headline  = the H4 key zone (SNR with DBD / RBR)
+//   Storyline = what price does when it comes back to that zone (M / W on M15 or M30 -> PREPARE -> ENTRY)
 //
 // Flow
 //   1. Key zones (rectangles), H4 only. A swing level (SNR) is only marked when price left it
@@ -13,13 +15,13 @@
 //        Breakout    an H4 close through a zone turns it grey and flips its role
 //                    (broken resistance -> support, broken support -> resistance); its retest is fresh.
 //   2. Confirmation (M15 or M30 chart), on FRESH zones only: on price's first approach to a
-//      zone, an M (double top) in a sell zone or a W (double bottom) in a buy zone makes the
-//      zone VALID. When a candle closes through the neckline -> PREPARE signal (limit order at
-//      the neckline). When price comes back to retest the neckline -> ENTRY signal.
-//      If the first approach forms no pattern, the zone is marked TESTED and ignored.
+//      zone, look for an M (double top) in a sell zone or a W (double bottom) in a buy zone.
+//      A candle closes through the neckline -> PREPARE signal (limit order at the neckline).
+//      Price comes back to retest the neckline -> ENTRY signal, and the zone becomes VALID.
+//      If the first approach ends without an entry, the zone is marked TESTED and ignored.
 //   3. Risk: fixed stop loss / take profit in points (default 600 / 1000).
 //
-indicator("KZ Pattern Entry (H4 SNR Zones + M15/M30 M/W)", shorttitle = "KZ-DTB", overlay = true,
+indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay = true,
      max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -601,7 +603,7 @@ if setupDir != 0
     string pside = setupDir == 1 ? "BUY" : "SELL"
     label.new(bar_index, lim, "PREPARE " + pside + "\nlimit " + str.tostring(lim, format.mintick),
          style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small)
-    alert("PREPARE " + pside + " " + syminfo.ticker + " (" + (setupDir == 1 ? "W / double bottom" : "M / double top") + " in " + pendZone +
+    alert("1PC PREPARE " + pside + " " + syminfo.ticker + " (" + (setupDir == 1 ? "W / double bottom" : "M / double top") + " in " + pendZone +
          " zone, neckline broken) | " + pside + " LIMIT " + str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) +
          " | TP " + str.tostring(ptp, format.mintick), alert.freq_once_per_bar_close)
 
@@ -626,17 +628,17 @@ if sig != 0 and not (oneTrade and openCount > 0)
          color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small)
     buyFired  := sig == 1
     sellFired := sig == -1
-    alert("ENTRY " + side + " " + syminfo.ticker + " (" + (sig == 1 ? "W / double bottom" : "M / double top") + " in " + sigZone + " zone)" +
+    alert("1PC ENTRY " + side + " " + syminfo.ticker + " (" + (sig == 1 ? "W / double bottom" : "M / double top") + " in " + sigZone + " zone)" +
          " | Entry " + str.tostring(entry, format.mintick) + " | SL " + str.tostring(sl, format.mintick) +
          " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
 
 plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny)
 plotshape(sellFired, "Sell signal", shape.triangledown, location.abovebar, color.red, size = size.tiny)
 
-alertcondition(prepBuy, "KZ Prepare Buy", "PREPARE BUY {{ticker}}: W in buy zone, neckline broken — wait for the retest")
-alertcondition(prepSell, "KZ Prepare Sell", "PREPARE SELL {{ticker}}: M in sell zone, neckline broken — wait for the retest")
-alertcondition(buyFired, "KZ Buy", "ENTRY BUY {{ticker}}: W in buy zone, neckline retested")
-alertcondition(sellFired, "KZ Sell", "ENTRY SELL {{ticker}}: M in sell zone, neckline retested")
+alertcondition(prepBuy, "1PC Prepare Buy", "PREPARE BUY {{ticker}}: W in buy zone, neckline broken — wait for the retest")
+alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: M in sell zone, neckline broken — wait for the retest")
+alertcondition(buyFired, "1PC Entry Buy", "ENTRY BUY {{ticker}}: W in buy zone, neckline retested")
+alertcondition(sellFired, "1PC Entry Sell", "ENTRY SELL {{ticker}}: M in sell zone, neckline retested")
 
 // Keep live zones extended to the current bar
 if barstate.islast
@@ -653,7 +655,7 @@ var table tb = table.new(position.top_right, 2, 9, bgcolor = color.new(color.bla
 if barstate.islast and showStats
     int total = wins + losses
     color tc  = color.white
-    table.cell(tb, 0, 0, "KZ Pattern Entry", text_color = tc, text_size = size.small)
+    table.cell(tb, 0, 0, "1PC Headline & Storyline", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 0, "", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Switch chart to M15 or M30", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
