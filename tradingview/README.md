@@ -4,7 +4,7 @@
 
 1. **Key zones (rectangles), H4 only.** An SNR swing level is only marked when price left it with a DBD or RBR:
    - **SNR + DBD → red (resistance / sell zone):** swing high → first drop (≥ 2 × H4 ATR) → base
-     (price bounces but stays below the high and retraces at most 70% of the drop) → second drop (an H4 close below the base low).
+     (price bounces but stays below the high and retraces at most 80% of the drop) → second drop (an H4 close below the base low).
      The zone is drawn at the swing high, from the wick to the candle body, and is at least 1 × ATR tall.
    - **SNR + RBR → blue (support / buy zone):** the mirror image, drawn at the swing low.
    - **Breakout → grey:** when an H4 candle closes through a zone, the zone turns grey and switches role
@@ -37,12 +37,13 @@ The last option sends the full message: side, zone, entry, SL and TP.
 |---|---|---|
 | Point size override | 0 (= symbol min tick) | 600 points = 600 × min tick. Examples: EURUSD (0.00001) gives 60 pips; XAUUSD (0.01) gives $6.00. Set it here if your broker's point is different. |
 | Min first drop / rally | 2 × H4 ATR | Size of the first leg away from the swing level. |
-| Max base bounce | 0.7 | Fraction of the first leg the base may retrace. |
+| Max base bounce | 0.8 | Fraction of the first leg the base may retrace. |
 | H4 swing strength | 3 | Bars on each side for an H4 swing high or low. |
 | Min zone height | 1 × H4 ATR | Lower it for thinner zones. |
 | Fresh zone: approach ends | 1 × H4 ATR | How far price must move away from a zone before its first approach is over. |
 | Signal trigger | Second peak confirmed | Choose **Neckline break** for a stricter signal, which waits for a close through the neckline. |
-| Max zones kept | 10 | Older zones are removed after this. |
+| Only show zones from the last | 30 days | Keeps only the nearest zones on the left. |
+| Max zones per type | 3 | At most 3 red and 3 blue zones; the newest are kept. |
 | Pattern pivot left / right bars | 5 / 3 | Signals appear `right bars` candles after the second peak (they don't repaint). |
 | Peak equality tolerance | 0.5 × ATR | Sets how close the two tops/bottoms must be. |
 | Zone touch tolerance | 0.25 × ATR | Allows wicks that poke slightly outside a zone. |

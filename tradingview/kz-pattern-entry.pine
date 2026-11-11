@@ -28,12 +28,15 @@ grpZ = "1 · H4 key zones (SNR with DBD / RBR)"
 swLen        = input.int(3, "H4 swing strength (bars each side)", minval = 1, maxval = 10, group = grpZ)
 minMoveAtr   = input.float(2.0, "Min first drop / rally (× H4 ATR)", minval = 0.5, step = 0.25, group = grpZ,
      tooltip = "Size of the first leg away from the swing level, e.g. the drop from the swing high in a DBD.")
-maxRetr      = input.float(0.7, "Max base bounce (fraction of first leg)", minval = 0.1, maxval = 1.0, step = 0.05, group = grpZ,
+maxRetr      = input.float(0.8, "Max base bounce (fraction of first leg)", minval = 0.1, maxval = 1.0, step = 0.05, group = grpZ,
      tooltip = "The base may retrace at most this much of the first leg. Deeper retracements are not a base.")
 maxBaseBars  = input.int(50, "Max base length (H4 bars)", minval = 2, maxval = 200, group = grpZ)
 minZoneAtr   = input.float(1.0, "Min zone height (× H4 ATR)", minval = 0.0, step = 0.1, group = grpZ,
      tooltip = "A zone runs from the swing wick to the candle body, and is made at least this tall.")
-maxZones     = input.int(10, "Max zones kept", minval = 1, maxval = 50, group = grpZ)
+maxAgeDays   = input.int(30, "Only show zones from the last (days)", minval = 1, maxval = 365, group = grpZ,
+     tooltip = "Keeps the chart to the nearest zones on the left. A zone is removed once its swing is older than this.")
+perType      = input.int(3, "Max zones per type (newest kept)", minval = 1, maxval = 20, group = grpZ,
+     tooltip = "At most this many red (SNR + DBD) and this many blue (SNR + RBR) zones; older ones are removed first.")
 mergeOverlap = input.bool(true, "Skip new zones that overlap an existing one", group = grpZ)
 keepDead     = input.bool(false, "Keep invalidated zones on chart", group = grpZ)
 hideTested   = input.bool(false, "Hide tested (used-up) zones", group = grpZ)
@@ -238,6 +241,7 @@ type Zone
     float  bot
     int    role            // 1 = buy zone (support / broken resistance), -1 = sell zone
     string kind
+    int    t0                 // time of the swing the zone starts at
     bool   broken     = false
     int    state      = 0     // 0 FRESH (untouched), 1 IN PLAY (first approach), 2 TESTED (no pattern), 3 VALID (pattern formed)
     int    firstTouch = na
@@ -271,11 +275,20 @@ addZone(float top, float bot, int t, int role, string kind) =>
     if not skip
         Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1,
              text_size = size.small, text_halign = text.align_right, text_valign = text.align_top),
-             top, bot, role, kind)
+             top, bot, role, kind, t)
         styleZone(nz)
         array.push(zones, nz)
-        if array.size(zones) > maxZones
-            box.delete(array.shift(zones).bx)
+        int cnt = 0
+        for z in zones
+            if z.kind == kind
+                cnt += 1
+        if cnt > perType
+            for i = 0 to array.size(zones) - 1
+                Zone oz = array.get(zones, i)
+                if oz.kind == kind
+                    box.delete(oz.bx)
+                    array.remove(zones, i)
+                    break
     true
 
 if h4Ok and not na(rT) and rT != lastResT
@@ -284,6 +297,14 @@ if h4Ok and not na(rT) and rT != lastResT
 if h4Ok and not na(sT) and sT != lastSupT
     lastSupT := sT
     addZone(sTop, sBot, sT, 1, "H4 SNR · RBR")
+
+// Only the nearest zones on the left: drop zones whose swing is older than maxAgeDays
+if array.size(zones) > 0
+    for i = array.size(zones) - 1 to 0
+        Zone z = array.get(zones, i)
+        if time - z.t0 > maxAgeDays * 86400000
+            box.delete(z.bx)
+            array.remove(zones, i)
 
 // Breakouts: an H4 close through a zone turns it grey, flips its role and makes it fresh
 // again (its first retest can give an entry). A grey zone closed back through is removed.
