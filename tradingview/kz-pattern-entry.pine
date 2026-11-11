@@ -45,6 +45,8 @@ colBrk       = input.color(color.new(color.gray, 75), "Breakout", group = grpC)
 showZoneText = input.bool(true, "Show zone labels", group = grpC)
 
 grpP = "2 · M30 confirmation (double top / bottom)"
+showEntries = input.bool(false, "Show M30 entries (patterns, SL/TP)", group = grpP,
+     tooltip = "Off = zones only. On = also track zone freshness, find M30 double tops / bottoms and draw SL/TP.")
 pL          = input.int(5, "Pattern pivot left bars", minval = 1, group = grpP)
 pR          = input.int(3, "Pattern pivot right bars", minval = 1, group = grpP)
 minGap      = input.int(5, "Min bars between the two peaks", minval = 2, group = grpP)
@@ -243,7 +245,7 @@ styleZone(Zone z) =>
     box.set_border_width(z.bx, z.state == 3 ? 2 : 1)
     box.set_border_style(z.bx, z.state == 2 ? line.style_dotted : line.style_solid)
     string st = z.state == 0 ? "FRESH" : z.state == 1 ? "IN PLAY" : z.state == 2 ? "TESTED" : "✓ VALID"
-    box.set_text(z.bx, showZoneText ? zoneName(z) + " · " + st : "")
+    box.set_text(z.bx, showZoneText ? zoneName(z) + (showEntries ? " · " + st : "") : "")
     box.set_text_color(z.bx, color.new(base, z.state == 2 ? 50 : 0))
     true
 
@@ -388,7 +390,7 @@ string sigZone = ""
 // is marked TESTED and is ignored from then on.
 float zTol  = zoneTolAtr * atrM
 float leave = leaveAtr * nz(h4Atr, 3 * atrM)
-if array.size(zones) > 0
+if showEntries and array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone z = array.get(zones, i)
         if z.state == 0
@@ -407,7 +409,7 @@ if array.size(zones) > 0
             else
                 styleZone(z)
 
-if isM30 and barstate.isconfirmed
+if showEntries and isM30 and barstate.isconfirmed
     // Neckline-break trigger for a pattern found earlier
     if pendDir != 0
         bool failed = pendDir == -1 ? high > pendInv : low < pendInv
