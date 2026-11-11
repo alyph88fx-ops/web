@@ -95,15 +95,17 @@ h4Scan(int len, float minMove, float retr, int maxBase, float minH) =>
     float hhLen = ta.highest(high, len)
     float llLen = ta.lowest(low, len)
 
-    // last confirmed swing high / low
-    var float shP = na
-    var float shB = na
-    var int   shT = na
-    var int   shI = na
-    var float slP = na
-    var float slB = na
-    var int   slT = na
-    var int   slI = na
+    // Top of the current up-leg (highest swing high since the last swing low) and bottom of the
+    // current down-leg (lowest swing low since the last swing high). A DBD is measured from the
+    // top of the whole leg, not from a small swing high part-way down the drop (and vice versa).
+    var float legHiP = na
+    var float legHiB = na
+    var int   legHiT = na
+    var int   legHiI = na
+    var float legLoP = na
+    var float legLoB = na
+    var int   legLoT = na
+    var int   legLoI = na
 
     // DBDs in progress (several at once): swing high H0 (+ body, time) -> swing low L1 (+ bar), base high so far
     var array<float> dH0   = array.new<float>()
@@ -171,45 +173,55 @@ h4Scan(int len, float minMove, float retr, int maxBase, float minH) =>
             if done
                 pop6(uL0, uL0B, uL0T, uH1, uH1I, uBase, i)
 
-    // New swing low that ends a big drop from the last swing high -> DBD candidate
+    // New swing low that ends a big drop from the top of the leg -> DBD candidate
     if not na(pl)
         int iL = bar_index - len
-        if not na(shI) and shI < iL and shP - pl >= minMove * atr and hhLen - pl <= retr * (shP - pl)
-            int k = array.indexof(dH0T, shT)
+        if not na(legHiI) and legHiI < iL and legHiP - pl >= minMove * atr and hhLen - pl <= retr * (legHiP - pl)
+            int k = array.indexof(dH0T, legHiT)
             if k >= 0
                 pop6(dH0, dH0B, dH0T, dL1, dL1I, dBase, k)
-            array.push(dH0, shP)
-            array.push(dH0B, shB)
-            array.push(dH0T, shT)
+            array.push(dH0, legHiP)
+            array.push(dH0B, legHiB)
+            array.push(dH0T, legHiT)
             array.push(dL1, pl)
             array.push(dL1I, iL)
             array.push(dBase, hhLen)
             if array.size(dL1) > 5
                 pop6(dH0, dH0B, dH0T, dL1, dL1I, dBase, 0)
-        slP := pl
-        slB := math.min(open[len], close[len])
-        slT := time[len]
-        slI := iL
+        legHiP := na
+        legHiB := na
+        legHiT := na
+        legHiI := na
+        if na(legLoP) or pl < legLoP
+            legLoP := pl
+            legLoB := math.min(open[len], close[len])
+            legLoT := time[len]
+            legLoI := iL
 
-    // New swing high that ends a big rally from the last swing low -> RBR candidate
+    // New swing high that ends a big rally from the bottom of the leg -> RBR candidate
     if not na(ph)
         int iH = bar_index - len
-        if not na(slI) and slI < iH and ph - slP >= minMove * atr and ph - llLen <= retr * (ph - slP)
-            int k = array.indexof(uL0T, slT)
+        if not na(legLoI) and legLoI < iH and ph - legLoP >= minMove * atr and ph - llLen <= retr * (ph - legLoP)
+            int k = array.indexof(uL0T, legLoT)
             if k >= 0
                 pop6(uL0, uL0B, uL0T, uH1, uH1I, uBase, k)
-            array.push(uL0, slP)
-            array.push(uL0B, slB)
-            array.push(uL0T, slT)
+            array.push(uL0, legLoP)
+            array.push(uL0B, legLoB)
+            array.push(uL0T, legLoT)
             array.push(uH1, ph)
             array.push(uH1I, iH)
             array.push(uBase, llLen)
             if array.size(uH1) > 5
                 pop6(uL0, uL0B, uL0T, uH1, uH1I, uBase, 0)
-        shP := ph
-        shB := math.max(open[len], close[len])
-        shT := time[len]
-        shI := iH
+        legLoP := na
+        legLoB := na
+        legLoT := na
+        legLoI := na
+        if na(legHiP) or ph > legHiP
+            legHiP := ph
+            legHiB := math.max(open[len], close[len])
+            legHiT := time[len]
+            legHiI := iH
 
     [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], close[1], atr[1]]
 
