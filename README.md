@@ -51,3 +51,7 @@ engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
 
 A second site built from the same template, in black, red and chrome: `1percentclub/` (main page `index.html`,
 member desk `account.html`). The Pages workflow publishes it at `/1percentclub/` next to 88FX.
+
+## TradingView indicator
+
+`pine/88_sharingan.pine` is the **88 Sharingan** Pine Script v6 indicator for XAUUSD (Daily/H4 direction → H4/H1 zones → M30–M1 confirmation). See [`pine/README.md`](pine/README.md) for install, rules, settings and limitations.
