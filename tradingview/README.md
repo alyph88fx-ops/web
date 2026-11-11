@@ -2,21 +2,20 @@
 
 `kz-pattern-entry.pine` (Pine Script v6). Three steps:
 
-1. **Key zones (rectangles).** **SNR** levels come from **H4 only** (swing highs and swing lows). **DBD/RBR** bases come from D1 and H4.
-   A zone is only marked where an H4 SNR level overlaps a DBD or RBR base. The rectangle covers both, for example "H4 SNR + D1 DBD".
-   - **SNR + DBD** (drop-base-drop): **red**, resistance / sell zone.
-   - **SNR + RBR** (rally-base-rally): **blue**, support / buy zone.
-   - **Breakout (grey)**: when a D1/H4 candle closes through a zone, the zone turns grey and switches role
+1. **Key zones (rectangles), H4 only.** An SNR swing level is only marked when price left it with a DBD or RBR:
+   - **SNR + DBD → red (resistance / sell zone):** swing high → first drop (≥ 2 × H4 ATR) → base
+     (price bounces but stays below the high and retraces at most 70% of the drop) → second drop (an H4 close below the base low).
+     The zone is drawn at the swing high, from the wick to the candle body, and is at least 1 × ATR tall.
+   - **SNR + RBR → blue (support / buy zone):** the mirror image, drawn at the swing low.
+   - **Breakout → grey:** when an H4 candle closes through a zone, the zone turns grey and switches role
      (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
      If price closes back through a grey zone, the zone is removed.
-   - To see every H4 SNR and D1/H4 DBD/RBR on its own, set *Zones to mark* to **All SNR and DBD/RBR**.
 2. **Confirmation on M30, fresh zones only.** Each zone has a status:
-   - **FRESH**: price hasn't come back to the zone yet.
-   - **IN PLAY**: price is making its first approach to the zone.
-   - **✓ VALID**: a double top (red zone, **SELL**) or double bottom (blue zone, **BUY**) formed on that first approach,
+   - **FRESH:** price hasn't come back to the zone yet.
+   - **IN PLAY:** price is on its first approach. The approach starts when price first reaches the zone, and ends when price moves 1 × H4 ATR away from it.
+   - **✓ VALID:** a double top (red zone, **SELL**) or double bottom (blue zone, **BUY**) formed during that first approach,
      with both peaks inside the zone. This is the entry. The zone gets a bold border and gives no more signals.
-   - **TESTED**: the first approach ended with no pattern. The zone fades with a dotted border and is ignored from then on.
-   - "First approach" means the pattern's first peak must form within *N* M30 bars of price first reaching the zone (default 12).
+   - **TESTED:** the first approach ended with no pattern. The zone fades with a dotted border and is ignored from then on.
    - Patterns are only scanned when the chart is on **30m**.
 3. **Risk**: the indicator draws **600-point SL** and **1000-point TP** boxes from the entry (the signal candle's close),
    marks each trade "TP ✓" or "SL ✗" when one is hit, and shows wins, losses and win rate in a table.
@@ -37,11 +36,13 @@ The last option sends the full message: side, zone, entry, SL and TP.
 | Setting | Default | Notes |
 |---|---|---|
 | Point size override | 0 (= symbol min tick) | 600 points = 600 × min tick. Examples: EURUSD (0.00001) gives 60 pips; XAUUSD (0.01) gives $6.00. Set it here if your broker's point is different. |
-| Zones to mark | SNR + DBD/RBR only | Choose **All SNR and DBD/RBR** to draw every level on its own. |
-| Fresh zone window | 12 bars | How soon after price first reaches a zone the first peak must form. |
+| Min first drop / rally | 2 × H4 ATR | Size of the first leg away from the swing level. |
+| Max base bounce | 0.7 | Fraction of the first leg the base may retrace. |
+| H4 swing strength | 3 | Bars on each side for an H4 swing high or low. |
+| Min zone height | 1 × H4 ATR | Lower it for thinner zones. |
+| Fresh zone: approach ends | 1 × H4 ATR | How far price must move away from a zone before its first approach is over. |
 | Signal trigger | Second peak confirmed | Choose **Neckline break** for a stricter signal, which waits for a close through the neckline. |
-| H4 SNR swing strength | 5 | A higher value gives fewer, stronger H4 levels. |
-| Max zones per timeframe | 8 | Older zones are removed after this. |
+| Max zones kept | 10 | Older zones are removed after this. |
 | Pattern pivot left / right bars | 5 / 3 | Signals appear `right bars` candles after the second peak (they don't repaint). |
 | Peak equality tolerance | 0.5 × ATR | Sets how close the two tops/bottoms must be. |
 | Zone touch tolerance | 0.25 × ATR | Allows wicks that poke slightly outside a zone. |
