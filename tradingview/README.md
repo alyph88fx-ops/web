@@ -74,7 +74,7 @@ There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry B
 
 | Setting | Default | Notes |
 |---|---|---|
-| Point size override | 0 (= symbol min tick) | 600 points = 600 × min tick. Examples: EURUSD (0.00001) gives 60 pips; XAUUSD (0.01) gives $6.00. Set it here if your broker's point is different. |
+| Point size override | 0 (= auto) | Gold (XAU / GOLD): 1 point = 0.01, so 600 points = $6 and 1000 points = $10 (sell at 3783 → SL 3789, TP 3773), even when the feed quotes 3 decimals. Other symbols: 1 point = the smallest price step (EURUSD 0.00001: 600 points = 60 pips). |
 | H4 / H1 / M30 zones | on / on / on | Turn any timeframe off. M30 zones need a 15m or 30m chart, H1 zones a chart of 1h or lower. |
 | Only fresh zones | on | Removes a zone once it has been tested. |
 | Min first drop / rally | 2 × ATR | Size of the first leg away from the swing level. |

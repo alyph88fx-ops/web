@@ -122,7 +122,8 @@ showHistory = input.bool(false, "Keep past signals on the chart", group = grpL,
 grpR = "3 · Risk management"
 slPts      = input.int(600, "Stop loss (points)", minval = 1, group = grpR)
 tpPts      = input.int(1000, "Take profit (points)", minval = 1, group = grpR)
-ptOverride = input.float(0.0, "Point size override (0 = symbol min tick)", minval = 0.0, step = 0.00001, group = grpR)
+ptOverride = input.float(0.0, "Point size override (0 = auto)", minval = 0.0, step = 0.00001, group = grpR,
+     tooltip = "Auto: 1 point = 0.01 on gold (XAU / GOLD), so 600 points = $6 like on MT5, even when the TradingView feed quotes 3 decimals; on other symbols 1 point = the symbol's smallest price step (EURUSD: 0.00001).")
 oneTrade   = input.bool(true, "One trade at a time", group = grpR)
 showStats  = input.bool(true, "Show stats table", group = grpR)
 
@@ -621,7 +622,8 @@ clearHistory() =>
 var int wins   = 0
 var int losses = 0
 
-pt = ptOverride > 0 ? ptOverride : syminfo.mintick
+isGold = str.contains(str.upper(syminfo.ticker), "XAU") or str.contains(str.upper(syminfo.ticker), "GOLD") or str.startswith(str.upper(syminfo.ticker), "GC")
+pt = ptOverride > 0 ? ptOverride : isGold ? 0.01 : syminfo.mintick
 
 int openCount = 0
 for t in trades
