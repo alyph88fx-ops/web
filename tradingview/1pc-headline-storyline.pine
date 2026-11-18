@@ -922,6 +922,9 @@ jSetup(string ev, string side, string kind, float entry, float sl, float tp, flo
          ",\"zone_tf_atr\":" + jNum(za) + ",\"point\":" + str.tostring(pt) + ",\"sl_points\":" + str.tostring(slPts) +
          ",\"tp_points\":" + str.tostring(tpPts) + ",\"time\":" + str.tostring(time) + ",\"candles\":" + jCandles(aiCandles) + "}"
 
+var int    nPrepare  = 0
+var string lastSig   = "none yet"
+
 // PREPARE: the limit price is known (smart zone entry, or M / W neckline broken) - place the order
 if setupDir != 0
     float  lim   = pendNeck
@@ -933,6 +936,8 @@ if setupDir != 0
     label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
          style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true)
     string how = smart ? "smart zone entry" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
+    nPrepare += 1
+    lastSig := pside + " limit " + str.tostring(lim, format.mintick) + " · " + str.format_time(time, "dd MMM HH:mm", syminfo.timezone)
     alert(aiJson ? jSetup("prepare", str.lower(pside), pendKind, lim, psl, ptp, pendScore, pendZ) :
          "1PC PREPARE " + pside + " " + syminfo.ticker + " (" + how + " in " + pendZone + " zone" + scTxt + ") | " + pside + " LIMIT " +
          str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) + " | TP " + str.tostring(ptp, format.mintick),
@@ -1014,7 +1019,7 @@ if barstate.islast and nearCount > 0 and array.size(zones) > 0
 // ─────────────────────────────────────────────────────────────────────────────
 // Stats table
 // ─────────────────────────────────────────────────────────────────────────────
-var table tb = table.new(position.top_right, 2, 9, bgcolor = color.new(color.black, 20),
+var table tb = table.new(position.top_right, 2, 11, bgcolor = color.new(color.black, 20),
      border_color = color.new(color.gray, 70), border_width = 1)
 
 if barstate.islast and showStats
@@ -1043,5 +1048,12 @@ if barstate.islast and showStats
     table.cell(tb, 1, 4, str.tostring(total) + "  (open " + str.tostring(openCount) + ")", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 5, "Wins / Losses", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 5, str.tostring(wins) + " / " + str.tostring(losses), text_color = tc, text_size = size.small)
+    string now = not showEntries ? "entries switched off" : not isPatTF ? "switch chart to M15 / M30" :
+         pendDir != 0 ? (pendDir == 1 ? "BUY" : "SELL") + " limit " + str.tostring(pendNeck, format.mintick) + " waiting for fill" :
+         smDir != 0 ? "price in " + zoneName(smZ) + ", waiting for rejection candle" : "waiting for price to reach a fresh zone"
+    table.cell(tb, 0, 8, "Signals (PREPARE)", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 8, str.tostring(nPrepare) + " · last: " + lastSig, text_color = tc, text_size = size.small)
+    table.cell(tb, 0, 9, "Now", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 9, now, text_color = color.yellow, text_size = size.small)
     table.cell(tb, 0, 6, "Win rate", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 6, total > 0 ? str.tostring(100.0 * wins / total, "#.0") + "%" : "–", text_color = tc, text_size = size.small)
