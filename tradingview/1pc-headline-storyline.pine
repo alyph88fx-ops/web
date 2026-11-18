@@ -52,8 +52,8 @@ maxRetr      = input.float(0.8, "Max base bounce (fraction of first leg)", minva
 maxBaseBars  = input.int(50, "Max base length (bars of the zone TF)", minval = 2, maxval = 200, group = grpZ)
 minZoneAtr   = input.float(1.0, "Min zone height (× zone TF ATR)", minval = 0.0, step = 0.1, group = grpZ,
      tooltip = "A zone runs from the swing wick to the candle body, and is made at least this tall.")
-nearCount    = input.int(2, "Show only the nearest zones to current price (above / below)", minval = 0, maxval = 10, group = grpZ,
-     tooltip = "Keeps the chart on the right side, around the current market price: only this many zones above price and this many below are shown (a zone price is inside is always shown). 0 = show all zones.")
+nearCount    = input.int(1, "Nearest zones to current price, per timeframe (above / below)", minval = 0, maxval = 10, group = grpZ,
+     tooltip = "Keeps the chart around the current market price: on each of H4, H1 and M30, only this many zones above price and this many below are shown (a zone price is inside is always shown). 0 = show all zones.")
 maxAgeDays   = input.int(4, "Only show zones from the last (trading days)", minval = 1, maxval = 365, group = grpZ,
      tooltip = "A zone is removed once the swing it starts at is older than this many trading days (Saturdays and Sundays don't count).")
 perType      = input.int(3, "Max zones per type and TF (newest kept)", minval = 1, maxval = 20, group = grpZ,
@@ -78,9 +78,9 @@ colBrk       = input.color(color.new(color.gray, 75), "Breakout (when not colour
 showZoneText = input.bool(true, "Show zone labels", group = grpC)
 showStatus   = input.bool(false, "Add status to labels (fresh / in play / valid)", group = grpC)
 
-grpP = "2 · M15 / M30 confirmation (M = sell, W = buy)"
+grpP = "2 · Entry on M1 / M5 / M15 / M30 (M = sell, W = buy)"
 showEntries  = input.bool(true, "Show entries (patterns, signals, SL/TP)", group = grpP,
-     tooltip = "Off = zones only. On = also track zone freshness, find M / W patterns on M15 or M30 and send signals.")
+     tooltip = "Off = zones only. On = smart zone entries and M / W patterns on M1, M5, M15 or M30 charts, with signals.")
 pL           = input.int(3, "Pattern pivot left bars", minval = 1, group = grpP)
 pR           = input.int(2, "Pattern pivot right bars", minval = 1, group = grpP)
 minGap       = input.int(2, "Min bars between the two tops", minval = 2, group = grpP)
@@ -110,6 +110,14 @@ grpA = "4 · AI second opinion (webhook)"
 aiJson      = input.bool(false, "Send alerts as JSON for the AI service", group = grpA,
      tooltip = "Turn on when the alert's webhook points at the 1PC AI signal service. Every alert message becomes JSON with the setup, the zone and the last candles, and Claude replies with its own entry price on the service's page.")
 aiCandles   = input.int(40, "Candles to send to the AI", minval = 10, maxval = 80, group = grpA)
+
+grpL = "5 · Live signal at current price"
+showLive    = input.bool(true, "Show the live signal at current price", group = grpL,
+     tooltip = "At the right edge of the chart: the trade you're in, the limit order waiting for a fill, or the plan at the nearest zone above (sell) and below (buy) with exact entry, SL and TP. Updates on every tick.")
+liveEntry   = input.string("Zone 50%", "Live plan entry price", options = ["Zone 50%", "Zone edge (first touch)"], group = grpL,
+     tooltip = "Where the plan puts the limit before price has reached the zone: the middle of the zone, or its near edge. Once price reacts inside the zone, the smart entry replaces it with the exact rejection-based price.")
+showHistory = input.bool(false, "Keep past signals on the chart", group = grpL,
+     tooltip = "Off = only the latest signal is drawn, so the chart shows what matters at current price.")
 
 grpR = "3 · Risk management"
 slPts      = input.int(600, "Stop loss (points)", minval = 1, group = grpR)
@@ -597,6 +605,19 @@ type Trade
     bool  open = true
 
 var array<Trade> trades = array.new<Trade>()
+
+// Drawings of past signals (removed when a new signal starts, unless "Keep past signals" is on)
+var array<label> sigL  = array.new<label>()
+var array<line>  sigLn = array.new<line>()
+var array<box>   sigB  = array.new<box>()
+clearHistory() =>
+    while array.size(sigL) > 0
+        label.delete(array.pop(sigL))
+    while array.size(sigLn) > 0
+        line.delete(array.pop(sigLn))
+    while array.size(sigB) > 0
+        box.delete(array.pop(sigB))
+    true
 var int wins   = 0
 var int losses = 0
 
@@ -616,8 +637,8 @@ for t in trades
                 losses += 1
             box.set_right(t.riskBx, bar_index)
             box.set_right(t.rewBx, bar_index)
-            label.new(bar_index, win ? t.tp : t.sl, win ? "TP ✓" : "SL ✗", style = label.style_label_left,
-                 color = win ? color.new(color.green, 0) : color.new(color.red, 0), textcolor = color.white, size = size.small, force_overlay = true)
+            array.push(sigL, label.new(bar_index, win ? t.tp : t.sl, win ? "TP ✓" : "SL ✗", style = label.style_label_left,
+                 color = win ? color.new(color.green, 0) : color.new(color.red, 0), textcolor = color.white, size = size.small, force_overlay = true))
         else
             box.set_right(t.riskBx, bar_index + 1)
             box.set_right(t.rewBx, bar_index + 1)
@@ -630,7 +651,7 @@ if array.size(trades) > 100 and not array.get(trades, 0).open
 // ─────────────────────────────────────────────────────────────────────────────
 // M15 / M30 double top (M) / double bottom (W)
 // ─────────────────────────────────────────────────────────────────────────────
-isPatTF = timeframe.period == "15" or timeframe.period == "30"
+isPatTF = timeframe.in_seconds() <= 1800   // signals on M1, M5, M15 and M30 charts
 atrM  = ta.atr(14)
 ph    = ta.pivothigh(high, pL, pR)
 pl    = ta.pivotlow(low, pL, pR)
@@ -660,11 +681,13 @@ var int    smStart   = na
 
 drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
     color c = dir == -1 ? color.red : color.blue
-    line.new(i1, p1, iN, neck, color = c, width = 2, force_overlay = true)
-    line.new(iN, neck, i2, p2, color = c, width = 2, force_overlay = true)
-    line.new(i1, neck, bar_index, neck, color = color.new(c, 40), style = line.style_dashed, force_overlay = true)
-    label.new(i2, p2, dir == -1 ? "DT" : "DB", style = dir == -1 ? label.style_label_down : label.style_label_up,
-         color = color.new(color.white, 100), textcolor = c, size = size.small, force_overlay = true)
+    if not showHistory and openCount == 0
+        clearHistory()
+    array.push(sigLn, line.new(i1, p1, iN, neck, color = c, width = 2, force_overlay = true))
+    array.push(sigLn, line.new(iN, neck, i2, p2, color = c, width = 2, force_overlay = true))
+    array.push(sigLn, line.new(i1, neck, bar_index, neck, color = color.new(c, 40), style = line.style_dashed, force_overlay = true))
+    array.push(sigL, label.new(i2, p2, dir == -1 ? "DT" : "DB", style = dir == -1 ? label.style_label_down : label.style_label_up,
+         color = color.new(color.white, 100), textcolor = c, size = size.small, force_overlay = true))
     true
 
 int    sig      = 0
@@ -933,8 +956,10 @@ if setupDir != 0
     string pside = setupDir == 1 ? "BUY" : "SELL"
     bool   smart = pendKind == "smart"
     string scTxt = na(pendScore) ? "" : " · score " + str.tostring(pendScore, "#")
-    label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
-         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true)
+    if smart and not showHistory and openCount == 0
+        clearHistory()
+    array.push(sigL, label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
+         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true))
     string how = smart ? "smart zone entry" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
     nPrepare += 1
     lastSig := pside + " limit " + str.tostring(lim, format.mintick) + " · " + str.format_time(time, "dd MMM HH:mm", syminfo.timezone)
@@ -956,12 +981,14 @@ if sig != 0 and not (oneTrade and openCount > 0)
          text = "TP " + str.tostring(tp, format.mintick), text_color = color.new(color.green, 0),
          text_size = size.small, text_halign = text.align_left, force_overlay = true)
     array.push(trades, Trade.new(sig, entry, sl, tp, bar_index, rb, wb))
+    array.push(sigB, rb)
+    array.push(sigB, wb)
     string side = sig == 1 ? "BUY" : "SELL"
-    label.new(bar_index, entry,
+    array.push(sigL, label.new(bar_index, entry,
          side + " · " + sigZone + "\nEntry " + str.tostring(entry, format.mintick) +
          "\nSL " + str.tostring(sl, format.mintick) + "\nTP " + str.tostring(tp, format.mintick),
          style = sig == 1 ? label.style_label_up : label.style_label_down,
-         color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small, force_overlay = true)
+         color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small, force_overlay = true))
     buyFired  := sig == 1
     sellFired := sig == -1
     string how = sigKind == "smart" ? "smart zone entry" : (sig == 1 ? "W / double bottom" : "M / double top")
@@ -994,27 +1021,99 @@ hideZone(Zone z) =>
         line.set_color(z.mid, none)
     true
 
-// Only the zones around the current market price: the nearest nearCount above and below price
-// (plus any zone price is inside). The others stay tracked but are hidden.
-if barstate.islast and nearCount > 0 and array.size(zones) > 0
+// Only the zones around the current market price: on each timeframe (H4, H1, M30) the nearest
+// nearCount zones above and below price (plus any zone price is inside). The others stay
+// tracked but are hidden.
+nearLimits(string tf) =>
     array<float> up = array.new<float>()
     array<float> dn = array.new<float>()
     for z in zones
-        if z.bot > close
-            array.push(up, z.bot - close)
-        else if z.top < close
-            array.push(dn, close - z.top)
+        if z.tf == tf
+            if z.bot > close
+                array.push(up, z.bot - close)
+            else if z.top < close
+                array.push(dn, close - z.top)
     array.sort(up, order.ascending)
     array.sort(dn, order.ascending)
-    float upLim = array.size(up) >= nearCount ? array.get(up, nearCount - 1) : 1e10
-    float dnLim = array.size(dn) >= nearCount ? array.get(dn, nearCount - 1) : 1e10
+    [array.size(up) >= nearCount ? array.get(up, nearCount - 1) : 1e10, array.size(dn) >= nearCount ? array.get(dn, nearCount - 1) : 1e10]
+
+if barstate.islast and nearCount > 0 and array.size(zones) > 0
+    [lim4u, lim4d] = nearLimits("H4")
+    [lim1u, lim1d] = nearLimits("H1")
+    [limMu, limMd] = nearLimits("M30")
     for z in zones
+        float upLim = z.tf == "H4" ? lim4u : z.tf == "H1" ? lim1u : limMu
+        float dnLim = z.tf == "H4" ? lim4d : z.tf == "H1" ? lim1d : limMd
         bool inside = z.bot <= close and z.top >= close
         bool near   = inside or (z.bot > close and z.bot - close <= upLim) or (z.top < close and close - z.top <= dnLim)
         if near
             styleZone(z)
         else
             hideZone(z)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Live signal at current price (redrawn on every tick of the last bar)
+// ─────────────────────────────────────────────────────────────────────────────
+var array<line>  liveLn = array.new<line>()
+var array<label> liveLb = array.new<label>()
+string liveTxt = ""
+
+liveLevel(float px, string txt, color c, int w) =>
+    array.push(liveLn, line.new(bar_index, px, bar_index + 12, px, color = c, width = w, style = line.style_dashed, force_overlay = true))
+    array.push(liveLb, label.new(bar_index + 12, px, txt, style = label.style_label_left, color = c, textcolor = color.white,
+         size = size.normal, force_overlay = true))
+    true
+
+riskTxt(int dir, float e) =>
+    "SL " + str.tostring(e - dir * slPts * pt, format.mintick) + " · TP " + str.tostring(e + dir * tpPts * pt, format.mintick)
+
+if barstate.islast and showLive
+    while array.size(liveLn) > 0
+        line.delete(array.pop(liveLn))
+    while array.size(liveLb) > 0
+        label.delete(array.pop(liveLb))
+    Trade openT = na
+    for t in trades
+        if t.open
+            openT := t
+    if not na(openT)
+        string sd = openT.dir == 1 ? "BUY" : "SELL"
+        float  pnl = (close - openT.entry) * openT.dir / pt
+        liveTxt := "IN TRADE " + sd + " @ " + str.tostring(openT.entry, format.mintick) + " · " + riskTxt(openT.dir, openT.entry) +
+             " · " + (pnl >= 0 ? "+" : "") + str.tostring(pnl, "#") + " pts"
+        liveLevel(openT.entry, liveTxt, openT.dir == 1 ? color.blue : color.red, 2)
+    else if pendDir != 0
+        string sd = pendDir == 1 ? "BUY" : "SELL"
+        liveTxt := "ACTIVE " + sd + " LIMIT " + str.tostring(pendNeck, format.mintick) + " · " + riskTxt(pendDir, pendNeck) +
+             (na(pendScore) ? "" : " · score " + str.tostring(pendScore, "#")) + " · " + pendZone
+        liveLevel(pendNeck, liveTxt, color.orange, 2)
+    else
+        // the plan at the nearest zone above (sell) and below (buy) current price
+        Zone up = na
+        Zone dn = na
+        for z in zones
+            if z.role == -1 and z.top >= close and (na(up) or z.bot < up.bot)
+                up := z
+            if z.role == 1 and z.bot <= close and (na(dn) or z.top > dn.top)
+                dn := z
+        string parts = ""
+        if not na(up)
+            float e   = liveEntry == "Zone 50%" ? (up.top + up.bot) / 2 : up.bot
+            bool  now = close >= e
+            e := now ? close : e
+            string tx = (now ? "SELL NOW " : "SELL LIMIT ") + str.tostring(e, format.mintick) + " · " + riskTxt(-1, e) + " · " + zoneName(up) +
+                 (now ? "" : " · " + str.tostring((e - close) / pt, "#") + " pts away") + (smDir == -1 ? " · waiting for rejection" : "")
+            liveLevel(e, tx, color.new(color.red, 0), 1)
+            parts := tx
+        if not na(dn)
+            float e   = liveEntry == "Zone 50%" ? (dn.top + dn.bot) / 2 : dn.top
+            bool  now = close <= e
+            e := now ? close : e
+            string tx = (now ? "BUY NOW " : "BUY LIMIT ") + str.tostring(e, format.mintick) + " · " + riskTxt(1, e) + " · " + zoneName(dn) +
+                 (now ? "" : " · " + str.tostring((close - e) / pt, "#") + " pts away") + (smDir == 1 ? " · waiting for rejection" : "")
+            liveLevel(e, tx, color.new(color.blue, 0), 1)
+            parts := parts == "" ? tx : parts + "\n" + tx
+        liveTxt := parts == "" ? "no fresh zone near price" : parts
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stats table
@@ -1028,7 +1127,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 0, "1PC Headline & Storyline", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 0, "", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Switch chart to M15 or M30", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
+    table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Signals need a chart of 30m or lower (M1, M5, M15, M30)", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 2, "H4 solid · H1 dashed · M30 dotted · Red supply · Blue demand · Grey base", text_color = tc, text_size = size.small)
     int nFresh = 0
@@ -1048,12 +1147,12 @@ if barstate.islast and showStats
     table.cell(tb, 1, 4, str.tostring(total) + "  (open " + str.tostring(openCount) + ")", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 5, "Wins / Losses", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 5, str.tostring(wins) + " / " + str.tostring(losses), text_color = tc, text_size = size.small)
-    string now = not showEntries ? "entries switched off" : not isPatTF ? "switch chart to M15 / M30" :
+    string now = not showEntries ? "entries switched off" : not isPatTF ? "signals need a 30m chart or lower" :
          pendDir != 0 ? (pendDir == 1 ? "BUY" : "SELL") + " limit " + str.tostring(pendNeck, format.mintick) + " waiting for fill" :
          smDir != 0 ? "price in " + zoneName(smZ) + ", waiting for rejection candle" : "waiting for price to reach a fresh zone"
     table.cell(tb, 0, 8, "Signals (PREPARE)", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 8, str.tostring(nPrepare) + " · last: " + lastSig, text_color = tc, text_size = size.small)
     table.cell(tb, 0, 9, "Now", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 9, now, text_color = color.yellow, text_size = size.small)
+    table.cell(tb, 1, 9, showLive and liveTxt != "" ? liveTxt : now, text_color = color.yellow, text_size = size.small)
     table.cell(tb, 0, 6, "Win rate", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 6, total > 0 ? str.tostring(100.0 * wins / total, "#.0") + "%" : "–", text_color = tc, text_size = size.small)

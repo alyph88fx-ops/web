@@ -11,12 +11,12 @@
    - **H4 / H1 breakout**: a swing high or low that a candle of its timeframe has closed through (or any zone that got broken).
      It's coloured by its new role (red = now resistance, blue = now support) and has a dashed midline. It's fresh again until its retest.
      If price closes back through a breakout zone, the zone is removed.
-   - **Near current price:** only the 2 zones nearest above price and the 2 nearest below are shown (plus a zone price is inside), so the chart shows what matters on the right edge. Change it with *Show only the nearest zones to current price*; 0 shows all.
+   - **Near current price:** on each of H4, H1 and M30, only the zone nearest above price and the one nearest below are shown (plus a zone price is inside). Change it with *Nearest zones to current price, per timeframe*; 0 shows all.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
      (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
    - **Overlaps:** the higher timeframe wins (H4 > H1 > M30), then breakout > SNR > base. Zones overlap when they share at least 30% of their height.
-2. **Entry on M15 or M30, fresh zones only.** When price reaches a fresh zone for the first time, the indicator works out an exact limit price inside the zone. Choose the method under **Entry method**:
+2. **Entry on M1, M5, M15 or M30, fresh zones only.** When price reaches a fresh zone for the first time, the indicator works out an exact limit price inside the zone. Choose the method under **Entry method**:
    - **Smart zone entry**: the indicator follows the extreme that price makes inside the zone.
      When a candle closes back through the candle that made the extreme (below its low for a sell, above its high for a buy), the rejection is confirmed.
      The limit price is placed at 50% of that rejection move, kept inside the zone (*Smart entry: retracement*).
@@ -39,11 +39,26 @@
 4. **AI second opinion (optional):** with **Send alerts as JSON for the AI service** turned on and a webhook to the [1PC AI signal service](ai-signal-service/README.md),
    Claude reviews every PREPARE setup. It sends back take / wait / skip with its own exact entry price inside the zone, shown on the service's page (and Telegram if set up).
 
+## Live signal at current price
+
+At the right edge of the chart, next to the price, a line and label always show what to do now. It updates on every tick:
+- **IN TRADE SELL @ …**: the trade you're in, with SL, TP and the points so far.
+- **ACTIVE SELL LIMIT …**: a limit order is waiting for its fill (smart entry or M / W), with SL, TP and score.
+- **SELL LIMIT … / BUY LIMIT …**: otherwise, the plan at the nearest zone above price (sell) and below (buy).
+  It shows the exact price (*Live plan entry price*: the zone's 50% or its near edge), SL, TP and how far away it is.
+  It says **SELL NOW / BUY NOW** when price is already there.
+  Once price reacts inside the zone, the smart entry replaces the plan with the exact rejection-based price.
+
+Old signals are removed from the chart when a new one starts. Turn on **Keep past signals on the chart** to see the history.
+
 ## Install
 
 1. In TradingView, open **Pine Editor** (bottom panel), then **New → Indicator**.
 2. Delete the template code, paste in the full contents of `1pc-headline-storyline.pine`, and click **Add to chart**.
-3. Switch the chart to **15m** or **30m**.
+3. Use the chart timeframe you trade:
+   - **M1, M5, M15 or M30:** H4, H1 and M30 zones, plus signals.
+   - **H1:** H4 and H1 zones only.
+   - **H4:** H4 zones only. Signals need a chart of 30m or lower.
 
 ## Alerts
 
