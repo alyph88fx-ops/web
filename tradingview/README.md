@@ -10,6 +10,7 @@
    - **Breakout → grey:** when a candle of the zone's own timeframe (H4, H1 or M30) closes through a zone, the zone turns grey and switches role
      (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
      If price closes back through a grey zone, the zone is removed.
+   - **Near current price:** only the 2 zones nearest above price and the 2 nearest below are shown (plus a zone price is inside), so the chart shows what matters on the right edge. Change it with *Show only the nearest zones to current price*; 0 shows all.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
      (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
