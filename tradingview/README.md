@@ -1,17 +1,20 @@
 # 1PC Headline & Storyline Indicator (TradingView)
 
-`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the H4 / H1 key zone; the **storyline** is what price does when it comes back to it. Three steps:
+`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 / M30 supply & demand zone; the **storyline** is what price does when it comes back to it. Three steps:
 
-1. **Key zones (rectangles) on H4 and H1** (H4 solid border, H1 dashed). An SNR swing level is only marked when price left it with a DBD or RBR. Each zone is measured on its own timeframe's candles and ATR:
+1. **Fresh key zones (rectangles) on H4, H1 and M30** (H4 solid border, H1 dashed, M30 dotted). An SNR swing level is only marked when price left it with a DBD or RBR. Each zone is measured on its own timeframe's candles and ATR:
    - **SNR + DBD → red (resistance / sell zone):** swing high → first drop (≥ 2 × ATR) → base
      (price bounces but stays below the high and retraces at most 80% of the drop) → second drop (a close below the base low).
      The zone is drawn at the swing high, from the wick to the candle body, and is at least 1 × ATR tall.
    - **SNR + RBR → blue (support / buy zone):** the mirror image, drawn at the swing low.
-   - **Breakout → grey:** when a candle of the zone's own timeframe (H4 or H1) closes through a zone, the zone turns grey and switches role
+   - **Breakout → grey:** when a candle of the zone's own timeframe (H4, H1 or M30) closes through a zone, the zone turns grey and switches role
      (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
      If price closes back through a grey zone, the zone is removed.
-   - **Overlaps:** H4 wins. An H1 zone that overlaps an H4 zone isn't drawn, and a new H4 zone replaces the H1 zones it covers.
-     A new zone also replaces an overlapping grey zone that now plays the same role.
+   - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
+     (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
+     Turn off *Only fresh zones* to keep tested zones on the chart (faded).
+   - **Overlaps:** the higher timeframe wins (H4 > H1 > M30). A zone that overlaps a zone of the same or a higher timeframe isn't drawn,
+     and a new zone replaces the lower-timeframe zones it covers. A new zone also replaces an overlapping grey zone that now plays the same role.
 2. **Confirmation on M15 or M30, fresh zones only.** On price's **first approach** to a zone, the indicator watches for one of two patterns:
    - **M (double top)** in a red or grey sell zone. The second top can be lower than the first, but must climb back at least 50% of the dip.
    - **W (double bottom)** in a blue or grey buy zone.
@@ -44,7 +47,8 @@ There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry B
 | Setting | Default | Notes |
 |---|---|---|
 | Point size override | 0 (= symbol min tick) | 600 points = 600 × min tick. Examples: EURUSD (0.00001) gives 60 pips; XAUUSD (0.01) gives $6.00. Set it here if your broker's point is different. |
-| H4 zones / H1 zones | on / on | Turn either timeframe off. |
+| H4 / H1 / M30 zones | on / on / on | Turn any timeframe off. M30 zones need a 15m or 30m chart, H1 zones a chart of 1h or lower. |
+| Only fresh zones | on | Removes a zone once it has been tested. |
 | Min first drop / rally | 2 × ATR | Size of the first leg away from the swing level. |
 | Max base bounce | 0.8 | Fraction of the first leg the base may retrace. |
 | Swing strength | 3 | Bars on each side for a swing high or low (H4 or H1 candles). |
@@ -53,7 +57,7 @@ There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry B
 | Entry | Neckline retest | **Neckline break** enters on the close through the neckline; **Second top** enters as soon as the pattern forms. |
 | Retest within | 16 bars | After the break, price must retest the neckline within this many candles. |
 | Only show zones from the last | 30 days | Keeps only the nearest zones on the left. |
-| Max zones per type and TF | 3 | At most 3 red and 3 blue zones on each of H4 and H1; the newest are kept. |
+| Max zones per type and TF | 3 | At most 3 red and 3 blue zones on each of H4, H1 and M30; the newest are kept. |
 | Pattern pivot left / right bars | 3 / 2 | A top is confirmed `right bars` candles after it forms (no repainting). |
 | 2nd top may be higher by | 0.5 × ATR | The second top can be lower than the first, or higher by at most this. |
 | 2nd top must climb back | 50% | Share of the dip to the neckline the second top must climb back. |

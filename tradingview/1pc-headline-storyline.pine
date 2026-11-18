@@ -2,12 +2,13 @@
 //@version=6
 //
 // 1PC Headline & Storyline Indicator
-//   Headline  = the H4 / H1 key zone (SNR with DBD / RBR)
+//   Headline  = the H4 / H1 / M30 key zone (supply & demand: SNR with DBD / RBR)
 //   Storyline = what price does when it comes back to that zone (M / W on M15 or M30 -> PREPARE -> ENTRY)
 //
 // Flow
-//   1. Key zones (rectangles) on H4 and H1. A swing level (SNR) is only marked when price left it
-//      with a DBD or RBR (H1 zones have a dashed border; H4 zones win where the two overlap):
+//   1. Fresh key zones (rectangles) on H4, H1 and M30. A swing level (SNR) is only marked when price
+//      left it with a DBD or RBR (H4 solid border, H1 dashed, M30 dotted; the higher timeframe wins
+//      where zones overlap). A zone is removed once price has come back to it and moved away again:
 //        SNR + DBD   swing high -> drop -> base (shallow bounce) -> second drop below the base
 //                    -> red zone at the swing high (resistance / sell zone)
 //        SNR + RBR   swing low -> rally -> base (shallow pullback) -> second rally above the base
@@ -27,9 +28,10 @@ indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay 
 // ─────────────────────────────────────────────────────────────────────────────
 // Inputs
 // ─────────────────────────────────────────────────────────────────────────────
-grpZ = "1 · H4 / H1 key zones (SNR with DBD / RBR)"
-useH4        = input.bool(true, "H4 zones", inline = "tf", group = grpZ)
-useH1        = input.bool(true, "H1 zones", inline = "tf", group = grpZ)
+grpZ = "1 · H4 / H1 / M30 key zones (SNR with DBD / RBR)"
+useH4        = input.bool(true, "H4", inline = "tf", group = grpZ)
+useH1        = input.bool(true, "H1", inline = "tf", group = grpZ)
+useM30       = input.bool(true, "M30 zones", inline = "tf", group = grpZ)
 swLen        = input.int(3, "Swing strength (bars each side)", minval = 1, maxval = 10, group = grpZ)
 minMoveAtr   = input.float(2.0, "Min first drop / rally (× zone TF ATR)", minval = 0.5, step = 0.25, group = grpZ,
      tooltip = "Size of the first leg away from the swing level, e.g. the drop from the swing high in a DBD.")
@@ -43,9 +45,10 @@ maxAgeDays   = input.int(30, "Only show zones from the last (days)", minval = 1,
 perType      = input.int(3, "Max zones per type and TF (newest kept)", minval = 1, maxval = 20, group = grpZ,
      tooltip = "At most this many red (SNR + DBD) and this many blue (SNR + RBR) zones on each timeframe; older ones are removed first.")
 mergeOverlap = input.bool(true, "Skip new zones that overlap an existing one", group = grpZ,
-     tooltip = "An H1 zone that overlaps an H4 zone is not drawn, and a new H4 zone replaces the H1 zones it covers.")
+     tooltip = "The higher timeframe wins: a zone that overlaps a zone of the same or a higher timeframe is not drawn, and a new zone replaces the lower-timeframe zones it covers.")
 keepDead     = input.bool(false, "Keep invalidated zones on chart", group = grpZ)
-hideTested   = input.bool(false, "Hide tested (used-up) zones", group = grpZ)
+hideTested   = input.bool(true, "Only fresh zones (remove a zone once it has been tested)", group = grpZ,
+     tooltip = "A zone is removed once price has come back to it and then moved away again (or once it gave its entry and price moved away). A breakout (grey) zone is fresh again until its retest.")
 
 grpC = "Zone colours"
 colRes       = input.color(color.new(color.red, 80), "Resistance (SNR + DBD)", group = grpC)
@@ -243,9 +246,11 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
 
 [rTop, rBot, rT, sTop, sBot, sT, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
 [r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
+[rmTop, rmBot, rmT, smTop, smBot, smT, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
 
-h4Ok = useH4 and timeframe.in_seconds() <= 14400
-h1Ok = useH1 and timeframe.in_seconds() <= 3600
+h4Ok  = useH4 and timeframe.in_seconds() <= 14400
+h1Ok  = useH1 and timeframe.in_seconds() <= 3600
+m30Ok = useM30 and timeframe.in_seconds() <= 1800
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Zones
@@ -257,7 +262,7 @@ type Zone
     int    role            // 1 = buy zone (support / broken resistance), -1 = sell zone
     string kind
     int    t0                 // time of the swing the zone starts at
-    string tf                 // "H4" or "H1"
+    string tf                 // "H4", "H1" or "M30"
     bool   broken     = false
     int    state      = 0     // 0 FRESH (untouched), 1 IN PLAY (first approach), 2 TESTED (no pattern), 3 VALID (pattern formed)
     int    firstTouch = na
@@ -268,20 +273,23 @@ var int         lastResT  = 0
 var int         lastSupT  = 0
 var int         lastRes1T = 0
 var int         lastSup1T = 0
+var int         lastResMT = 0
+var int         lastSupMT = 0
 
-// close / ATR of the zone's own timeframe (closed candles)
-tfClose(Zone z) => z.tf == "H1" ? h1C : h4C
-tfAtr(Zone z)   => z.tf == "H1" ? h1Atr : h4Atr
+// close / ATR of the zone's own timeframe (closed candles), and its rank (higher TF wins)
+tfClose(Zone z) => z.tf == "M30" ? m30C : z.tf == "H1" ? h1C : h4C
+tfAtr(Zone z)   => z.tf == "M30" ? m30Atr : z.tf == "H1" ? h1Atr : h4Atr
+tfRank(string tf) => tf == "H4" ? 3 : tf == "H1" ? 2 : 1
 
 zoneName(Zone z) => z.kind + (z.broken ? " · BRK" : "")
 
 styleZone(Zone z) =>
     color base = z.broken ? colBrk : z.role == 1 ? colSup : colRes
-    color c    = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0) + (z.tf == "H1" ? 5 : 0)))
+    color c    = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0) + (z.tf == "H1" ? 5 : z.tf == "M30" ? 9 : 0)))
     box.set_bgcolor(z.bx, c)
     box.set_border_color(z.bx, color.new(base, z.state == 2 ? 70 : 30))
     box.set_border_width(z.bx, z.state == 3 ? 2 : 1)
-    box.set_border_style(z.bx, z.state == 2 ? line.style_dotted : z.tf == "H1" ? line.style_dashed : line.style_solid)
+    box.set_border_style(z.bx, z.tf == "M30" ? line.style_dotted : z.tf == "H1" ? line.style_dashed : line.style_solid)
     string st = z.state == 0 ? "FRESH" : z.state == 1 ? "IN PLAY" : z.state == 2 ? "TESTED" : "✓ VALID"
     box.set_text(z.bx, showZoneText ? zoneName(z) + (showEntries ? " · " + st : "") : "")
     box.set_text_color(z.bx, color.new(base, z.state == 2 ? 50 : 0))
@@ -294,18 +302,18 @@ addZone(float top, float bot, int t, int role, string kind, string tf) =>
     bool skip = false
     if mergeOverlap
         for z in zones
-            // same TF: skip overlapping new zone; H1 never overlaps an H4 zone
-            if overlaps(z, top, bot, role) and (z.tf == tf or tf == "H1")
+            // skip a new zone that overlaps a zone of the same or a higher timeframe
+            if overlaps(z, top, bot, role) and tfRank(z.tf) >= tfRank(tf)
                 skip := true
                 break
     if not skip
-        // The new zone replaces what it covers: an H4 zone replaces overlapping H1 zones, and any
-        // new zone replaces an overlapping grey (broken) zone that now plays the same role.
+        // The new zone replaces what it covers: overlapping zones of a lower timeframe, and an
+        // overlapping grey (broken) zone of the same or a lower timeframe that now plays the same role.
         if mergeOverlap and array.size(zones) > 0
             for i = array.size(zones) - 1 to 0
                 Zone oz = array.get(zones, i)
                 bool hit = oz.role == role and top >= oz.bot and bot <= oz.top
-                if hit and ((tf == "H4" and oz.tf == "H1") or (oz.broken and (oz.tf == tf or tf == "H4")))
+                if hit and (tfRank(oz.tf) < tfRank(tf) or (oz.broken and tfRank(oz.tf) <= tfRank(tf)))
                     box.delete(oz.bx)
                     array.remove(zones, i)
         Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1, force_overlay = true,
@@ -338,6 +346,12 @@ if h1Ok and not na(r1T) and r1T != lastRes1T
 if h1Ok and not na(s1T) and s1T != lastSup1T
     lastSup1T := s1T
     addZone(s1Top, s1Bot, s1T, 1, "H1 SNR · RBR", "H1")
+if m30Ok and not na(rmT) and rmT != lastResMT
+    lastResMT := rmT
+    addZone(rmTop, rmBot, rmT, -1, "M30 SNR · DBD", "M30")
+if m30Ok and not na(smT) and smT != lastSupMT
+    lastSupMT := smT
+    addZone(smTop, smBot, smT, 1, "M30 SNR · RBR", "M30")
 
 // Only the nearest zones on the left: drop zones whose swing is older than maxAgeDays
 if array.size(zones) > 0
@@ -347,7 +361,7 @@ if array.size(zones) > 0
             box.delete(z.bx)
             array.remove(zones, i)
 
-// Breakouts: a close through a zone on its own timeframe (H4 or H1) turns it grey, flips its
+// Breakouts: a close through a zone on its own timeframe (H4, H1 or M30) turns it grey, flips its
 // role and makes it fresh again (its first retest can give an entry). A grey zone closed back
 // through is removed.
 if array.size(zones) > 0
@@ -475,11 +489,12 @@ string sigZone  = ""
 float  entryPx  = na
 int    setupDir = 0      // PREPARE signal fired on this bar (neckline broken, waiting for retest)
 
-// Zone freshness: FRESH until price first reaches it (-> IN PLAY). The first approach ends when
-// price moves leaveAtr × the zone TF's ATR away from the zone; if no entry happened by then, the
-// zone is marked TESTED and is ignored from then on.
+// Zone freshness (always tracked): FRESH until price first reaches it (-> IN PLAY). The first
+// approach ends when price moves leaveAtr × the zone TF's ATR away from the zone. A zone that had
+// no entry by then is TESTED; with "Only fresh zones" on, tested zones (and zones that already gave
+// their entry, once price has moved away) are removed from the chart.
 float zTol = zoneTolAtr * atrM
-if showEntries and array.size(zones) > 0
+if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone  z     = array.get(zones, i)
         float leave = leaveAtr * nz(tfAtr(z), 3 * atrM)
@@ -488,11 +503,12 @@ if showEntries and array.size(zones) > 0
                 z.state      := 1
                 z.firstTouch := bar_index
                 styleZone(z)
-        else if z.state == 1 and na(z.leaveBar)
+        else if (z.state == 1 or z.state == 3) and na(z.leaveBar)
             if (z.role == -1 and low < z.bot - leave) or (z.role == 1 and high > z.top + leave)
                 z.leaveBar := bar_index
-        else if z.state == 1 and bar_index > z.leaveBar + pR
-            z.state := 2
+        else if (z.state == 1 or z.state == 3) and bar_index > z.leaveBar + pR
+            if z.state == 1
+                z.state := 2
             if hideTested
                 box.delete(z.bx)
                 array.remove(zones, i)
@@ -695,7 +711,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Switch chart to M15 or M30", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 2, "H4 solid · H1 dashed · Red DBD · Blue RBR · Grey BRK", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 2, "H4 solid · H1 dashed · M30 dotted · Red DBD · Blue RBR · Grey BRK", text_color = tc, text_size = size.small)
     int nFresh = 0
     int nPlay  = 0
     for z in zones
