@@ -21,7 +21,7 @@
 //      If the first approach ends without an entry, the zone is marked TESTED and ignored.
 //   3. Risk: fixed stop loss / take profit in points (default 600 / 1000).
 //
-indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay = true,
+indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay = true, scale = scale.right,
      max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -308,7 +308,7 @@ addZone(float top, float bot, int t, int role, string kind, string tf) =>
                 if hit and ((tf == "H4" and oz.tf == "H1") or (oz.broken and (oz.tf == tf or tf == "H4")))
                     box.delete(oz.bx)
                     array.remove(zones, i)
-        Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1,
+        Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1, force_overlay = true,
              text_size = size.small, text_halign = text.align_right, text_valign = text.align_top),
              top, bot, role, kind, t, tf)
         styleZone(nz)
@@ -429,7 +429,7 @@ for t in trades
             box.set_right(t.riskBx, bar_index)
             box.set_right(t.rewBx, bar_index)
             label.new(bar_index, win ? t.tp : t.sl, win ? "TP ✓" : "SL ✗", style = label.style_label_left,
-                 color = win ? color.new(color.green, 0) : color.new(color.red, 0), textcolor = color.white, size = size.small)
+                 color = win ? color.new(color.green, 0) : color.new(color.red, 0), textcolor = color.white, size = size.small, force_overlay = true)
         else
             box.set_right(t.riskBx, bar_index + 1)
             box.set_right(t.rewBx, bar_index + 1)
@@ -463,11 +463,11 @@ var Zone   pendZ     = na
 
 drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
     color c = dir == -1 ? color.red : color.blue
-    line.new(i1, p1, iN, neck, color = c, width = 2)
-    line.new(iN, neck, i2, p2, color = c, width = 2)
-    line.new(i1, neck, bar_index, neck, color = color.new(c, 40), style = line.style_dashed)
+    line.new(i1, p1, iN, neck, color = c, width = 2, force_overlay = true)
+    line.new(iN, neck, i2, p2, color = c, width = 2, force_overlay = true)
+    line.new(i1, neck, bar_index, neck, color = color.new(c, 40), style = line.style_dashed, force_overlay = true)
     label.new(i2, p2, dir == -1 ? "DT" : "DB", style = dir == -1 ? label.style_label_down : label.style_label_up,
-         color = color.new(color.white, 100), textcolor = c, size = size.small)
+         color = color.new(color.white, 100), textcolor = c, size = size.small, force_overlay = true)
     true
 
 int    sig      = 0
@@ -637,7 +637,7 @@ if setupDir != 0
     float ptp = lim + setupDir * tpPts * pt
     string pside = setupDir == 1 ? "BUY" : "SELL"
     label.new(bar_index, lim, "PREPARE " + pside + "\nlimit " + str.tostring(lim, format.mintick),
-         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small)
+         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true)
     alert("1PC PREPARE " + pside + " " + syminfo.ticker + " (" + (setupDir == 1 ? "W / double bottom" : "M / double top") + " in " + pendZone +
          " zone, neckline broken) | " + pside + " LIMIT " + str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) +
          " | TP " + str.tostring(ptp, format.mintick), alert.freq_once_per_bar_close)
@@ -649,26 +649,26 @@ if sig != 0 and not (oneTrade and openCount > 0)
     box rb = box.new(bar_index, math.max(entry, sl), bar_index + 1, math.min(entry, sl),
          border_color = color.new(color.red, 50), bgcolor = color.new(color.red, 85),
          text = "SL " + str.tostring(sl, format.mintick), text_color = color.new(color.red, 0),
-         text_size = size.small, text_halign = text.align_left)
+         text_size = size.small, text_halign = text.align_left, force_overlay = true)
     box wb = box.new(bar_index, math.max(entry, tp), bar_index + 1, math.min(entry, tp),
          border_color = color.new(color.green, 50), bgcolor = color.new(color.green, 85),
          text = "TP " + str.tostring(tp, format.mintick), text_color = color.new(color.green, 0),
-         text_size = size.small, text_halign = text.align_left)
+         text_size = size.small, text_halign = text.align_left, force_overlay = true)
     array.push(trades, Trade.new(sig, entry, sl, tp, bar_index, rb, wb))
     string side = sig == 1 ? "BUY" : "SELL"
     label.new(bar_index, entry,
          side + " · " + sigZone + "\nEntry " + str.tostring(entry, format.mintick) +
          "\nSL " + str.tostring(sl, format.mintick) + "\nTP " + str.tostring(tp, format.mintick),
          style = sig == 1 ? label.style_label_up : label.style_label_down,
-         color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small)
+         color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small, force_overlay = true)
     buyFired  := sig == 1
     sellFired := sig == -1
     alert("1PC ENTRY " + side + " " + syminfo.ticker + " (" + (sig == 1 ? "W / double bottom" : "M / double top") + " in " + sigZone + " zone)" +
          " | Entry " + str.tostring(entry, format.mintick) + " | SL " + str.tostring(sl, format.mintick) +
          " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
 
-plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny)
-plotshape(sellFired, "Sell signal", shape.triangledown, location.abovebar, color.red, size = size.tiny)
+plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny, force_overlay = true)
+plotshape(sellFired, "Sell signal", shape.triangledown, location.abovebar, color.red, size = size.tiny, force_overlay = true)
 
 alertcondition(prepBuy, "1PC Prepare Buy", "PREPARE BUY {{ticker}}: W in buy zone, neckline broken — wait for the retest")
 alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: M in sell zone, neckline broken — wait for the retest")
