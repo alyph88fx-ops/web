@@ -6,14 +6,18 @@
 //   Storyline = what price does when it comes back to that zone (M / W on M15 or M30 -> PREPARE -> ENTRY)
 //
 // Flow
-//   1. Fresh key zones (rectangles) on H4, H1 and M30. A swing level (SNR) is only marked when price
-//      left it with a DBD or RBR (H4 solid border, H1 dashed, M30 dotted; the higher timeframe wins
-//      where zones overlap). A zone is removed once price has come back to it and moved away again:
+//   1. Fresh key zones (rectangles) on H4, H1 and M30 (H4 solid border, H1 dashed, M30 dotted):
+//        SNR (DBD/RBR)  a swing level that price left with a DBD or RBR (red supply / blue demand)
+//        base (DBD/RBR) the base itself on M30 / H1 (grey), e.g. "M30 base (DBD)"
+//        breakout       an H4 / H1 swing level (or any zone) that a candle of its timeframe closed
+//                       through, coloured by its new role, e.g. "H4 breakout"
+//      Only the nearest zones to current price are shown; a zone is removed once price has come
+//      back to it and moved away again. Where zones overlap, the higher timeframe wins:
 //        SNR + DBD   swing high -> drop -> base (shallow bounce) -> second drop below the base
 //                    -> red zone at the swing high (resistance / sell zone)
 //        SNR + RBR   swing low -> rally -> base (shallow pullback) -> second rally above the base
 //                    -> blue zone at the swing low (support / buy zone)
-//        Breakout    a close through a zone on its own timeframe turns it grey and flips its role
+//        Breakout    a close through a zone on its own timeframe makes it a breakout zone and flips its role
 //                    (broken resistance -> support, broken support -> resistance); its retest is fresh.
 //   2. Confirmation (M15 or M30 chart), on FRESH zones only: on price's first approach to a
 //      zone, look for an M (double top) in a sell zone or a W (double bottom) in a buy zone.
@@ -33,6 +37,8 @@ useH4        = input.bool(true, "H4", inline = "tf", group = grpZ)
 useH1        = input.bool(true, "H1", inline = "tf", group = grpZ)
 useM30       = input.bool(true, "M30 zones", inline = "tf", group = grpZ)
 swLen        = input.int(3, "Swing strength (bars each side)", minval = 1, maxval = 10, group = grpZ)
+m30Right     = input.int(1, "M30 swing confirmation (candles to the right)", minval = 1, maxval = 10, group = grpZ,
+     tooltip = "M30 bases are short, so an M30 swing low/high is confirmed after this many candles (H4 and H1 use the swing strength on both sides).")
 minMoveAtr   = input.float(2.0, "Min first drop / rally (× zone TF ATR)", minval = 0.5, step = 0.25, group = grpZ,
      tooltip = "Size of the first leg away from the swing level, e.g. the drop from the swing high in a DBD.")
 maxRetr      = input.float(0.8, "Max base bounce (fraction of first leg)", minval = 0.1, maxval = 1.0, step = 0.05, group = grpZ,
@@ -52,11 +58,19 @@ keepDead     = input.bool(false, "Keep invalidated zones on chart", group = grpZ
 hideTested   = input.bool(true, "Only fresh zones (remove a zone once it has been tested)", group = grpZ,
      tooltip = "A zone is removed once price has come back to it and then moved away again (or once it gave its entry and price moved away). A breakout (grey) zone is fresh again until its retest.")
 
+showBases       = input.bool(true, "Mark DBD / RBR bases (M30, H1)", group = grpZ,
+     tooltip = "Also draws the base itself (the sideways part between the two drops or rallies) as a grey zone, e.g. 'M30 base (DBD)'.")
+showLevelBreaks = input.bool(true, "Mark breakouts of swing levels (H4, H1)", group = grpZ,
+     tooltip = "When a candle closes through an H4 or H1 swing high or low (SNR), the level is marked as a breakout zone, e.g. 'H4 breakout'.")
+
 grpC = "Zone colours"
-colRes       = input.color(color.new(color.red, 80), "Resistance (SNR + DBD)", group = grpC)
-colSup       = input.color(color.new(color.blue, 80), "Support (SNR + RBR)", group = grpC)
-colBrk       = input.color(color.new(color.gray, 75), "Breakout", group = grpC)
+colRes       = input.color(color.new(color.red, 85), "Resistance / supply", group = grpC)
+colSup       = input.color(color.new(color.blue, 85), "Support / demand", group = grpC)
+colBase      = input.color(color.new(color.gray, 80), "DBD / RBR base", group = grpC)
+brkRoleColor = input.bool(true, "Colour breakouts by their new role (red = now resistance, blue = now support)", group = grpC)
+colBrk       = input.color(color.new(color.gray, 75), "Breakout (when not coloured by role)", group = grpC)
 showZoneText = input.bool(true, "Show zone labels", group = grpC)
+showStatus   = input.bool(false, "Add status to labels (fresh / in play / valid)", group = grpC)
 
 grpP = "2 · M15 / M30 confirmation (M = sell, W = buy)"
 showEntries  = input.bool(true, "Show entries (patterns, signals, SL/TP)", group = grpP,
@@ -109,12 +123,15 @@ pop6(array<float> a, array<float> b, array<int> c, array<float> d, array<int> e,
     array.remove(f, i)
     true
 
-zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
+// fast = M30 mode: the first leg is measured from the extreme of the last 20 candles, a weak close
+// through the base only extends it (the second leg needs a candle body of at least 0.5 × ATR), and
+// the newest base wins. levels = also track breakouts of plain swing levels.
+zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, bool fast, bool levels) =>
     float atr   = ta.atr(14)
-    float ph    = ta.pivothigh(high, len, len)
-    float pl    = ta.pivotlow(low, len, len)
-    float hhLen = ta.highest(high, len)
-    float llLen = ta.lowest(low, len)
+    float ph    = ta.pivothigh(high, len, rgt)
+    float pl    = ta.pivotlow(low, len, rgt)
+    float hhLen = ta.highest(high, rgt)
+    float llLen = ta.lowest(low, rgt)
 
     // Top of the current up-leg (highest swing high since the last swing low) and bottom of the
     // current down-leg (lowest swing low since the last swing high). A DBD is measured from the
@@ -142,13 +159,29 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
     var array<float> uH1   = array.new<float>()
     var array<int>   uH1I  = array.new<int>()
     var array<float> uBase = array.new<float>()
+    // Plain swing levels (SNR) waiting to be broken: 1 = swing high (resistance), -1 = swing low (support)
+    var array<float> lvTop = array.new<float>()
+    var array<float> lvBot = array.new<float>()
+    var array<int>   lvT   = array.new<int>()
+    var array<int>   lvI   = array.new<int>()
+    var array<int>   lvDir = array.new<int>()
 
-    float resTop = na
+    float resTop = na    // SNR + DBD: zone at the swing high the drop started from
     float resBot = na
     int   resT   = na
-    float supTop = na
+    float supTop = na    // SNR + RBR: zone at the swing low the rally started from
     float supBot = na
     int   supT   = na
+    float dbTop  = na    // DBD base: the sideways part between the two drops
+    float dbBot  = na
+    int   dbT    = na
+    float rbTop  = na    // RBR base: the sideways part between the two rallies
+    float rbBot  = na
+    int   rbT    = na
+    float bkTop  = na    // breakout: a swing level closed through on this timeframe
+    float bkBot  = na
+    int   bkT    = na
+    int   bkRole = 0     // its new role: 1 = now support, -1 = now resistance
 
     // Progress DBDs: second drop (close below L1) confirms; new high above H0, too-deep bounce or too-long base cancels
     if array.size(dL1) > 0
@@ -158,15 +191,23 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
             bool  done = false
             if high > h0 or bar_index - array.get(dL1I, i) > maxBase
                 done := true
-            else if close < l1
-                if na(resT)
+            else if close < l1 and (not fast or open - close >= 0.5 * atr)
+                if not fast or na(resT)
                     resTop := h0
                     resBot := math.min(array.get(dH0B, i), h0 - minH * atr)
                     resT   := array.get(dH0T, i)
+                    float bh = array.get(dBase, i)
+                    float bm = (bh + l1) / 2
+                    dbTop := math.max(bh, bm + minH * atr / 2)
+                    dbBot := math.min(l1, bm - minH * atr / 2)
+                    dbT   := time[bar_index - array.get(dL1I, i)]
                 done := true
             else
                 float bs = math.max(array.get(dBase, i), high)
                 array.set(dBase, i, bs)
+                if fast
+                    l1 := math.min(l1, low)
+                    array.set(dL1, i, l1)
                 if bs - l1 > retr * (h0 - l1)
                     done := true
             if done
@@ -180,30 +221,71 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
             bool  done = false
             if low < l0 or bar_index - array.get(uH1I, i) > maxBase
                 done := true
-            else if close > h1
-                if na(supT)
+            else if close > h1 and (not fast or close - open >= 0.5 * atr)
+                if not fast or na(supT)
                     supBot := l0
                     supTop := math.max(array.get(uL0B, i), l0 + minH * atr)
                     supT   := array.get(uL0T, i)
+                    float bl = array.get(uBase, i)
+                    float bm = (bl + h1) / 2
+                    rbTop := math.max(h1, bm + minH * atr / 2)
+                    rbBot := math.min(bl, bm - minH * atr / 2)
+                    rbT   := time[bar_index - array.get(uH1I, i)]
                 done := true
             else
                 float bs = math.min(array.get(uBase, i), low)
                 array.set(uBase, i, bs)
+                if fast
+                    h1 := math.max(h1, high)
+                    array.set(uH1, i, h1)
                 if h1 - bs > retr * (h1 - l0)
                     done := true
             if done
                 pop6(uL0, uL0B, uL0T, uH1, uH1I, uBase, i)
 
-    // New swing low that ends a big drop from the top of the leg -> DBD candidate
+    // Breakouts of plain swing levels: a close through the level flips its role
+    if levels and array.size(lvTop) > 0
+        for i = array.size(lvTop) - 1 to 0
+            int  dir  = array.get(lvDir, i)
+            bool gone = bar_index - array.get(lvI, i) > 4 * maxBase
+            if (dir == 1 and close > array.get(lvTop, i)) or (dir == -1 and close < array.get(lvBot, i))
+                if na(bkT)
+                    bkTop  := array.get(lvTop, i)
+                    bkBot  := array.get(lvBot, i)
+                    bkT    := array.get(lvT, i)
+                    bkRole := dir
+                gone := true
+            if gone
+                array.remove(lvTop, i)
+                array.remove(lvBot, i)
+                array.remove(lvT, i)
+                array.remove(lvI, i)
+                array.remove(lvDir, i)
+
+    // New swing low that ends a big drop -> DBD candidate. The drop starts at the top of the leg
+    // (fast mode: at the highest high of the last 20 candles before the swing low).
     if not na(pl)
-        int iL = bar_index - len
-        if not na(legHiI) and legHiI < iL and legHiP - pl >= minMove * atr and hhLen - pl <= retr * (legHiP - pl)
-            int k = array.indexof(dH0T, legHiT)
+        int   iL  = bar_index - rgt
+        float oP  = legHiP
+        float oB  = legHiB
+        int   oT  = legHiT
+        bool  oOk = not na(legHiI) and legHiI < iL
+        if fast
+            int ko = rgt + 1
+            for k = rgt + 1 to rgt + 20
+                if high[k] > high[ko]
+                    ko := k
+            oP  := high[ko]
+            oB  := math.max(open[ko], close[ko])
+            oT  := time[ko]
+            oOk := true
+        if oOk and oP - pl >= minMove * atr and hhLen - pl <= retr * (oP - pl)
+            int k = array.indexof(dH0T, oT)
             if k >= 0
                 pop6(dH0, dH0B, dH0T, dL1, dL1I, dBase, k)
-            array.push(dH0, legHiP)
-            array.push(dH0B, legHiB)
-            array.push(dH0T, legHiT)
+            array.push(dH0, oP)
+            array.push(dH0B, oB)
+            array.push(dH0T, oT)
             array.push(dL1, pl)
             array.push(dL1I, iL)
             array.push(dBase, hhLen)
@@ -215,20 +297,40 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
         legHiI := na
         if na(legLoP) or pl < legLoP
             legLoP := pl
-            legLoB := math.min(open[len], close[len])
-            legLoT := time[len]
+            legLoB := math.min(open[rgt], close[rgt])
+            legLoT := time[rgt]
             legLoI := iL
+        // remember the swing low as a support level (wick to body, at least minH × ATR tall)
+        array.push(lvBot, pl)
+        array.push(lvTop, math.max(math.min(open[rgt], close[rgt]), pl + minH * atr))
+        array.push(lvT, time[rgt])
+        array.push(lvI, iL)
+        array.push(lvDir, -1)
 
-    // New swing high that ends a big rally from the bottom of the leg -> RBR candidate
+    // New swing high that ends a big rally -> RBR candidate (fast mode: the rally starts at the
+    // lowest low of the last 20 candles before the swing high)
     if not na(ph)
-        int iH = bar_index - len
-        if not na(legLoI) and legLoI < iH and ph - legLoP >= minMove * atr and ph - llLen <= retr * (ph - legLoP)
-            int k = array.indexof(uL0T, legLoT)
+        int   iH  = bar_index - rgt
+        float oP  = legLoP
+        float oB  = legLoB
+        int   oT  = legLoT
+        bool  oOk = not na(legLoI) and legLoI < iH
+        if fast
+            int ko = rgt + 1
+            for k = rgt + 1 to rgt + 20
+                if low[k] < low[ko]
+                    ko := k
+            oP  := low[ko]
+            oB  := math.min(open[ko], close[ko])
+            oT  := time[ko]
+            oOk := true
+        if oOk and ph - oP >= minMove * atr and ph - llLen <= retr * (ph - oP)
+            int k = array.indexof(uL0T, oT)
             if k >= 0
                 pop6(uL0, uL0B, uL0T, uH1, uH1I, uBase, k)
-            array.push(uL0, legLoP)
-            array.push(uL0B, legLoB)
-            array.push(uL0T, legLoT)
+            array.push(uL0, oP)
+            array.push(uL0B, oB)
+            array.push(uL0T, oT)
             array.push(uH1, ph)
             array.push(uH1I, iH)
             array.push(uBase, llLen)
@@ -240,15 +342,28 @@ zoneScan(int len, float minMove, float retr, int maxBase, float minH) =>
         legLoI := na
         if na(legHiP) or ph > legHiP
             legHiP := ph
-            legHiB := math.max(open[len], close[len])
-            legHiT := time[len]
+            legHiB := math.max(open[rgt], close[rgt])
+            legHiT := time[rgt]
             legHiI := iH
+        // remember the swing high as a resistance level
+        array.push(lvTop, ph)
+        array.push(lvBot, math.min(math.max(open[rgt], close[rgt]), ph - minH * atr))
+        array.push(lvT, time[rgt])
+        array.push(lvI, iH)
+        array.push(lvDir, 1)
 
-    [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], close[1], atr[1]]
+    if array.size(lvTop) > 16
+        array.shift(lvTop)
+        array.shift(lvBot)
+        array.shift(lvT)
+        array.shift(lvI)
+        array.shift(lvDir)
 
-[rTop, rBot, rT, sTop, sBot, sT, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
-[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
-[rmTop, rmBot, rmT, smTop, smBot, smT, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr), lookahead = barmerge.lookahead_on)
+    [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], dbTop[1], dbBot[1], dbT[1], rbTop[1], rbBot[1], rbT[1], bkTop[1], bkBot[1], bkT[1], bkRole[1], close[1], atr[1]]
+
+[rTop, rBot, rT, sTop, sBot, sT, dTop, dBot, dT, uTop, uBot, uT, bTop, bBot, bT, bRole, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true), lookahead = barmerge.lookahead_on)
+[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, d1Top, d1Bot, d1T, u1Top, u1Bot, u1T, b1Top, b1Bot, b1T, b1Role, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true), lookahead = barmerge.lookahead_on)
+[rmTop, rmBot, rmT, smTop, smBot, smT, dmTop, dmBot, dmT, umTop, umBot, umT, bmTop, bmBot, bmT, bmRole, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, m30Right, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, true, false), lookahead = barmerge.lookahead_on)
 
 h4Ok  = useH4 and timeframe.in_seconds() <= 14400
 h1Ok  = useH1 and timeframe.in_seconds() <= 3600
@@ -261,66 +376,88 @@ type Zone
     box    bx
     float  top
     float  bot
-    int    role            // 1 = buy zone (support / broken resistance), -1 = sell zone
+    int    role            // 1 = buy zone (support / demand / broken resistance), -1 = sell zone
     string kind
-    int    t0                 // time of the swing the zone starts at
+    int    t0                 // time of the candle the zone starts at (left edge)
     string tf                 // "H4", "H1" or "M30"
-    bool   broken     = false
+    bool   isBase     = false // DBD / RBR base zone
+    bool   broken     = false // breakout zone
+    int    tAge       = na    // age is counted from here (zone start, or the breakout)
+    line   mid        = na    // dashed midline of a breakout zone
+    bool   armed      = false // price has moved clear of the zone once since it formed
     int    state      = 0     // 0 FRESH (untouched), 1 IN PLAY (first approach), 2 TESTED (no pattern), 3 VALID (pattern formed)
     int    firstTouch = na
     int    leaveBar   = na    // bar where price moved away after the first approach
 
-var array<Zone> zones     = array.new<Zone>()
-var int         lastResT  = 0
-var int         lastSupT  = 0
-var int         lastRes1T = 0
-var int         lastSup1T = 0
-var int         lastResMT = 0
-var int         lastSupMT = 0
+var array<Zone> zones = array.new<Zone>()
+var map<string, int> seen = map.new<string, int>()
 
 // close / ATR of the zone's own timeframe (closed candles), and its rank (higher TF wins)
 tfClose(Zone z) => z.tf == "M30" ? m30C : z.tf == "H1" ? h1C : h4C
 tfAtr(Zone z)   => z.tf == "M30" ? m30Atr : z.tf == "H1" ? h1Atr : h4Atr
 tfRank(string tf) => tf == "H4" ? 3 : tf == "H1" ? 2 : 1
 
-zoneName(Zone z) => z.kind + (z.broken ? " · BRK" : "")
+zoneName(Zone z) => z.broken ? z.tf + " breakout" : z.kind
+
+zoneColor(Zone z) =>
+    z.broken ? (brkRoleColor ? (z.role == 1 ? colSup : colRes) : colBrk) : z.isBase ? colBase : z.role == 1 ? colSup : colRes
 
 styleZone(Zone z) =>
-    color base = z.broken ? colBrk : z.role == 1 ? colSup : colRes
-    color c    = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0) + (z.tf == "H1" ? 5 : z.tf == "M30" ? 9 : 0)))
+    color base = zoneColor(z)
+    color c    = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0)))
     box.set_bgcolor(z.bx, c)
-    box.set_border_color(z.bx, color.new(base, z.state == 2 ? 70 : 30))
+    box.set_border_color(z.bx, color.new(base, z.state == 2 ? 70 : 20))
     box.set_border_width(z.bx, z.state == 3 ? 2 : 1)
     box.set_border_style(z.bx, z.tf == "M30" ? line.style_dotted : z.tf == "H1" ? line.style_dashed : line.style_solid)
-    string st = z.state == 0 ? "FRESH" : z.state == 1 ? "IN PLAY" : z.state == 2 ? "TESTED" : "✓ VALID"
-    box.set_text(z.bx, showZoneText ? zoneName(z) + (showEntries ? " · " + st : "") : "")
-    box.set_text_color(z.bx, color.new(base, z.state == 2 ? 50 : 0))
+    string st = z.state == 0 ? "fresh" : z.state == 1 ? "in play" : z.state == 2 ? "tested" : "✓ valid"
+    box.set_text(z.bx, showZoneText ? zoneName(z) + (showStatus ? " · " + st : "") : "")
+    color tcol = z.isBase and not z.broken ? (z.role == 1 ? colSup : colRes) : base
+    box.set_text_color(z.bx, color.new(tcol, z.state == 2 ? 50 : 0))
+    if z.broken
+        float m = (z.top + z.bot) / 2
+        if na(z.mid)
+            z.mid := line.new(z.t0, m, time, m, xloc = xloc.bar_time, style = line.style_dashed, force_overlay = true)
+        line.set_color(z.mid, color.new(base, 10))
     true
 
-overlaps(Zone z, float top, float bot, int role) =>
-    z.role == role and not z.broken and z.state <= 1 and top >= z.bot and bot <= z.top
+killZone(Zone z) =>
+    box.delete(z.bx)
+    if not na(z.mid)
+        line.delete(z.mid)
+    true
 
-addZone(float top, float bot, int t, int role, string kind, string tf) =>
+// Priority where zones overlap: higher timeframe first (H4 > H1 > M30), then breakout > SNR > base
+zScore(string tf, bool brk, bool isBase) => tfRank(tf) * 10 + (brk ? 3 : isBase ? 1 : 2)
+// overlap of at least 30% of the smaller zone's height
+zOverlap(float top, float bot, Zone z) => math.min(top, z.top) - math.max(bot, z.bot) > 0.3 * math.min(top - bot, z.top - z.bot)
+
+addZone(float top, float bot, int t, int role, string kind, string tf, bool isBase, bool brk) =>
+    int  sn   = zScore(tf, brk, isBase)
     bool skip = false
     if mergeOverlap
         for z in zones
-            // skip a new zone that overlaps a zone of the same or a higher timeframe
-            if overlaps(z, top, bot, role) and tfRank(z.tf) >= tfRank(tf)
+            int  sz = zScore(z.tf, z.broken, z.isBase)
+            bool ov = zOverlap(top, bot, z) and z.state <= 1
+            // a zone with a higher priority already covers this area with the same role
+            if ov and z.role == role and (sz > sn or (sz == sn and not brk))
                 skip := true
+            // the original zone is still there and will turn into this breakout zone itself
+            if ov and brk and not z.broken and z.role == -role and z.tf == tf
+                skip := true
+            if skip
                 break
     if not skip
-        // The new zone replaces what it covers: overlapping zones of a lower timeframe, and an
-        // overlapping grey (broken) zone of the same or a lower timeframe that now plays the same role.
+        // the new zone replaces overlapping zones with a lower priority (and an older breakout of the same kind)
         if mergeOverlap and array.size(zones) > 0
             for i = array.size(zones) - 1 to 0
                 Zone oz = array.get(zones, i)
-                bool hit = oz.role == role and top >= oz.bot and bot <= oz.top
-                if hit and (tfRank(oz.tf) < tfRank(tf) or (oz.broken and tfRank(oz.tf) <= tfRank(tf)))
-                    box.delete(oz.bx)
+                int  so = zScore(oz.tf, oz.broken, oz.isBase)
+                if oz.role == role and zOverlap(top, bot, oz) and (so < sn or (so == sn and brk))
+                    killZone(oz)
                     array.remove(zones, i)
         Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1, force_overlay = true,
-             text_size = size.small, text_halign = text.align_right, text_valign = text.align_top),
-             top, bot, role, kind, t, tf)
+             text_size = size.normal, text_halign = text.align_center, text_valign = text.align_center),
+             top, bot, role, kind, t, tf, isBase, brk, brk ? time : t)
         styleZone(nz)
         array.push(zones, nz)
         int cnt = 0
@@ -331,46 +468,56 @@ addZone(float top, float bot, int t, int role, string kind, string tf) =>
             for i = 0 to array.size(zones) - 1
                 Zone oz = array.get(zones, i)
                 if oz.kind == kind
-                    box.delete(oz.bx)
+                    killZone(oz)
                     array.remove(zones, i)
                     break
     true
 
-if h4Ok and not na(rT) and rT != lastResT
-    lastResT := rT
-    addZone(rTop, rBot, rT, -1, "H4 SNR · DBD", "H4")
-if h4Ok and not na(sT) and sT != lastSupT
-    lastSupT := sT
-    addZone(sTop, sBot, sT, 1, "H4 SNR · RBR", "H4")
-if h1Ok and not na(r1T) and r1T != lastRes1T
-    lastRes1T := r1T
-    addZone(r1Top, r1Bot, r1T, -1, "H1 SNR · DBD", "H1")
-if h1Ok and not na(s1T) and s1T != lastSup1T
-    lastSup1T := s1T
-    addZone(s1Top, s1Bot, s1T, 1, "H1 SNR · RBR", "H1")
-if m30Ok and not na(rmT) and rmT != lastResMT
-    lastResMT := rmT
-    addZone(rmTop, rmBot, rmT, -1, "M30 SNR · DBD", "M30")
-if m30Ok and not na(smT) and smT != lastSupMT
-    lastSupMT := smT
-    addZone(smTop, smBot, smT, 1, "M30 SNR · RBR", "M30")
+// add a zone once (the same value repeats on every chart bar until the next higher-TF bar)
+addOnce(string key, float top, float bot, int t, int role, string kind, string tf, bool isBase, bool brk) =>
+    int last = map.contains(seen, key) ? map.get(seen, key) : 0
+    if not na(t) and not na(top) and not na(bot) and t != last
+        map.put(seen, key, t)
+        addZone(top, bot, t, role, kind, tf, isBase, brk)
+    true
+
+// higher timeframe first, and breakouts before SNR zones before bases (overlap priority)
+if h4Ok
+    if showLevelBreaks and bRole != 0
+        addOnce("H4b", bTop, bBot, bT, bRole, "H4 SNR", "H4", false, true)
+    addOnce("H4r", rTop, rBot, rT, -1, "H4 SNR (DBD)", "H4", false, false)
+    addOnce("H4s", sTop, sBot, sT, 1, "H4 SNR (RBR)", "H4", false, false)
+if h1Ok
+    if showLevelBreaks and b1Role != 0
+        addOnce("H1b", b1Top, b1Bot, b1T, b1Role, "H1 SNR", "H1", false, true)
+    addOnce("H1r", r1Top, r1Bot, r1T, -1, "H1 SNR (DBD)", "H1", false, false)
+    addOnce("H1s", s1Top, s1Bot, s1T, 1, "H1 SNR (RBR)", "H1", false, false)
+    if showBases
+        addOnce("H1d", d1Top, d1Bot, d1T, -1, "H1 base (DBD)", "H1", true, false)
+        addOnce("H1u", u1Top, u1Bot, u1T, 1, "H1 base (RBR)", "H1", true, false)
+if m30Ok
+    addOnce("M30r", rmTop, rmBot, rmT, -1, "M30 SNR (DBD)", "M30", false, false)
+    addOnce("M30s", smTop, smBot, smT, 1, "M30 SNR (RBR)", "M30", false, false)
+    if showBases
+        addOnce("M30d", dmTop, dmBot, dmT, -1, "M30 base (DBD)", "M30", true, false)
+        addOnce("M30u", umTop, umBot, umT, 1, "M30 base (RBR)", "M30", true, false)
 
 // Age in trading days between two times (weekends are not counted)
 tradeDays(int t0, int t1) =>
     float d = (t1 - t0) / 86400000.0
     d - 2 * math.floor(d / 7) - (dayofweek(t1) < dayofweek(t0) ? 2 : 0)
 
-// Only recent zones: drop zones whose swing is older than maxAgeDays trading days
+// Only recent zones: drop zones older than maxAgeDays trading days (breakouts count from the break)
 if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone z = array.get(zones, i)
-        if tradeDays(z.t0, time) > maxAgeDays
-            box.delete(z.bx)
+        if tradeDays(z.tAge, time) > maxAgeDays
+            killZone(z)
             array.remove(zones, i)
 
-// Breakouts: a close through a zone on its own timeframe (H4, H1 or M30) turns it grey, flips its
-// role and makes it fresh again (its first retest can give an entry). A grey zone closed back
-// through is removed.
+// Breakouts: a close through a zone on its own timeframe (H4, H1 or M30) turns it into a breakout
+// zone, flips its role and makes it fresh again (its first retest can give an entry). A breakout
+// zone that is closed back through is removed.
 if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone  z  = array.get(zones, i)
@@ -384,6 +531,8 @@ if array.size(zones) > 0
                 z.state      := 0
                 z.firstTouch := na
                 z.leaveBar   := na
+                z.armed      := false
+                z.tAge       := time
                 styleZone(z)
         else if (z.role == 1 and zc < z.bot) or (z.role == -1 and zc > z.top)
             if keepDead
@@ -392,8 +541,10 @@ if array.size(zones) > 0
                 box.set_border_color(z.bx, color.new(color.gray, 80))
                 box.set_border_style(z.bx, line.style_dotted)
                 box.set_text(z.bx, "")
+                if not na(z.mid)
+                    line.set_x2(z.mid, time)
             else
-                box.delete(z.bx)
+                killZone(z)
             array.remove(zones, i)
 
 // Pattern check: both tops inside the zone and both formed during the zone's FIRST approach
@@ -505,7 +656,11 @@ if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone  z     = array.get(zones, i)
         float leave = leaveAtr * nz(tfAtr(z), 3 * atrM)
-        if z.state == 0
+        if not z.armed
+            // touches only count once price has moved clear of the zone after it formed
+            if (z.role == -1 and high < z.bot - zTol) or (z.role == 1 and low > z.top + zTol)
+                z.armed := true
+        else if z.state == 0
             if (z.role == -1 and high >= z.bot - zTol) or (z.role == 1 and low <= z.top + zTol)
                 z.state      := 1
                 z.firstTouch := bar_index
@@ -517,7 +672,7 @@ if array.size(zones) > 0
             if z.state == 1
                 z.state := 2
             if hideTested
-                box.delete(z.bx)
+                killZone(z)
                 array.remove(zones, i)
             else
                 styleZone(z)
@@ -698,17 +853,21 @@ alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: M in sell
 alertcondition(buyFired, "1PC Entry Buy", "ENTRY BUY {{ticker}}: W in buy zone, neckline retested")
 alertcondition(sellFired, "1PC Entry Sell", "ENTRY SELL {{ticker}}: M in sell zone, neckline retested")
 
-// Keep live zones extended to the current bar
+// Keep live zones extended past the current bar
 if barstate.islast
-    int ext = time + 10 * timeframe.in_seconds() * 1000
+    int ext = time + 40 * timeframe.in_seconds() * 1000
     for z in zones
         box.set_right(z.bx, ext)
+        if not na(z.mid)
+            line.set_x2(z.mid, ext)
 
 hideZone(Zone z) =>
     color none = color.new(color.white, 100)
     box.set_bgcolor(z.bx, none)
     box.set_border_color(z.bx, none)
     box.set_text_color(z.bx, none)
+    if not na(z.mid)
+        line.set_color(z.mid, none)
     true
 
 // Only the zones around the current market price: the nearest nearCount above and below price
@@ -747,7 +906,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Switch chart to M15 or M30", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 2, "H4 solid · H1 dashed · M30 dotted · Red DBD · Blue RBR · Grey BRK", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 2, "H4 solid · H1 dashed · M30 dotted · Red supply · Blue demand · Grey base", text_color = tc, text_size = size.small)
     int nFresh = 0
     int nPlay  = 0
     for z in zones

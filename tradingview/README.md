@@ -2,20 +2,20 @@
 
 `1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 / M30 supply & demand zone; the **storyline** is what price does when it comes back to it. Three steps:
 
-1. **Fresh key zones (rectangles) on H4, H1 and M30** (H4 solid border, H1 dashed, M30 dotted). An SNR swing level is only marked when price left it with a DBD or RBR. Each zone is measured on its own timeframe's candles and ATR:
-   - **SNR + DBD → red (resistance / sell zone):** swing high → first drop (≥ 2 × ATR) → base
-     (price bounces but stays below the high and retraces at most 80% of the drop) → second drop (a close below the base low).
-     The zone is drawn at the swing high, from the wick to the candle body, and is at least 1 × ATR tall.
-   - **SNR + RBR → blue (support / buy zone):** the mirror image, drawn at the swing low.
-   - **Breakout → grey:** when a candle of the zone's own timeframe (H4, H1 or M30) closes through a zone, the zone turns grey and switches role
-     (broken resistance becomes support, broken support becomes resistance). It becomes fresh again, so its first retest can give an entry.
-     If price closes back through a grey zone, the zone is removed.
+1. **Fresh key zones (rectangles) on H4, H1 and M30** (H4 solid border, H1 dashed, M30 dotted), labelled in the middle of the box:
+   - **H4 / H1 / M30 SNR (DBD)**, red supply: a swing high that price left with drop → base → second drop.
+     **SNR (RBR)**, blue demand: a swing low that price left with rally → base → second rally.
+     The zone runs from the swing wick to the candle body and is at least 1 × ATR tall. The first leg must be ≥ 2 × ATR and the base may retrace at most 80% of it.
+   - **M30 / H1 base (DBD / RBR)**, grey: the base itself, the sideways part between the two drops or rallies (red label for DBD, blue for RBR).
+     On M30, the drop into the base is measured from the highest high of the last 20 candles, and the second drop needs a candle body of at least 0.5 × ATR.
+   - **H4 / H1 breakout**: a swing high or low that a candle of its timeframe has closed through (or any zone that got broken).
+     It's coloured by its new role (red = now resistance, blue = now support) and has a dashed midline. It's fresh again until its retest.
+     If price closes back through a breakout zone, the zone is removed.
    - **Near current price:** only the 2 zones nearest above price and the 2 nearest below are shown (plus a zone price is inside), so the chart shows what matters on the right edge. Change it with *Show only the nearest zones to current price*; 0 shows all.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
      (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
-   - **Overlaps:** the higher timeframe wins (H4 > H1 > M30). A zone that overlaps a zone of the same or a higher timeframe isn't drawn,
-     and a new zone replaces the lower-timeframe zones it covers. A new zone also replaces an overlapping grey zone that now plays the same role.
+   - **Overlaps:** the higher timeframe wins (H4 > H1 > M30), then breakout > SNR > base. Zones overlap when they share at least 30% of their height.
 2. **Confirmation on M15 or M30, fresh zones only.** On price's **first approach** to a zone, the indicator watches for one of two patterns:
    - **M (double top)** in a red or grey sell zone. The second top can be lower than the first, but must climb back at least 50% of the dip.
    - **W (double bottom)** in a blue or grey buy zone.
