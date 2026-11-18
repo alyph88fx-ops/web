@@ -57,7 +57,7 @@ There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry B
 | Fresh zone: approach ends | 1 × ATR | How far price must move away from a zone before its first approach is over. |
 | Entry | Neckline retest | **Neckline break** enters on the close through the neckline; **Second top** enters as soon as the pattern forms. |
 | Retest within | 16 bars | After the break, price must retest the neckline within this many candles. |
-| Only show zones from the last | 30 days | Keeps only the nearest zones on the left. |
+| Only show zones from the last | 4 trading days | A zone is removed once its swing is older than this (weekends don't count). |
 | Max zones per type and TF | 3 | At most 3 red and 3 blue zones on each of H4, H1 and M30; the newest are kept. |
 | Pattern pivot left / right bars | 3 / 2 | A top is confirmed `right bars` candles after it forms (no repainting). |
 | 2nd top may be higher by | 0.5 × ATR | The second top can be lower than the first, or higher by at most this. |

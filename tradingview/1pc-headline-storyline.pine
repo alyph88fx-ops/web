@@ -42,8 +42,8 @@ minZoneAtr   = input.float(1.0, "Min zone height (× zone TF ATR)", minval = 0.0
      tooltip = "A zone runs from the swing wick to the candle body, and is made at least this tall.")
 nearCount    = input.int(2, "Show only the nearest zones to current price (above / below)", minval = 0, maxval = 10, group = grpZ,
      tooltip = "Keeps the chart on the right side, around the current market price: only this many zones above price and this many below are shown (a zone price is inside is always shown). 0 = show all zones.")
-maxAgeDays   = input.int(30, "Only show zones from the last (days)", minval = 1, maxval = 365, group = grpZ,
-     tooltip = "Keeps the chart to the nearest zones on the left. A zone is removed once its swing is older than this.")
+maxAgeDays   = input.int(4, "Only show zones from the last (trading days)", minval = 1, maxval = 365, group = grpZ,
+     tooltip = "A zone is removed once the swing it starts at is older than this many trading days (Saturdays and Sundays don't count).")
 perType      = input.int(3, "Max zones per type and TF (newest kept)", minval = 1, maxval = 20, group = grpZ,
      tooltip = "At most this many red (SNR + DBD) and this many blue (SNR + RBR) zones on each timeframe; older ones are removed first.")
 mergeOverlap = input.bool(true, "Skip new zones that overlap an existing one", group = grpZ,
@@ -355,11 +355,16 @@ if m30Ok and not na(smT) and smT != lastSupMT
     lastSupMT := smT
     addZone(smTop, smBot, smT, 1, "M30 SNR · RBR", "M30")
 
-// Only the nearest zones on the left: drop zones whose swing is older than maxAgeDays
+// Age in trading days between two times (weekends are not counted)
+tradeDays(int t0, int t1) =>
+    float d = (t1 - t0) / 86400000.0
+    d - 2 * math.floor(d / 7) - (dayofweek(t1) < dayofweek(t0) ? 2 : 0)
+
+// Only recent zones: drop zones whose swing is older than maxAgeDays trading days
 if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone z = array.get(zones, i)
-        if time - z.t0 > maxAgeDays * 86400000
+        if tradeDays(z.t0, time) > maxAgeDays
             box.delete(z.bx)
             array.remove(zones, i)
 
