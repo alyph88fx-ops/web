@@ -6,16 +6,19 @@
    - **H4 / H1 / M30 SNR (DBD)**, red supply: a swing high that price left with drop → base → second drop.
      **SNR (RBR)**, blue demand: a swing low that price left with rally → base → second rally.
      The zone runs from the swing wick to the candle body and is at least 1 × ATR tall. The first leg must be ≥ 2 × ATR and the base may retrace at most 80% of it.
-   - **M30 / H1 base (DBD / RBR)**, grey: the base itself, the sideways part between the two drops or rallies (red label for DBD, blue for RBR).
+   - **H4 / H1 / M30 base (DBD / RBR)**, grey: the base itself, the sideways part between the two drops or rallies (red label for DBD, blue for RBR).
      On M30, the drop into the base is measured from the highest high of the last 20 candles, and the second drop needs a candle body of at least 0.5 × ATR.
-   - **H4 / H1 breakout**: a swing high or low that a candle of its timeframe has closed through (or any zone that got broken).
+   - **H4 / H1 / M30 breakout**: a swing high or low that a candle of its timeframe has closed through (or any zone that got broken).
      It's coloured by its new role (red = now resistance, blue = now support) and has a dashed midline. It's fresh again until its retest.
      If price closes back through a breakout zone, the zone is removed.
-   - **Near current price:** on each of H4, H1 and M30, only the zone nearest above price and the one nearest below are shown (plus a zone price is inside). Change it with *Nearest zones to current price, per timeframe*; 0 shows all.
+   - **Plain SNR levels**: every H4 / H1 / M30 swing high (*resistance*, red) and swing low (*support*, blue) that price reacted from by at least 1 × ATR (*SNR level: min reaction*).
+     When a DBD / RBR forms from the same swing, the SND zone replaces the plain level.
+   - **Every timeframe is drawn**: H4, H1 and M30 zones all show, even where they overlap. Labels sit in the middle (H4), on the right (H1) or on the left (M30) of the box.
+     Only duplicates (same kind, same timeframe) are merged. Turn on *Hide lower-TF zones under higher-TF zones* for a cleaner chart.
+   - **Recent and fresh only:** zones from the last 4 trading days that price hasn't tested yet. All of them are shown by default; set *Nearest zones to current price, per timeframe* to 1 or 2 to keep only the closest ones.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
      (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
-   - **Overlaps:** the higher timeframe wins (H4 > H1 > M30), then breakout > SNR > base. Zones overlap when they share at least 30% of their height.
 2. **Entry on M1, M5, M15 or M30, fresh zones only.** When price reaches a fresh zone for the first time, the indicator works out an exact limit price inside the zone. Choose the method under **Entry method**:
    - **Smart zone entry**: the indicator follows the extreme that price makes inside the zone.
      When a candle closes back through the candle that made the extreme (below its low for a sell, above its high for a buy), the rejection is confirmed.
