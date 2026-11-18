@@ -19,12 +19,18 @@
 //                    -> blue zone at the swing low (support / buy zone)
 //        Breakout    a close through a zone on its own timeframe makes it a breakout zone and flips its role
 //                    (broken resistance -> support, broken support -> resistance); its retest is fresh.
-//   2. Confirmation (M15 or M30 chart), on FRESH zones only: on price's first approach to a
-//      zone, look for an M (double top) in a sell zone or a W (double bottom) in a buy zone.
-//      A candle closes through the neckline -> PREPARE signal (limit order at the neckline).
-//      Price comes back to retest the neckline -> ENTRY signal, and the zone becomes VALID.
-//      If the first approach ends without an entry, the zone is marked TESTED and ignored.
+//   2. Entry (M15 or M30 chart), on FRESH zones only. When price reaches a zone for the first time:
+//        smart zone entry  follow the extreme inside the zone; when a candle closes back through
+//                          the extreme candle, PREPARE a limit at 50% of that rejection move,
+//                          inside the zone, with a 0-100 setup score
+//        M / W pattern     a double top in a sell zone / double bottom in a buy zone; PREPARE a
+//                          limit at the neckline once it breaks
+//      ENTRY when the limit fills; the zone becomes VALID. A zone whose first approach ends without
+//      an entry is TESTED and removed.
 //   3. Risk: fixed stop loss / take profit in points (default 600 / 1000).
+//   4. Optional AI second opinion: with "Send alerts as JSON" on, the alert webhook goes to the
+//      1PC AI signal service (tradingview/ai-signal-service), where Claude reviews each setup and
+//      answers with its own entry price inside the zone.
 //
 indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay = true, scale = scale.right,
      max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
@@ -93,7 +99,17 @@ neckExpiry   = input.int(20, "Neckline break must happen within (bars)", minval 
 retestExpiry = input.int(16, "Retest must happen within (bars after the break)", minval = 1, group = grpP)
 retestTolAtr = input.float(0.15, "Retest tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP,
      tooltip = "The retest counts if price gets this close to the neckline.")
-allowBrk    = input.bool(true, "Allow entries at breakout (grey) zones", group = grpP)
+allowBrk    = input.bool(true, "Allow entries at breakout zones", group = grpP)
+entryMode   = input.string("Smart zone entry + M/W", "Entry method", options = ["Smart zone entry + M/W", "Smart zone entry only", "M/W pattern only"], group = grpP,
+     tooltip = "Smart zone entry: when price reaches a fresh zone, the indicator reads the reaction (the extreme inside the zone, the rejection wick and the candle that closes back through the extreme candle) and gives an exact limit price inside the zone. M/W: the double top / double bottom with neckline break and retest.")
+smartFib    = input.float(0.5, "Smart entry: retracement of the rejection move", minval = 0.236, maxval = 0.786, step = 0.05, group = grpP,
+     tooltip = "After the rejection, the limit price is placed at this retracement of the move from the extreme to the rejection candle's low (high for buys), kept inside the zone.")
+smartExpiry = input.int(16, "Smart entry: rejection must come within (bars)", minval = 2, group = grpP)
+
+grpA = "4 · AI second opinion (webhook)"
+aiJson      = input.bool(false, "Send alerts as JSON for the AI service", group = grpA,
+     tooltip = "Turn on when the alert's webhook points at the 1PC AI signal service. Every alert message becomes JSON with the setup, the zone and the last candles, and Claude replies with its own entry price on the service's page.")
+aiCandles   = input.int(40, "Candles to send to the AI", minval = 10, maxval = 80, group = grpA)
 
 grpR = "3 · Risk management"
 slPts      = input.int(600, "Stop loss (points)", minval = 1, group = grpR)
@@ -632,6 +648,15 @@ var int    pendExp   = na
 var int    pendBrkI  = na
 var string pendZone  = ""
 var Zone   pendZ     = na
+var string pendKind  = ""       // "smart" or "pattern"
+var float  pendScore = na
+// Smart zone entry waiting for the rejection candle
+var int    smDir     = 0
+var Zone   smZ       = na
+var float  smExt     = na       // extreme reached inside the zone (high for sells, low for buys)
+var float  smExOther = na       // low (sells) / high (buys) of the candle that made the extreme
+var float  smWick    = 0.0      // rejection wick of that candle, as a share of its range
+var int    smStart   = na
 
 drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
     color c = dir == -1 ? color.red : color.blue
@@ -644,8 +669,10 @@ drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
 
 int    sig      = 0
 string sigZone  = ""
+string sigKind  = ""     // "smart" or "pattern"
 float  entryPx  = na
-int    setupDir = 0      // PREPARE signal fired on this bar (neckline broken, waiting for retest)
+int    setupDir = 0      // PREPARE signal fired on this bar (limit price known, waiting for the fill)
+Zone   newTouch = na     // zone that price reached for the first time on this bar
 
 // Zone freshness (always tracked): FRESH until price first reaches it (-> IN PLAY). The first
 // approach ends when price moves leaveAtr × the zone TF's ATR away from the zone. A zone that had
@@ -665,6 +692,8 @@ if array.size(zones) > 0
                 z.state      := 1
                 z.firstTouch := bar_index
                 styleZone(z)
+                if na(newTouch)
+                    newTouch := z
         else if (z.state == 1 or z.state == 3) and na(z.leaveBar)
             if (z.role == -1 and low < z.bot - leave) or (z.role == 1 and high > z.top + leave)
                 z.leaveBar := bar_index
@@ -679,6 +708,26 @@ if array.size(zones) > 0
 
 float rTol = retestTolAtr * atrM
 
+useSmart = entryMode != "M/W pattern only"
+useMW    = entryMode != "Smart zone entry only"
+
+// rejection wick of the current candle as a share of its range (upper wick for sells, lower for buys)
+candleWick(int dir) =>
+    float r = high - low
+    r > 0 ? (dir == -1 ? high - math.max(open, close) : math.min(open, close) - low) / r : 0.0
+
+// Setup score 0-100: zone timeframe, zone type, rejection wick, strength of the rejection candle,
+// first touch, and another timeframe's zone in the same place
+smartScore(Zone z, float wick, float bodyAtr) =>
+    float sc = (z.tf == "H4" ? 30 : z.tf == "H1" ? 22 : 15) + (z.broken ? 20 : z.isBase ? 14 : 18) + 10
+    sc += wick >= 0.5 ? 15 : wick >= 0.3 ? 8 : 0
+    sc += bodyAtr >= 0.6 ? 15 : bodyAtr >= 0.3 ? 8 : 0
+    for o in zones
+        if o.tf != z.tf and o.role == z.role and o.top >= z.bot and o.bot <= z.top
+            sc += 10
+            break
+    math.min(100.0, sc)
+
 if showEntries and isPatTF and barstate.isconfirmed
     // Stage 1: wait for a close through the neckline. Stage 2: wait for the retest of the neckline.
     if pendDir != 0
@@ -690,6 +739,7 @@ if showEntries and isPatTF and barstate.isconfirmed
                 if trigger == "Neckline break"
                     sig     := pendDir
                     sigZone := pendZone
+                    sigKind := pendKind
                     entryPx := close
                     pendDir := 0
                     markValid(pendZ)
@@ -705,9 +755,48 @@ if showEntries and isPatTF and barstate.isconfirmed
             else if bar_index > pendBrkI and ((pendDir == -1 and high >= pendNeck - rTol) or (pendDir == 1 and low <= pendNeck + rTol))
                 sig     := pendDir
                 sigZone := pendZone
+                sigKind := pendKind
                 entryPx := pendDir == -1 ? math.min(pendNeck, high) : math.max(pendNeck, low)
                 pendDir := 0
                 markValid(pendZ)
+
+    // Smart zone entry. Step 1: price reaches a fresh zone -> follow the extreme it makes inside
+    // the zone. Step 2: a candle closes back through the extreme candle (below its low for sells,
+    // above its high for buys) -> limit price at smartFib of that rejection move, inside the zone.
+    if useSmart and smDir == 0 and pendDir == 0 and not na(newTouch)
+        smZ       := newTouch
+        smDir     := newTouch.role == -1 ? -1 : 1
+        smExt     := smDir == -1 ? high : low
+        smExOther := smDir == -1 ? low : high
+        smWick    := candleWick(smDir)
+        smStart   := bar_index
+    else if smDir != 0
+        bool smBroke = smDir == -1 ? close > smZ.top + zTol : close < smZ.bot - zTol
+        if smBroke or bar_index - smStart > smartExpiry or pendDir != 0
+            smDir := 0
+        else
+            if (smDir == -1 and high > smExt) or (smDir == 1 and low < smExt)
+                smExt     := smDir == -1 ? high : low
+                smExOther := smDir == -1 ? low : high
+                smWick    := candleWick(smDir)
+            else if (smDir == -1 and close < open and close < smExOther) or (smDir == 1 and close > open and close > smExOther)
+                float mv = smDir == -1 ? smExt - low : high - smExt
+                float e  = smDir == -1 ? smExt - smartFib * mv : smExt + smartFib * mv
+                e := math.max(smZ.bot, math.min(smZ.top, e))
+                if (smDir == -1 and e <= close) or (smDir == 1 and e >= close)
+                    e := close
+                pendZ     := smZ
+                pendDir   := smDir
+                pendNeck  := e
+                pendInv   := smDir == -1 ? smZ.top + zTol : smZ.bot - zTol
+                pendZone  := zoneName(smZ)
+                pendStage := 2
+                pendBrkI  := bar_index
+                pendExp   := bar_index + retestExpiry
+                pendKind  := "smart"
+                pendScore := smartScore(smZ, smWick, math.abs(close - open) / atrM)
+                setupDir  := smDir
+                smDir     := 0
 
     // Double top -> SELL (both peaks inside a sell zone)
     if not na(ph)
@@ -727,7 +816,7 @@ if showEntries and isPatTF and barstate.isconfirmed
                     maxMid := math.max(maxMid, high[k])
                 float top2 = math.max(p1, p2)
                 if maxMid <= top2 and p1 - neck >= minDepthAtr * atrM and p2 - neck >= recoverPct * (p1 - neck)
-                    Zone zf = findZone(p1, p2, -1, zTol, lastPHi, i2)
+                    Zone zf = useMW and pendDir == 0 ? findZone(p1, p2, -1, zTol, lastPHi, i2) : na
                     if not na(zf)
                         string zn = zoneName(zf)
                         drawPattern(lastPHi, p1, bar_index - neckOff, neck, i2, p2, -1)
@@ -739,10 +828,13 @@ if showEntries and isPatTF and barstate.isconfirmed
                         if trigger == "Second top" or (brk and trigger == "Neckline break")
                             sig     := -1
                             sigZone := zn
+                            sigKind := "pattern"
                             entryPx := close
                             markValid(zf)
                         else
                             pendZ     := zf
+                            pendKind  := "pattern"
+                            pendScore := na
                             pendDir   := -1
                             pendNeck  := neck
                             pendInv   := top2
@@ -773,7 +865,7 @@ if showEntries and isPatTF and barstate.isconfirmed
                     minMid := math.min(minMid, low[k])
                 float bot2 = math.min(q1, q2)
                 if minMid >= bot2 and neck - q1 >= minDepthAtr * atrM and neck - q2 >= recoverPct * (neck - q1)
-                    Zone zf = findZone(q1, q2, 1, zTol, lastPLi, j2)
+                    Zone zf = useMW and pendDir == 0 ? findZone(q1, q2, 1, zTol, lastPLi, j2) : na
                     if not na(zf)
                         string zn = zoneName(zf)
                         drawPattern(lastPLi, q1, bar_index - neckOff, neck, j2, q2, 1)
@@ -784,10 +876,13 @@ if showEntries and isPatTF and barstate.isconfirmed
                         if trigger == "Second top" or (brk and trigger == "Neckline break")
                             sig     := 1
                             sigZone := zn
+                            sigKind := "pattern"
                             entryPx := close
                             markValid(zf)
                         else
                             pendZ     := zf
+                            pendKind  := "pattern"
+                            pendScore := na
                             pendDir   := 1
                             pendNeck  := neck
                             pendInv   := bot2
@@ -808,17 +903,40 @@ bool sellFired  = false
 bool prepBuy    = setupDir == 1
 bool prepSell   = setupDir == -1
 
-// PREPARE: neckline broken, place a limit order at the neckline and wait for the retest
+// ── JSON helpers for the AI webhook ──
+jNum(float x) => na(x) ? "null" : str.tostring(x, format.mintick)
+jCandles(int n) =>
+    string out = "["
+    for i = n - 1 to 0
+        out += "[" + str.tostring(time[i]) + "," + jNum(open[i]) + "," + jNum(high[i]) + "," + jNum(low[i]) + "," + jNum(close[i]) + "]" + (i > 0 ? "," : "")
+    out + "]"
+jZone(Zone z) =>
+    na(z) ? "null" : "{\"name\":\"" + zoneName(z) + "\",\"tf\":\"" + z.tf + "\",\"top\":" + jNum(z.top) + ",\"bottom\":" + jNum(z.bot) +
+         ",\"role\":\"" + (z.role == -1 ? "resistance" : "support") + "\",\"breakout\":" + (z.broken ? "true" : "false") +
+         ",\"base\":" + (z.isBase ? "true" : "false") + "}"
+jSetup(string ev, string side, string kind, float entry, float sl, float tp, float score, Zone z) =>
+    float za = na(z) ? na : tfAtr(z)
+    "{\"event\":\"" + ev + "\",\"source\":\"1PC Headline & Storyline\",\"symbol\":\"" + syminfo.ticker + "\",\"chart_tf\":\"" + timeframe.period +
+         "\",\"side\":\"" + side + "\",\"method\":\"" + kind + "\",\"entry\":" + jNum(entry) + ",\"sl\":" + jNum(sl) + ",\"tp\":" + jNum(tp) +
+         ",\"score\":" + (na(score) ? "null" : str.tostring(score, "#")) + ",\"zone\":" + jZone(z) + ",\"atr\":" + jNum(atrM) +
+         ",\"zone_tf_atr\":" + jNum(za) + ",\"point\":" + str.tostring(pt) + ",\"sl_points\":" + str.tostring(slPts) +
+         ",\"tp_points\":" + str.tostring(tpPts) + ",\"time\":" + str.tostring(time) + ",\"candles\":" + jCandles(aiCandles) + "}"
+
+// PREPARE: the limit price is known (smart zone entry, or M / W neckline broken) - place the order
 if setupDir != 0
-    float lim = pendNeck
-    float psl = lim - setupDir * slPts * pt
-    float ptp = lim + setupDir * tpPts * pt
+    float  lim   = pendNeck
+    float  psl   = lim - setupDir * slPts * pt
+    float  ptp   = lim + setupDir * tpPts * pt
     string pside = setupDir == 1 ? "BUY" : "SELL"
-    label.new(bar_index, lim, "PREPARE " + pside + "\nlimit " + str.tostring(lim, format.mintick),
+    bool   smart = pendKind == "smart"
+    string scTxt = na(pendScore) ? "" : " · score " + str.tostring(pendScore, "#")
+    label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
          style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true)
-    alert("1PC PREPARE " + pside + " " + syminfo.ticker + " (" + (setupDir == 1 ? "W / double bottom" : "M / double top") + " in " + pendZone +
-         " zone, neckline broken) | " + pside + " LIMIT " + str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) +
-         " | TP " + str.tostring(ptp, format.mintick), alert.freq_once_per_bar_close)
+    string how = smart ? "smart zone entry" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
+    alert(aiJson ? jSetup("prepare", str.lower(pside), pendKind, lim, psl, ptp, pendScore, pendZ) :
+         "1PC PREPARE " + pside + " " + syminfo.ticker + " (" + how + " in " + pendZone + " zone" + scTxt + ") | " + pside + " LIMIT " +
+         str.tostring(lim, format.mintick) + " | SL " + str.tostring(psl, format.mintick) + " | TP " + str.tostring(ptp, format.mintick),
+         alert.freq_once_per_bar_close)
 
 if sig != 0 and not (oneTrade and openCount > 0)
     float entry = nz(entryPx, close)
@@ -841,17 +959,18 @@ if sig != 0 and not (oneTrade and openCount > 0)
          color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small, force_overlay = true)
     buyFired  := sig == 1
     sellFired := sig == -1
-    alert("1PC ENTRY " + side + " " + syminfo.ticker + " (" + (sig == 1 ? "W / double bottom" : "M / double top") + " in " + sigZone + " zone)" +
-         " | Entry " + str.tostring(entry, format.mintick) + " | SL " + str.tostring(sl, format.mintick) +
-         " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
+    string how = sigKind == "smart" ? "smart zone entry" : (sig == 1 ? "W / double bottom" : "M / double top")
+    alert(aiJson ? jSetup("entry", str.lower(side), sigKind, entry, sl, tp, float(na), pendZ) :
+         "1PC ENTRY " + side + " " + syminfo.ticker + " (" + how + " in " + sigZone + " zone) | Entry " + str.tostring(entry, format.mintick) +
+         " | SL " + str.tostring(sl, format.mintick) + " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
 
 plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny, force_overlay = true)
 plotshape(sellFired, "Sell signal", shape.triangledown, location.abovebar, color.red, size = size.tiny, force_overlay = true)
 
-alertcondition(prepBuy, "1PC Prepare Buy", "PREPARE BUY {{ticker}}: W in buy zone, neckline broken — wait for the retest")
-alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: M in sell zone, neckline broken — wait for the retest")
-alertcondition(buyFired, "1PC Entry Buy", "ENTRY BUY {{ticker}}: W in buy zone, neckline retested")
-alertcondition(sellFired, "1PC Entry Sell", "ENTRY SELL {{ticker}}: M in sell zone, neckline retested")
+alertcondition(prepBuy, "1PC Prepare Buy", "PREPARE BUY {{ticker}}: buy limit set inside a buy zone")
+alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: sell limit set inside a sell zone")
+alertcondition(buyFired, "1PC Entry Buy", "ENTRY BUY {{ticker}}: buy limit filled")
+alertcondition(sellFired, "1PC Entry Sell", "ENTRY SELL {{ticker}}: sell limit filled")
 
 // Keep live zones extended past the current bar
 if barstate.islast

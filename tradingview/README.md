@@ -1,6 +1,6 @@
 # 1PC Headline & Storyline Indicator (TradingView)
 
-`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 / M30 supply & demand zone; the **storyline** is what price does when it comes back to it. Three steps:
+`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 / M30 supply & demand zone; the **storyline** is what price does when it comes back to it.
 
 1. **Fresh key zones (rectangles) on H4, H1 and M30** (H4 solid border, H1 dashed, M30 dotted), labelled in the middle of the box:
    - **H4 / H1 / M30 SNR (DBD)**, red supply: a swing high that price left with drop → base → second drop.
@@ -16,18 +16,28 @@
      (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
    - **Overlaps:** the higher timeframe wins (H4 > H1 > M30), then breakout > SNR > base. Zones overlap when they share at least 30% of their height.
-2. **Confirmation on M15 or M30, fresh zones only.** On price's **first approach** to a zone, the indicator watches for one of two patterns:
-   - **M (double top)** in a red or grey sell zone. The second top can be lower than the first, but must climb back at least 50% of the dip.
-   - **W (double bottom)** in a blue or grey buy zone.
-
-   Both tops or bottoms must be inside the zone. The low between the two tops of an M (the high between the two bottoms of a W) is the **neckline**.
-   - **PREPARE** signal: a candle closes through the neckline. Place a limit order at the neckline, with SL and TP shown.
-   - **ENTRY** signal: price comes back to retest the neckline. That's your fill. The zone then turns **✓ VALID** and gives no more signals.
-   - If the pattern fails (price closes beyond the tops or bottoms, or nothing happens in time), the zone stays **IN PLAY** for the next pattern.
-     When price moves 1 × ATR away from the zone without an entry, the zone becomes **TESTED** and is ignored.
-   - Under **Entry**, choose **Neckline break** to enter on the break itself, or **Second top** to enter as soon as the pattern forms.
-3. **Risk**: the indicator draws **600-point SL** and **1000-point TP** boxes from the entry (the signal candle's close),
+2. **Entry on M15 or M30, fresh zones only.** When price reaches a fresh zone for the first time, the indicator works out an exact limit price inside the zone. Choose the method under **Entry method**:
+   - **Smart zone entry**: the indicator follows the extreme that price makes inside the zone.
+     When a candle closes back through the candle that made the extreme (below its low for a sell, above its high for a buy), the rejection is confirmed.
+     The limit price is placed at 50% of that rejection move, kept inside the zone (*Smart entry: retracement*).
+     It comes with a **score from 0 to 100**, which adds up:
+     - the zone's timeframe and type;
+     - the rejection wick;
+     - the size of the rejection candle;
+     - first touch;
+     - another timeframe's zone in the same place.
+   - **M / W pattern**: a double top in a sell zone or a double bottom in a buy zone.
+     The neckline break gives the limit price at the neckline, and the retest fills it.
+   - Default: both.
+   - **PREPARE** alert: the limit price is known, for example `SELL LIMIT 3792.40 · score 78`. Place the order then.
+     **ENTRY** alert: the limit is filled. The zone then turns ✓ valid and gives no more signals.
+   - If the zone breaks or nothing happens in time, the setup is cancelled.
+     When price moves 1 × ATR away from the zone without an entry, the zone counts as tested and is removed.
+   - Under **Entry**, choose **Neckline break** to enter on the break itself, or **Second top** to enter as soon as an M / W forms.
+3. **Risk**: the indicator draws **600-point SL** and **1000-point TP** boxes from the entry price,
    marks each trade "TP ✓" or "SL ✗" when one is hit, and shows wins, losses and win rate in a table.
+4. **AI second opinion (optional):** with **Send alerts as JSON for the AI service** turned on and a webhook to the [1PC AI signal service](ai-signal-service/README.md),
+   Claude reviews every PREPARE setup. It sends back take / wait / skip with its own exact entry price inside the zone, shown on the service's page (and Telegram if set up).
 
 ## Install
 
@@ -38,8 +48,10 @@
 ## Alerts
 
 Create Alert → Condition: **1PC H&S** → **Any alert() function call**. That sends both messages, each with zone, price, SL and TP:
-- `1PC PREPARE SELL XAUUSD (M / double top in H4 SNR · RBR · BRK zone, neckline broken) | SELL LIMIT 4055.00 | SL 4061.00 | TP 4045.00`
-- `1PC ENTRY SELL XAUUSD (...) | Entry 4055.00 | SL 4061.00 | TP 4045.00`
+- `1PC PREPARE SELL XAUUSD (smart zone entry in M30 base (DBD) zone · score 78) | SELL LIMIT 3792.40 | SL 3798.40 | TP 3782.40`
+- `1PC ENTRY SELL XAUUSD (smart zone entry in M30 base (DBD) zone) | Entry 3792.40 | SL 3798.40 | TP 3782.40`
+
+For the AI service, turn on **Send alerts as JSON for the AI service** and add the service's webhook URL to the alert (see [ai-signal-service/README.md](ai-signal-service/README.md)).
 
 There are also separate conditions: **1PC Prepare Buy / Sell** and **1PC Entry Buy / Sell**.
 
