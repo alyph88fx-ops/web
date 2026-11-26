@@ -72,6 +72,8 @@ lvlH4           = input.bool(true, "H4 support / resistance", inline = "lvl", gr
 lvlH1           = input.bool(false, "H1", inline = "lvl", group = grpZ)
 lvlM30          = input.bool(false, "M30", inline = "lvl", group = grpZ)
 snrReact        = input.float(1.0, "SNR level: min reaction (× ATR)", minval = 0.0, step = 0.25, group = grpZ)
+lvlRight        = input.int(2, "Support / resistance confirmation (candles to the right)", minval = 1, maxval = 10, group = grpZ,
+     tooltip = "A swing high / low becomes a support / resistance level once this many candles of its timeframe have closed after it (H4: 2 candles = 8 hours).")
 showLevelBreaks = input.bool(true, "Mark breakouts (horizontal lines)", group = grpZ,
      tooltip = "When a candle closes through an H4 or H1 swing high or low (SNR), or through a DBD / RBR zone, the level is marked with a horizontal line, e.g. 'H4 breakout'.")
 hideLowerTf     = input.bool(false, "Hide lower-TF zones under higher-TF zones", group = grpZ,
@@ -161,8 +163,13 @@ pop6(array<float> a, array<float> b, array<int> c, array<float> d, array<int> e,
 // fast = M30 mode: the first leg is measured from the extreme of the last 20 candles, a weak close
 // through the base only extends it (the second leg needs a candle body of at least 0.5 × ATR), and
 // the newest base wins. levels = also track breakouts of plain swing levels.
-zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, bool fast, bool levels, float react) =>
+zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, bool fast, bool levels, float react, int lrgt) =>
     float atr   = ta.atr(14)
+    // support / resistance levels use their own, faster swing confirmation (lrgt candles to the right)
+    float phL   = ta.pivothigh(high, len, lrgt)
+    float plL   = ta.pivotlow(low, len, lrgt)
+    float hhL   = ta.highest(high, lrgt)
+    float llL   = ta.lowest(low, lrgt)
     float ph    = ta.pivothigh(high, len, rgt)
     float pl    = ta.pivotlow(low, len, rgt)
     float hhLen = ta.highest(high, rgt)
@@ -341,11 +348,6 @@ zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, b
             legLoB := math.min(open[rgt], close[rgt])
             legLoT := time[rgt]
             legLoI := iL
-        // plain SNR support, when price reacted from it by at least react × ATR
-        if hhLen - pl >= react * atr
-            loBot := pl
-            loTop := math.max(math.min(open[rgt], close[rgt]), pl + minH * atr)
-            loT   := time[rgt]
         // remember the swing low as a support level (wick to body, at least minH × ATR tall)
         array.push(lvBot, pl)
         array.push(lvTop, math.max(math.min(open[rgt], close[rgt]), pl + minH * atr))
@@ -391,17 +393,22 @@ zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, b
             legHiB := math.max(open[rgt], close[rgt])
             legHiT := time[rgt]
             legHiI := iH
-        // plain SNR resistance
-        if ph - llLen >= react * atr
-            hiTop := ph
-            hiBot := math.min(math.max(open[rgt], close[rgt]), ph - minH * atr)
-            hiT   := time[rgt]
         // remember the swing high as a resistance level
         array.push(lvTop, ph)
         array.push(lvBot, math.min(math.max(open[rgt], close[rgt]), ph - minH * atr))
         array.push(lvT, time[rgt])
         array.push(lvI, iH)
         array.push(lvDir, 1)
+
+    // plain SNR support / resistance, when price reacted from the swing by at least react × ATR
+    if not na(plL) and hhL - plL >= react * atr
+        loBot := plL
+        loTop := math.max(math.min(open[lrgt], close[lrgt]), plL + minH * atr)
+        loT   := time[lrgt]
+    if not na(phL) and phL - llL >= react * atr
+        hiTop := phL
+        hiBot := math.min(math.max(open[lrgt], close[lrgt]), phL - minH * atr)
+        hiT   := time[lrgt]
 
     if array.size(lvTop) > 16
         array.shift(lvTop)
@@ -412,9 +419,9 @@ zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, b
 
     [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], dbTop[1], dbBot[1], dbT[1], rbTop[1], rbBot[1], rbT[1], bkTop[1], bkBot[1], bkT[1], bkRole[1], hiTop[1], hiBot[1], hiT[1], loTop[1], loBot[1], loT[1], close[1], atr[1]]
 
-[rTop, rBot, rT, sTop, sBot, sT, dTop, dBot, dT, uTop, uBot, uT, bTop, bBot, bT, bRole, xhTop, xhBot, xhT, xlTop, xlBot, xlT, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact), lookahead = barmerge.lookahead_on)
-[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, d1Top, d1Bot, d1T, u1Top, u1Bot, u1T, b1Top, b1Bot, b1T, b1Role, x1hTop, x1hBot, x1hT, x1lTop, x1lBot, x1lT, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact), lookahead = barmerge.lookahead_on)
-[rmTop, rmBot, rmT, smTop, smBot, smT, dmTop, dmBot, dmT, umTop, umBot, umT, bmTop, bmBot, bmT, bmRole, xmhTop, xmhBot, xmhT, xmlTop, xmlBot, xmlT, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, m30Right, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, true, true, snrReact), lookahead = barmerge.lookahead_on)
+[rTop, rBot, rT, sTop, sBot, sT, dTop, dBot, dT, uTop, uBot, uT, bTop, bBot, bT, bRole, xhTop, xhBot, xhT, xlTop, xlBot, xlT, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight), lookahead = barmerge.lookahead_on)
+[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, d1Top, d1Bot, d1T, u1Top, u1Bot, u1T, b1Top, b1Bot, b1T, b1Role, x1hTop, x1hBot, x1hT, x1lTop, x1lBot, x1lT, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight), lookahead = barmerge.lookahead_on)
+[rmTop, rmBot, rmT, smTop, smBot, smT, dmTop, dmBot, dmT, umTop, umBot, umT, bmTop, bmBot, bmT, bmRole, xmhTop, xmhBot, xmhT, xmlTop, xmlBot, xmlT, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, m30Right, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, true, true, snrReact, lvlRight), lookahead = barmerge.lookahead_on)
 
 h4Ok  = useH4 and timeframe.in_seconds() <= 14400
 h1Ok  = useH1 and timeframe.in_seconds() <= 3600

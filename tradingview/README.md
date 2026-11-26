@@ -13,6 +13,7 @@
      It's fresh again until its retest. If price closes back through it, it's removed.
    - **Boxes, H4 resistance / H4 support**: every H4 swing high (red) and swing low (blue) that price reacted from by at least 1 × ATR (*SNR level: min reaction*).
      Unlike SND zones, they stay on the chart after price tests them. They go when they break (they become a blue / red breakout line) or get older than the age limit.
+     A swing counts once 2 candles of its timeframe have closed after it (H4: about 8 hours; *Support / resistance confirmation*).
      When a DBD / RBR forms from the same swing, the SND box replaces the plain level. H1 and M30 support / resistance can be turned on in the settings.
    - **Off by default, in the settings:**
      - *M30 zones*.
