@@ -106,11 +106,13 @@ retestExpiry = input.int(16, "Retest must happen within (bars after the break)",
 retestTolAtr = input.float(0.15, "Retest tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP,
      tooltip = "The retest counts if price gets this close to the neckline.")
 allowBrk    = input.bool(true, "Allow entries at breakout zones", group = grpP)
-entryMode   = input.string("Smart zone entry + M/W", "Entry method", options = ["Smart zone entry + M/W", "Smart zone entry only", "M/W pattern only"], group = grpP,
+entryMode   = input.string("Smart zone entry only", "Entry method", options = ["Smart zone entry + M/W", "Smart zone entry only", "M/W pattern only"], group = grpP,
      tooltip = "Smart zone entry: when price reaches a fresh zone, the indicator reads the reaction (the extreme inside the zone, the rejection wick and the candle that closes back through the extreme candle) and gives an exact limit price inside the zone. M/W: the double top / double bottom with neckline break and retest.")
 smartFib    = input.float(0.5, "Smart entry: retracement of the rejection move", minval = 0.236, maxval = 0.786, step = 0.05, group = grpP,
      tooltip = "After the rejection, the limit price is placed at this retracement of the move from the extreme to the rejection candle's low (high for buys), kept inside the zone.")
 smartExpiry = input.int(16, "Smart entry: rejection must come within (bars)", minval = 2, group = grpP)
+showPrepLbl = input.bool(false, "Show PREPARE labels on the chart", group = grpP,
+     tooltip = "Off = the waiting limit order is shown only by the live signal at the right edge (it disappears once filled or cancelled). The PREPARE alert is sent either way.")
 
 grpA = "4 · AI second opinion (webhook)"
 aiJson      = input.bool(false, "Send alerts as JSON for the AI service", group = grpA,
@@ -1023,8 +1025,9 @@ if setupDir != 0
     string scTxt = na(pendScore) ? "" : " · score " + str.tostring(pendScore, "#")
     if smart and not showHistory and openCount == 0
         clearHistory()
-    array.push(sigL, label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
-         style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true))
+    if showPrepLbl
+        array.push(sigL, label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
+             style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true))
     string how = smart ? "smart zone entry" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
     nPrepare += 1
     lastSig := pside + " limit " + str.tostring(lim, format.mintick) + " · " + str.format_time(time, "dd MMM HH:mm", syminfo.timezone)

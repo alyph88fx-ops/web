@@ -32,8 +32,8 @@
      - another timeframe's zone in the same place.
    - **M / W pattern**: a double top in a sell zone or a double bottom in a buy zone.
      The neckline break gives the limit price at the neckline, and the retest fills it.
-   - Default: both.
-   - **PREPARE** alert: the limit price is known, for example `SELL LIMIT 3792.40 · score 78`. Place the order then.
+   - Default: **smart zone entry only**. Choose *Smart zone entry + M/W* or *M/W pattern only* to use the double top / bottom.
+   - **PREPARE** alert (no label on the chart unless *Show PREPARE labels* is on; the live signal shows the waiting order): the limit price is known, for example `SELL LIMIT 3792.40 · score 78`. Place the order then.
      **ENTRY** alert: the limit is filled. The zone then turns ✓ valid and gives no more signals.
    - If the zone breaks or nothing happens in time, the setup is cancelled.
      When price moves 1 × ATR away from the zone without an entry, the zone counts as tested and is removed.
