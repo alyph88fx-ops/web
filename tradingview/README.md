@@ -11,10 +11,12 @@
      **Blue line = buy breakout** (price broke up, the level is now support), labelled e.g. "H1 breakout ▲ BUY".
      **Red line = sell breakout** (price broke down, the level is now resistance), labelled "H1 breakout ▼ SELL".
      It's fresh again until its retest. If price closes back through it, it's removed.
+   - **Boxes, H4 resistance / H4 support**: every H4 swing high (red) and swing low (blue) that price reacted from by at least 1 × ATR (*SNR level: min reaction*).
+     Unlike SND zones, they stay on the chart after price tests them. They go when they break (they become a blue / red breakout line) or get older than the age limit.
+     When a DBD / RBR forms from the same swing, the SND box replaces the plain level. H1 and M30 support / resistance can be turned on in the settings.
    - **Off by default, in the settings:**
      - *M30 zones*.
      - *Mark DBD / RBR bases*: the base itself, as a grey box.
-     - *Mark SNR levels*: every swing high / low with at least a 1 × ATR reaction.
      Where zones of different timeframes overlap, all are drawn. Turn on *Hide lower-TF zones under higher-TF zones* for a cleaner chart.
    - **Recent and fresh only:** zones confirmed (or broken) in the last 4 trading days that price hasn't tested yet. The age counts from the confirmation because H4 DBD / RBR zones often take days to form. All of them are shown by default; set *Nearest zones to current price, per timeframe* to 1 or 2 to keep only the closest ones.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again

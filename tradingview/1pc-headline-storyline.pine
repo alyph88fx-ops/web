@@ -67,8 +67,10 @@ hideTested   = input.bool(true, "Only fresh zones (remove a zone once it has bee
 
 showBases       = input.bool(false, "Mark DBD / RBR bases", group = grpZ,
      tooltip = "Also draws the base itself (the sideways part between the two drops or rallies) as a grey zone, e.g. 'M30 base (DBD)'.")
-showLevels      = input.bool(false, "Mark SNR levels (swing highs / lows)", group = grpZ,
-     tooltip = "Every swing high (resistance) and swing low (support) on H4, H1 and M30 that price reacted from by at least the reaction below.")
+lvlH4           = input.bool(true, "H4 support / resistance", inline = "lvl", group = grpZ,
+     tooltip = "Plain SNR levels: every swing high (resistance) and swing low (support) that price reacted from by at least the reaction below. They stay on the chart after price tests them, until they break (then they become a breakout line) or get older than the age limit.")
+lvlH1           = input.bool(false, "H1", inline = "lvl", group = grpZ)
+lvlM30          = input.bool(false, "M30", inline = "lvl", group = grpZ)
 snrReact        = input.float(1.0, "SNR level: min reaction (× ATR)", minval = 0.0, step = 0.25, group = grpZ)
 showLevelBreaks = input.bool(true, "Mark breakouts (horizontal lines)", group = grpZ,
      tooltip = "When a candle closes through an H4 or H1 swing high or low (SNR), or through a DBD / RBR zone, the level is marked with a horizontal line, e.g. 'H4 breakout'.")
@@ -564,7 +566,7 @@ if h4Ok
     if showBases
         addOnce("H4d", dTop, dBot, dT, -1, "H4 base (DBD)", "H4", 1)
         addOnce("H4u", uTop, uBot, uT, 1, "H4 base (RBR)", "H4", 1)
-    if showLevels
+    if lvlH4
         addOnce("H4h", xhTop, xhBot, xhT, -1, "H4 resistance", "H4", 2)
         addOnce("H4l", xlTop, xlBot, xlT, 1, "H4 support", "H4", 2)
 if h1Ok
@@ -575,7 +577,7 @@ if h1Ok
     if showBases
         addOnce("H1d", d1Top, d1Bot, d1T, -1, "H1 base (DBD)", "H1", 1)
         addOnce("H1u", u1Top, u1Bot, u1T, 1, "H1 base (RBR)", "H1", 1)
-    if showLevels
+    if lvlH1
         addOnce("H1h", x1hTop, x1hBot, x1hT, -1, "H1 resistance", "H1", 2)
         addOnce("H1l", x1lTop, x1lBot, x1lT, 1, "H1 support", "H1", 2)
 if m30Ok
@@ -586,7 +588,7 @@ if m30Ok
     if showBases
         addOnce("M30d", dmTop, dmBot, dmT, -1, "M30 base (DBD)", "M30", 1)
         addOnce("M30u", umTop, umBot, umT, 1, "M30 base (RBR)", "M30", 1)
-    if showLevels
+    if lvlM30
         addOnce("M30h", xmhTop, xmhBot, xmhT, -1, "M30 resistance", "M30", 2)
         addOnce("M30l", xmlTop, xmlBot, xmlT, 1, "M30 support", "M30", 2)
 
@@ -787,6 +789,14 @@ if array.size(zones) > 0
         else if (z.state == 1 or z.state == 3) and na(z.leaveBar)
             if (z.role == -1 and low < z.bot - leave) or (z.role == 1 and high > z.top + leave)
                 z.leaveBar := bar_index
+        else if (z.state == 1 or z.state == 3) and bar_index > z.leaveBar + pR and z.cat == 2 and not z.broken
+            // support / resistance levels are meant to hold more than once: after a test they stay
+            // on the chart and are watched again on the next approach
+            z.state      := 0
+            z.firstTouch := na
+            z.leaveBar   := na
+            z.armed      := false
+            styleZone(z)
         else if (z.state == 1 or z.state == 3) and bar_index > z.leaveBar + pR
             if z.state == 1
                 z.state := 2
@@ -1199,7 +1209,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Signals need a chart of 30m or lower (M1, M5, M15, M30)", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 2, "Boxes: H4 / H1 DBD-RBR · Lines: breakouts", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 2, "Boxes: H4 / H1 DBD-RBR, H4 S/R · Lines: breakouts", text_color = tc, text_size = size.small)
     int nFresh = 0
     int nPlay  = 0
     for z in zones
