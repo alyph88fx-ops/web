@@ -7,8 +7,10 @@
      **SNR (RBR)**, blue demand: a swing low that price left with rally → base → second rally.
      The zone runs from the swing wick to the candle body and is at least 1 × ATR tall. The first leg must be ≥ 2 × ATR and the base may retrace at most 80% of it.
    - **Horizontal lines, H4 / H1 breakout**: an H4 / H1 swing high or low, or a DBD / RBR box, that a candle of its timeframe has closed through.
-     The line sits at the middle of the broken level, labelled "H4 breakout" / "H1 breakout" at its right end (H4 solid, H1 dashed).
-     It's coloured by its new role (red = now resistance, blue = now support) and is fresh again until its retest. If price closes back through it, it's removed.
+     The line sits at the middle of the broken level, labelled at its right end (H4 solid, H1 dashed).
+     **Blue line = buy breakout** (price broke up, the level is now support), labelled e.g. "H1 breakout ▲ BUY".
+     **Red line = sell breakout** (price broke down, the level is now resistance), labelled "H1 breakout ▼ SELL".
+     It's fresh again until its retest. If price closes back through it, it's removed.
    - **Off by default, in the settings:**
      - *M30 zones*.
      - *Mark DBD / RBR bases*: the base itself, as a grey box.

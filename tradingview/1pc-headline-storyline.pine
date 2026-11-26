@@ -79,8 +79,8 @@ grpC = "Zone colours"
 colRes       = input.color(color.new(color.red, 85), "Resistance / supply", group = grpC)
 colSup       = input.color(color.new(color.blue, 85), "Support / demand", group = grpC)
 colBase      = input.color(color.new(color.gray, 80), "DBD / RBR base", group = grpC)
-brkRoleColor = input.bool(true, "Colour breakouts by their new role (red = now resistance, blue = now support)", group = grpC)
-colBrk       = input.color(color.new(color.gray, 75), "Breakout (when not coloured by role)", group = grpC)
+colBrkBuy    = input.color(color.blue, "Buy breakout line (broke up, now support)", group = grpC)
+colBrkSell   = input.color(color.red, "Sell breakout line (broke down, now resistance)", group = grpC)
 showZoneText = input.bool(true, "Show zone labels", group = grpC)
 showStatus   = input.bool(false, "Add status to labels (fresh / in play / valid)", group = grpC)
 
@@ -446,10 +446,10 @@ tfClose(Zone z) => z.tf == "M30" ? m30C : z.tf == "H1" ? h1C : h4C
 tfAtr(Zone z)   => z.tf == "M30" ? m30Atr : z.tf == "H1" ? h1Atr : h4Atr
 tfRank(string tf) => tf == "H4" ? 3 : tf == "H1" ? 2 : 1
 
-zoneName(Zone z) => z.broken ? z.tf + " breakout" : z.kind
+zoneName(Zone z) => z.broken ? z.tf + " breakout " + (z.role == 1 ? "▲ BUY" : "▼ SELL") : z.kind
 
 zoneColor(Zone z) =>
-    z.broken ? (brkRoleColor ? (z.role == 1 ? colSup : colRes) : colBrk) : z.isBase ? colBase : z.role == 1 ? colSup : colRes
+    z.broken ? (z.role == 1 ? colBrkBuy : colBrkSell) : z.isBase ? colBase : z.role == 1 ? colSup : colRes
 
 styleZone(Zone z) =>
     color  base = zoneColor(z)
