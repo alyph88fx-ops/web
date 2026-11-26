@@ -405,6 +405,13 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; background: #
 .more-ind { color: var(--muted); margin-top: 18px; font-size: 15px; }
 .more-ind a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--crimson); text-underline-offset: 3px; }
 @media (max-width: 860px) { .switches { grid-template-columns: 1fr; } }
+.official { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 22px; align-items: center; padding: 22px 26px; margin-bottom: 16px; transition: filter .25s; }
+.official:hover { filter: brightness(1.12); }
+.off-badge { font: 700 11px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--crimson); padding: 8px 11px; white-space: nowrap; }
+.off-body { display: grid; gap: 6px; min-width: 0; }
+.off-title { font: 400 clamp(26px, 3vw, 36px)/1 var(--f-display); text-transform: uppercase; }
+.off-text { color: var(--muted); font-size: 16px; }
+@media (max-width: 760px) { .official { grid-template-columns: 1fr; gap: 14px; justify-items: start; } }
 
 /* ---------- numbers ---------- */
 .numbers { border-block: 1px solid var(--line); }
@@ -825,6 +832,11 @@ footer { border-top: 1px solid var(--line); padding-top: 56px; padding-bottom: c
         <h2 id="indTitle">Built on the desk. <span class="red">Used in every lesson.</span></h2>
         <p>The same indicators you see in the videos, for TradingView, MT4 and MT5. Switch one on and watch it draw.</p>
       </div>
+      <a class="official frame" href="headline-storyline.html">
+        <span class="off-badge">Official · v1.0</span>
+        <span class="off-body"><span class="off-title">1PC Headline &amp; Storyline</span><span class="off-text">Fresh H4 / H1 supply and demand, support and resistance and breakout lines, with buy and sell signals on M1 to M30. For TradingView.</span></span>
+        <span class="link-arrow">Open the indicator <svg><use href="#arr"/></svg></span>
+      </a>
       <div class="lab frame">
         <div class="lab-top"><div class="ohlc" id="labOhlc"><span><b>EUR/USD</b></span><span>H1</span></div></div>
         <div class="lab-chart"><canvas class="chart" id="labChart" role="img" aria-label="EUR/USD hourly candlestick chart with the selected indicator drawn on top"></canvas></div>
@@ -950,7 +962,7 @@ footer { border-top: 1px solid var(--line); padding-top: 56px; padding-bottom: c
         <p class="about">One hub. Endless trading possibilities. Videos, ebooks and indicators from one desk.</p>
       </div>
       <div><h4>Learn</h4><ul><li><a href="#library">Video channel</a></li><li><a href="#ebooks">Ebooks</a></li><li><a href="#path">Learning path</a></li></ul></div>
-      <div><h4>Tools</h4><ul><li><a href="#desk">The desk</a></li><li><a href="#indicators">Indicators</a></li><li><a href="#hub">The hub</a></li></ul></div>
+      <div><h4>Tools</h4><ul><li><a href="#desk">The desk</a></li><li><a href="#indicators">Indicators</a></li><li><a href="headline-storyline.html">Headline &amp; Storyline</a></li><li><a href="#hub">The hub</a></li></ul></div>
       <div><h4>Account</h4><ul><li><a href="#pricing">Membership</a></li><li><a href="#join">Start free</a></li><li><a href="account.html">Sign in</a></li></ul></div>
     </div>
     <div class="wordmark-wrap" aria-hidden="true"><img class="wordmark" id="wordmark" src="1pc-logo.webp" alt="" width="821" height="322"></div>

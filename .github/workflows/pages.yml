@@ -42,6 +42,8 @@ jobs:
           # Second site: 1 Percent Club, served from /1percentclub/ (same body-only index.html convention).
           mkdir -p _site/1percentclub
           cp 1percentclub/*.html 1percentclub/*.webp _site/1percentclub/
+          # The official 1PC indicator: the page loads and offers the code from the same file as the repo.
+          cp tradingview/1pc-headline-storyline.pine _site/1percentclub/
           { printf '<!doctype html>\n<html lang="en">\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'; cat 1percentclub/index.html; } > _site/1percentclub/index.html
       - name: Fetch this week's economic calendar (ForexFactory feed)
         run: |

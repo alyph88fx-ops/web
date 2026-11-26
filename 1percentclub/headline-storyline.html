@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1PC Headline &amp; Storyline</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The official 1 Percent Club indicator for TradingView: fresh H4 and H1 supply and demand zones, support and resistance, breakout lines and buy / sell signals on M1 to M30.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout concept: a product sheet from the desk. The 1 Percent Club chrome (dock, chamfered frames, crimson
+   accent) around one long read: the chart that shows the whole setup, then the headline (what it marks), the
+   storyline (how a signal forms), risk, alerts, install with the code itself, settings and the version log.
+   Blue / red keep their chart meaning (buy / sell); crimson stays the brand accent. */
+:root {
+  color-scheme: dark;
+  --ink: #0a0a0c;
+  --panel: #111114;
+  --panel-2: #17171b;
+  --line: #25262c;
+  --line-2: #37383f;
+  --fg: #ecebe6;
+  --muted: #a8a7a2;
+  --dim: #7f7e79;
+  --crimson: #dc143c;
+  --crimson-hi: #ff2d55;
+  --crimson-deep: #8f0b26;
+  --buy: #5b84ff;
+  --sell: #ff5d73;
+  --bull: #2ed3a0;
+  --chrome: linear-gradient(180deg, #ffffff 0%, #eceef4 22%, #9a9daa 44%, #fbfbff 52%, #c3c6d1 66%, #74778a 84%, #d9dbe4 100%);
+  --f-display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --f-ui: "Chakra Petch", "Barlow", system-ui, sans-serif;
+  --f-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-num: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --gl: max(16px, env(safe-area-inset-left, 0px));
+  --gr: max(16px, env(safe-area-inset-right, 0px));
+  --cut: 14px;
+  --chamfer: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut));
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--ink); -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--ink); color: var(--fg); font: 400 17px/1.6 var(--f-body); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--ink); }
+img { max-width: 100%; display: block; height: auto; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+:focus-visible { outline: 2px solid var(--crimson-hi); outline-offset: 3px; }
+::selection { background: var(--crimson); color: #fff; }
+.wrap { max-width: 1240px; margin-inline: auto; padding-left: var(--gl); padding-right: var(--gr); }
+.red { color: var(--crimson-hi); text-shadow: 0 0 30px rgba(220,20,60,.45); }
+.chrome { background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mono { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.eyebrow { font: 600 12px/1 var(--f-ui); letter-spacing: .22em; text-transform: uppercase; color: var(--fg); display: inline-flex; gap: 8px; align-items: center; }
+.eyebrow::before { content: "["; color: var(--crimson-hi); } .eyebrow::after { content: "]"; color: var(--crimson-hi); }
+.sec { padding-block: clamp(64px, 9vw, 120px); }
+.sec + .sec { padding-top: 0; }
+.sec-head { display: grid; gap: 16px; max-width: 900px; margin-bottom: clamp(28px, 4vw, 48px); }
+.sec-head h2 { font: 400 clamp(38px, 5.6vw, 76px)/.95 var(--f-display); text-transform: uppercase; text-wrap: balance; }
+.sec-head p { color: var(--muted); max-width: 62ch; font-size: 18px; }
+.btn { --cut: 10px; display: inline-flex; align-items: center; gap: 10px; padding: 15px 24px; border: 0; clip-path: var(--chamfer);
+  font: 700 14px/1 var(--f-ui); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; transition: filter .25s; }
+.btn svg { width: 16px; height: 16px; flex: none; }
+.btn:hover { filter: brightness(1.12); }
+.btn-red { background: linear-gradient(180deg, var(--crimson-hi), var(--crimson) 55%, var(--crimson-deep)); color: #fff; }
+.btn-chrome { background: var(--chrome); color: #0b0b0a; }
+.btn-dark { background: var(--panel-2); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line-2); }
+.chip { font: 600 11px/1 var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 7px 10px; background: var(--panel-2); box-shadow: inset 0 0 0 1px var(--line); }
+.frame { --cut: 18px; clip-path: var(--chamfer); background: var(--panel); box-shadow: inset 0 0 0 1px var(--line-2); }
+
+/* dock */
+.dock { position: fixed; z-index: 55; top: calc(env(safe-area-inset-top, 0px) + 14px); left: var(--gl); right: var(--gr); max-width: 1208px; margin-inline: auto;
+  --cut: 12px; clip-path: var(--chamfer); display: flex; align-items: center; gap: 22px; padding: 9px 9px 9px 18px;
+  background: rgba(14,14,17,.78); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3); box-shadow: inset 0 0 0 1px var(--line); }
+.dock .logo img { height: 34px; width: auto; }
+.dock-links { display: flex; gap: 4px; margin-left: auto; }
+.dock-links a { font: 600 12px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 10px 12px; }
+.dock-links a:hover, .dock-links a.on { color: var(--fg); }
+.dock-links a.on::before { content: ""; display: inline-block; width: 6px; height: 6px; background: var(--crimson-hi); margin-right: 8px; vertical-align: 1px; }
+.dock .btn { padding: 12px 18px; font-size: 12px; }
+.menu-btn { display: none; margin-left: auto; width: 44px; height: 44px; border: 0; background: var(--panel-2); box-shadow: inset 0 0 0 1px var(--line-2); place-items: center; }
+.menu-btn svg { width: 20px; height: 20px; }
+.mobile-menu { position: fixed; z-index: 54; top: calc(env(safe-area-inset-top, 0px) + 74px); left: var(--gl); right: var(--gr); padding: 14px; display: grid; gap: 4px;
+  background: rgba(14,14,17,.96); box-shadow: inset 0 0 0 1px var(--line); --cut: 12px; clip-path: var(--chamfer); }
+.mobile-menu a { font: 600 15px/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; padding: 14px 10px; border-bottom: 1px solid var(--line); }
+@media (max-width: 1020px) { .dock-links, .dock-cta { display: none; } .menu-btn { display: grid; } }
+
+/* opener */
+.opener { padding-top: calc(env(safe-area-inset-top, 0px) + 140px); padding-bottom: 36px;
+  background: radial-gradient(60% 50% at 80% 0%, rgba(220,20,60,.16), transparent 70%); }
+.crumb { font: 600 12px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: var(--dim); }
+.crumb a { color: var(--muted); } .crumb a:hover { color: var(--fg); }
+.opener h1 { font: 400 clamp(52px, 9.4vw, 140px)/.9 var(--f-display); text-transform: uppercase; margin-top: 20px; text-wrap: balance; }
+.opener .lede { color: var(--muted); font-size: clamp(18px, 2vw, 21px); max-width: 58ch; margin-top: 22px; }
+.opener .ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.badge { font: 700 11px/1 var(--f-ui); letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--crimson); padding: 7px 10px; }
+
+.shot { margin-top: clamp(28px, 4vw, 48px); padding: 10px; }
+.shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.shot figcaption { color: var(--dim); font-size: 14px; padding: 12px 8px 4px; }
+
+/* headline cards */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); gap: 14px; }
+.card { padding: 24px; display: grid; gap: 12px; align-content: start; }
+.card h3 { font: 600 20px/1.2 var(--f-ui); }
+.card p { color: var(--muted); font-size: 16px; }
+.swatch { height: 46px; position: relative; }
+.sw-sell { background: rgba(255,45,85,.16); box-shadow: inset 0 0 0 1.5px rgba(255,45,85,.75); }
+.sw-buy { background: rgba(79,125,255,.18); box-shadow: inset 0 0 0 1.5px rgba(79,125,255,.8); }
+.sw-form { background: rgba(255,45,85,.06); border: 1.5px dashed rgba(255,45,85,.7); }
+.sw-line { background: none; }
+.sw-line::before, .sw-line::after { content: ""; position: absolute; left: 0; right: 52%; height: 3px; top: 21px; background: var(--buy); }
+.sw-line::after { left: 52%; right: 0; background: var(--sell); }
+.sw-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sw-split span { display: block; height: 46px; }
+.note { color: var(--dim); font-size: 15px; margin-top: 18px; max-width: 80ch; }
+
+/* steps (a real sequence: the signal forms in this order) */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; }
+.step { padding: 24px; display: grid; gap: 10px; align-content: start; }
+.step .n { font: 400 46px/1 var(--f-display); color: var(--crimson-hi); }
+.step h3 { font: 600 19px/1.25 var(--f-ui); }
+.step p { color: var(--muted); font-size: 16px; }
+
+/* two-column info blocks */
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+.panel { padding: 26px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel h3 { font: 600 21px/1.2 var(--f-ui); }
+.panel p, .panel li { color: var(--muted); font-size: 16px; }
+.panel ol { display: grid; gap: 8px; counter-reset: s; }
+.panel ol li { counter-increment: s; padding-left: 30px; position: relative; }
+.panel ol li::before { content: counter(s); position: absolute; left: 0; top: 1px; width: 20px; height: 20px; display: grid; place-items: center;
+  font: 700 12px/1 var(--f-ui); color: #fff; background: var(--crimson); }
+.panel b { color: var(--fg); font-weight: 600; }
+.example { font-family: var(--f-num); font-size: 14px; color: var(--fg); background: var(--ink); box-shadow: inset 0 0 0 1px var(--line); padding: 12px 14px; overflow-x: auto; white-space: nowrap; }
+table.risk { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.risk th, table.risk td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+table.risk th { font: 600 11px/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+table.risk td { font-variant-numeric: tabular-nums; }
+.buy { color: var(--buy); } .sell { color: var(--sell); } .ok { color: var(--bull); }
+
+/* install */
+.code-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.code-head .acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.status { min-height: 1.5em; font-size: 15px; color: var(--bull); }
+textarea#code { width: 100%; min-width: 0; height: 420px; resize: vertical; background: #08080a; color: #d7dde8; border: 0;
+  box-shadow: inset 0 0 0 1px var(--line-2); padding: 14px 16px; font: 12px/1.55 var(--f-num); tab-size: 4; }
+
+/* settings */
+.table-wrap { overflow-x: auto; }
+table.settings { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 15px; }
+table.settings th, table.settings td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+table.settings th { font: 600 11px/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+table.settings td:first-child { font-weight: 600; white-space: nowrap; }
+table.settings td:nth-child(2) { font-family: var(--f-num); font-size: 13px; color: var(--fg); white-space: nowrap; }
+table.settings td:last-child { color: var(--muted); }
+
+/* versions */
+.version { padding: 26px; display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 20px; }
+@media (max-width: 640px) { .version { grid-template-columns: 1fr; } }
+.version .v { font: 400 44px/1 var(--f-display); }
+.version .d { color: var(--dim); font: 600 12px/1 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; margin-top: 8px; }
+.version ul { display: grid; gap: 8px; }
+.version li { color: var(--muted); padding-left: 18px; position: relative; font-size: 16px; }
+.version li::before { content: ""; position: absolute; left: 0; top: 11px; width: 7px; height: 7px; background: var(--crimson-hi); }
+
+/* footer */
+footer { border-top: 1px solid var(--line); padding-top: 56px; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 28px); }
+.foot { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 28px; }
+.foot .logo img { height: 40px; width: auto; }
+.foot .about { color: var(--muted); font-size: 15px; margin-top: 14px; max-width: 34ch; }
+.foot h4 { font: 600 11px/1 var(--f-ui); letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
+.foot li + li { margin-top: 10px; } .foot a { color: var(--muted); font-size: 15px; } .foot a:hover { color: var(--fg); }
+.risk-note { margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); display: grid; gap: 10px; }
+.risk-note p { color: var(--dim); font-size: 13px; max-width: 110ch; }
+@media (max-width: 860px) { .foot { grid-template-columns: 1fr 1fr; } .foot > div:first-child { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="arr" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="dock">
+  <a class="logo" href="index.html" aria-label="1 Percent Club home"><img src="1pc-logo.webp" alt="1 Percent Club" width="821" height="322"></a>
+  <nav class="dock-links" aria-label="Main">
+    <a href="index.html#hub">Hub</a><a href="index.html#library">Videos</a><a href="index.html#ebooks">Ebooks</a><a class="on" href="index.html#indicators">Indicators</a><a href="index.html#pricing">Membership</a>
+  </nav>
+  <div class="dock-cta">
+    <a class="btn btn-red" href="#install">Get the indicator</a>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M8 17h12"/></svg>
+  </button>
+</header>
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile" hidden>
+  <a href="index.html#hub">Hub</a><a href="index.html#library">Videos</a><a href="index.html#ebooks">Ebooks</a><a href="index.html#indicators">Indicators</a><a href="index.html#pricing">Membership</a>
+  <a href="#how">How it works</a><a href="#install">Install</a>
+</nav>
+
+<main>
+  <section class="opener">
+    <div class="wrap">
+      <p class="crumb"><a href="index.html#indicators">Indicators</a> / 1PC Headline &amp; Storyline</p>
+      <h1><span class="chrome">Headline</span> <span class="red">&amp;</span><br><span class="chrome">Storyline</span></h1>
+      <p class="lede">The official 1 Percent Club indicator for TradingView. The <b>headline</b> is the zone where price should react; the <b>storyline</b> is what price does when it gets there. It marks fresh H4 and H1 supply and demand, support and resistance and breakout lines, and gives buy and sell signals on M1 to M30 with fixed risk.</p>
+      <div class="ctas">
+        <a class="btn btn-red" href="#install">Get the code <svg><use href="#arr"/></svg></a>
+        <a class="btn btn-chrome" href="#how">How it works</a>
+      </div>
+      <div class="chips">
+        <span class="badge">Official · v1.0</span>
+        <span class="chip">TradingView · Pine Script v6</span><span class="chip">Gold &amp; FX</span><span class="chip">H4 · H1 zones</span><span class="chip">Signals M1–M30</span><span class="chip">Alerts</span>
+      </div>
+      <figure class="shot frame">
+        <img src="headline-storyline-setup.webp" width="2400" height="1800" alt="Illustrated M30 gold chart: an H4 resistance box at the top, H4 support and an H1 RBR box at the bottom, H1 turning bullish, an M30 breakout drawn as a blue line, a buy on the retest of the line and the take profit being hit.">
+        <figcaption>The whole setup on one chart. Illustration with made-up candles, not live prices.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sec" id="how" aria-labelledby="headTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The headline</span>
+        <h2 id="headTitle">Where price <span class="red">should react</span></h2>
+        <p>Everything is read from closed H4 and H1 candles, so nothing repaints. Boxes are zones; lines are breakouts. Blue means buy, red means sell.</p>
+      </div>
+      <div class="cards">
+        <article class="card frame"><div class="swatch sw-sell"></div><h3>SNR (DBD) · supply</h3><p>A swing high that price left with drop → base → second drop. Red box from the wick to the candle body. H4 boxes have a solid border, H1 a dashed one.</p></article>
+        <article class="card frame"><div class="swatch sw-buy"></div><h3>SNR (RBR) · demand</h3><p>A swing low that price left with rally → base → second rally. Blue box at the low where the first rally started.</p></article>
+        <article class="card frame"><div class="sw-split"><span class="sw-buy"></span><span class="sw-sell"></span></div><h3>H4 support &amp; resistance</h3><p>Every H4 swing that price bounced from by at least 1 ATR, drawn from the swing candle's open to its wick. These stay after a test and go when they break.</p></article>
+        <article class="card frame"><div class="swatch sw-line"></div><h3>Breakout lines</h3><p>When a candle of its timeframe closes through a level, the zone becomes a line at its middle: <span class="buy">blue ▲ BUY</span> when broken upward, <span class="sell">red ▼ SELL</span> when broken downward.</p></article>
+        <article class="card frame"><div class="swatch sw-form"></div><h3>Forming</h3><p>A faint dashed box as soon as the first leg and the base are there, before the second leg confirms the DBD or RBR.</p></article>
+      </div>
+      <p class="note">Only recent, fresh zones are shown: a zone confirmed in the last 4 trading days that price hasn't tested yet. Support and resistance boxes stay until they break or age out.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="storyTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">The storyline</span>
+        <h2 id="storyTitle">How a signal <span class="red">forms</span></h2>
+        <p>A buy needs the bigger picture and the smaller one to agree. A sell is the same, upside down.</p>
+      </div>
+      <ol class="steps">
+        <li class="step frame"><span class="n">01</span><h3>H1 sets the direction</h3><p>H1 is bullish after an H1 candle closes above the last H1 swing high, and bearish after one closes below the last H1 swing low.</p></li>
+        <li class="step frame"><span class="n">02</span><h3>M30 breaks out the same way</h3><p>An M30 candle closes above the last M30 swing high. The broken level is drawn as a blue line, "M30 breakout ▲ BUY".</p></li>
+        <li class="step frame"><span class="n">03</span><h3>Buy the retest</h3><p>A limit order waits at the line and fills when price comes back to it within 16 candles. If price closes back through the line first, the setup is cancelled.</p></li>
+        <li class="step frame"><span class="n">04</span><h3>Fixed risk</h3><p>Stop loss 600 points and take profit 1000 points from the entry, drawn as boxes on the chart, with an alert on the order and on the fill.</p></li>
+      </ol>
+      <p class="note">The indicator also gives a smart zone entry: when price reaches a fresh zone for the first time and rejects it, it places a limit at 50% of the rejection move, inside the zone.</p>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="riskTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Risk &amp; alerts</span>
+        <h2 id="riskTitle">The same risk <span class="red">every time</span></h2>
+      </div>
+      <div class="split">
+        <div class="panel frame">
+          <h3>600 / 1000 points</h3>
+          <p>On gold one point is 0.01, so 600 points is <b>$6</b> and 1000 points is <b>$10</b>, the same as MT5, even on TradingView feeds that quote three decimals. On other symbols one point is the smallest price step (EURUSD: 600 points = 60 pips).</p>
+          <table class="risk">
+            <thead><tr><th>Side</th><th>Entry</th><th>Stop loss</th><th>Take profit</th></tr></thead>
+            <tbody>
+              <tr><td class="sell">Sell</td><td>3783</td><td>3789</td><td>3773</td></tr>
+              <tr><td class="buy">Buy</td><td>3783</td><td>3777</td><td>3793</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel frame">
+          <h3>Alerts</h3>
+          <ol>
+            <li>On the chart, open <b>Alert</b> and choose <b>1PC H&amp;S</b>.</li>
+            <li>Pick <b>Any alert() function call</b>.</li>
+            <li>You get one message when the limit order is placed and one when it fills.</li>
+          </ol>
+          <p class="example">1PC ENTRY BUY XAUUSD (M30 breakout with the H1 trend) | Entry 3636.00 | SL 3630.00 | TP 3646.00</p>
+          <p>There are also separate conditions for each event: <b>1PC Prepare Buy / Sell</b> and <b>1PC Entry Buy / Sell</b>.</p>
+        </div>
+      </div>
+      <p class="note">On 60 days of gold M30 data (September to November 2026), buying or selling the retest of an M30 breakout in the H1 direction gave 47 trades with 38% winners: about break-even with 600 / 1000 points. Wider stops at the same ratio did better. Past results don't predict future results.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="install" aria-labelledby="installTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Install</span>
+        <h2 id="installTitle">On your chart in <span class="red">two minutes</span></h2>
+      </div>
+      <div class="split">
+        <div class="panel frame">
+          <h3>Steps</h3>
+          <ol>
+            <li>Copy the code below, or download the <b>.pine</b> file.</li>
+            <li>On <b>tradingview.com</b>, open a chart and then <b>Pine Editor</b> → <b>New → Indicator</b>.</li>
+            <li>Select everything in the editor, delete it and paste.</li>
+            <li>Click <b>Save</b>, then <b>Add to chart</b>. Use a 30m or lower chart for signals.</li>
+          </ol>
+          <p>The TradingView phone app has no Pine Editor. On a phone, open tradingview.com in the browser as the desktop site, or install from a computer; the indicator then shows in the app too.</p>
+        </div>
+        <div class="panel frame">
+          <h3>Updating</h3>
+          <p>To move to a newer version, remove <b>1PC H&amp;S</b> from the chart, paste the new code over the old one in the Pine Editor, save, and add it to the chart again.</p>
+          <p>Your current version is shown at the top of the code: <span class="mono">v1.0 (26 Nov 2026)</span>.</p>
+        </div>
+      </div>
+      <div class="panel frame" style="margin-top:14px">
+        <div class="code-head">
+          <h3>The code</h3>
+          <div class="acts">
+            <button class="btn btn-red" id="copyBtn" type="button">Copy code</button>
+            <a class="btn btn-dark" href="1pc-headline-storyline.pine" download>Download .pine <svg><use href="#dl"/></svg></a>
+          </div>
+        </div>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+        <label class="chip" for="code" style="justify-self:start">Pine Script v6 · 1pc-headline-storyline.pine</label>
+        <textarea id="code" readonly spellcheck="false" wrap="off">Loading the code…</textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="setTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Settings</span>
+        <h2 id="setTitle">The ones <span class="red">worth knowing</span></h2>
+        <p>Open them with the gear next to 1PC H&amp;S on the chart. The defaults are the ones described on this page.</p>
+      </div>
+      <div class="table-wrap frame" style="padding:6px 10px">
+        <table class="settings">
+          <thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>H4 / H1 / M30 zones</td><td>on / on / off</td><td>Which timeframes get DBD / RBR boxes.</td></tr>
+            <tr><td>H4 support / resistance</td><td>on</td><td>H1 and M30 support / resistance have their own switches (off).</td></tr>
+            <tr><td>Support / resistance box</td><td>Open to wick</td><td>Or body to wick, at least 1 ATR tall.</td></tr>
+            <tr><td>Only show zones from the last</td><td>4 trading days</td><td>Counted from when the zone was confirmed or broken.</td></tr>
+            <tr><td>Show DBD / RBR while forming</td><td>on</td><td>The faint dashed boxes.</td></tr>
+            <tr><td>M30 breakout signals in the H1 direction</td><td>on</td><td>The buy / sell signals from steps 01–04.</td></tr>
+            <tr><td>M30 breakout entry</td><td>Retest</td><td>Or enter at the close of the breakout candle.</td></tr>
+            <tr><td>Stop loss / take profit</td><td>600 / 1000 points</td><td>Fixed distances from the entry.</td></tr>
+            <tr><td>Point size override</td><td>0 = auto</td><td>Gold uses 0.01; set it by hand if your broker's point differs.</td></tr>
+            <tr><td>Send alerts as JSON for the AI service</td><td>off</td><td>For the optional Claude second-opinion service.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="verTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Versions</span>
+        <h2 id="verTitle">Release <span class="red">notes</span></h2>
+      </div>
+      <article class="version frame">
+        <div><p class="v chrome">v1.0</p><p class="d">26 Nov 2026 · first official release</p></div>
+        <ul>
+          <li>Fresh H4 and H1 SNR (DBD / RBR) zones, with dashed boxes while they form.</li>
+          <li>H4 support and resistance from the swing candle's open to its wick.</li>
+          <li>Breakout lines: blue for buy, red for sell.</li>
+          <li>Buy / sell signals from M30 breakouts in the H1 direction, entered on the retest.</li>
+          <li>Smart zone entry with a limit price inside the zone.</li>
+          <li>Fixed 600 / 1000-point stop loss and take profit, correct on gold feeds.</li>
+          <li>Alerts for the order and the fill; optional JSON alerts for the AI service.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="logo" href="index.html" aria-label="1 Percent Club home"><img src="1pc-logo.webp" alt="1 Percent Club" width="821" height="322"></a>
+        <p class="about">One hub. Endless trading possibilities. Videos, ebooks and indicators from one desk.</p>
+      </div>
+      <div><h4>Learn</h4><ul><li><a href="index.html#library">Video channel</a></li><li><a href="index.html#ebooks">Ebooks</a></li><li><a href="index.html#path">Learning path</a></li></ul></div>
+      <div><h4>Tools</h4><ul><li><a href="index.html#desk">The desk</a></li><li><a href="index.html#indicators">Indicators</a></li><li><a href="headline-storyline.html">Headline &amp; Storyline</a></li></ul></div>
+      <div><h4>Account</h4><ul><li><a href="index.html#pricing">Membership</a></li><li><a href="index.html#join">Start free</a></li><li><a href="account.html">Sign in</a></li></ul></div>
+    </div>
+    <div class="risk-note">
+      <p><b>Risk warning.</b> Trading foreign exchange, CFDs and crypto on margin carries a high level of risk and may not be suitable for all investors. You could lose more than your initial deposit. 1 Percent Club provides education only and does not give investment advice or manage funds. Indicator signals and backtests are not a recommendation, and past performance is not indicative of future results.</p>
+      <p>© 2026 1 Percent Club. The 1PC Headline &amp; Storyline indicator is provided for education.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const menuBtn = $('#menuBtn'), menu = $('#mobileMenu');
+  menuBtn.addEventListener('click', () => { const open = menu.hidden; menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { menu.hidden = true; menuBtn.setAttribute('aria-expanded', 'false'); }));
+
+  // The code is published next to this page (copied from tradingview/1pc-headline-storyline.pine at build time).
+  const box = $('#code'), status = $('#status'), copyBtn = $('#copyBtn');
+  let loaded = false;
+  fetch('1pc-headline-storyline.pine', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(t => { box.value = t; loaded = true; })
+    .catch(() => { box.value = 'The code could not be loaded here. Use "Download .pine", or open this page on the published 1 Percent Club site.'; });
+
+  function selectAll() { box.focus(); box.setSelectionRange(0, box.value.length); box.select(); }
+  copyBtn.addEventListener('click', () => {
+    if (!loaded) { status.textContent = 'The code has not loaded yet. Use "Download .pine" instead.'; return; }
+    const done = () => { status.textContent = 'Copied. Paste it into the Pine Editor on tradingview.com.'; };
+    const fallback = () => {
+      selectAll();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      status.textContent = ok ? 'Copied. Paste it into the Pine Editor on tradingview.com.' : 'Copying was blocked. The code is selected: use your device\'s Copy.';
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(box.value).then(done, fallback);
+    else fallback();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,9 +1,11 @@
 // This Pine Script® code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 //@version=6
 //
-// 1PC Headline & Storyline Indicator
-//   Headline  = the H4 / H1 / M30 key zone (supply & demand: SNR with DBD / RBR)
-//   Storyline = what price does when it comes back to that zone (M / W on M15 or M30 -> PREPARE -> ENTRY)
+// 1PC Headline & Storyline Indicator · v1.0 (26 Nov 2026)
+// The official TradingView indicator of the 1 Percent Club · © 2026 1 Percent Club
+// Guide and latest version: the 1 Percent Club website, Indicators → 1PC Headline & Storyline
+//   Headline  = the H4 / H1 key zone (supply & demand: SNR with DBD / RBR, support / resistance, breakouts)
+//   Storyline = what price does at that zone, and M30 breakouts with the H1 trend (signals on M1-M30)
 //
 // Flow
 //   1. Fresh key zones on H4 and H1:
@@ -35,6 +37,8 @@
 //
 indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay = true, scale = scale.right,
      max_boxes_count = 500, max_lines_count = 500, max_labels_count = 500, max_bars_back = 500)
+
+VERSION = "1.0"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Inputs
@@ -1342,7 +1346,7 @@ var table tb = table.new(position.top_right, 2, 11, bgcolor = color.new(color.bl
 if barstate.islast and showStats
     int total = wins + losses
     color tc  = color.white
-    table.cell(tb, 0, 0, "1PC Headline & Storyline", text_color = tc, text_size = size.small)
+    table.cell(tb, 0, 0, "1PC Headline & Storyline v" + VERSION, text_color = tc, text_size = size.small)
     table.cell(tb, 1, 0, "", text_color = tc, text_size = size.small)
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Signals need a chart of 30m or lower (M1, M5, M15, M30)", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)

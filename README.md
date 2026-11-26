@@ -51,3 +51,9 @@ engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
 
 A second site built from the same template, in black, red and chrome: `1percentclub/` (main page `index.html`,
 member desk `account.html`). The Pages workflow publishes it at `/1percentclub/` next to 88FX.
+
+**1PC Headline & Storyline** (`1percentclub/headline-storyline.html`) is the page of the official 1 Percent Club TradingView indicator:
+what it marks, how a signal forms, risk, alerts, install with the code (Copy and Download), settings and release notes.
+The Indicators section of the main page links to it. The code itself lives in `tradingview/1pc-headline-storyline.pine`;
+the Pages workflow copies that file next to the page, so the site always offers the version in the repository.
+When you release a new version, update the version in the code header (`VERSION`) and add an entry under "Release notes" on the page.

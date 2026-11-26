@@ -1,5 +1,7 @@
 # 1PC Headline & Storyline Indicator (TradingView)
 
+**Official 1 Percent Club indicator · v1.0 (26 Nov 2026).** Its public page is `1percentclub/headline-storyline.html` on the 1 Percent Club site, which serves this same file for copy and download.
+
 `1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 supply & demand zone; the **storyline** is what price does when it comes back to it.
 
 1. **Fresh key zones on H4 and H1:**
