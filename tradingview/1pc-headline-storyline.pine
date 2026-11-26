@@ -6,13 +6,14 @@
 //   Storyline = what price does when it comes back to that zone (M / W on M15 or M30 -> PREPARE -> ENTRY)
 //
 // Flow
-//   1. Fresh key zones (rectangles) on H4, H1 and M30 (H4 solid border, H1 dashed, M30 dotted):
-//        SNR (DBD/RBR)  a swing level that price left with a DBD or RBR (red supply / blue demand)
-//        base (DBD/RBR) the base itself on M30 / H1 (grey), e.g. "M30 base (DBD)"
-//        breakout       an H4 / H1 swing level (or any zone) that a candle of its timeframe closed
-//                       through, coloured by its new role, e.g. "H4 breakout"
-//      Only the nearest zones to current price are shown; a zone is removed once price has come
-//      back to it and moved away again. Where zones overlap, the higher timeframe wins:
+//   1. Fresh key zones on H4 and H1:
+//        boxes      SNR (DBD) red supply / SNR (RBR) blue demand: a swing level that price left
+//                   with a DBD or RBR (H4 solid border, H1 dashed)
+//        lines      breakout: an H4 / H1 swing level or DBD / RBR box that a candle of its
+//                   timeframe closed through, a horizontal line coloured by its new role
+//        optional   M30 zones, DBD / RBR bases (grey boxes) and plain SNR levels (settings)
+//      Only recent, fresh zones are shown: a zone is removed once price has come back to it and
+//      moved away again, or when it is older than 4 trading days. How the zones are found:
 //        SNR + DBD   swing high -> drop -> base (shallow bounce) -> second drop below the base
 //                    -> red zone at the swing high (resistance / sell zone)
 //        SNR + RBR   swing low -> rally -> base (shallow pullback) -> second rally above the base
@@ -41,7 +42,7 @@ indicator("1PC Headline & Storyline Indicator", shorttitle = "1PC H&S", overlay 
 grpZ = "1 · H4 / H1 / M30 key zones (SNR with DBD / RBR)"
 useH4        = input.bool(true, "H4", inline = "tf", group = grpZ)
 useH1        = input.bool(true, "H1", inline = "tf", group = grpZ)
-useM30       = input.bool(true, "M30 zones", inline = "tf", group = grpZ)
+useM30       = input.bool(false, "M30 zones", inline = "tf", group = grpZ)
 swLen        = input.int(3, "Swing strength (bars each side)", minval = 1, maxval = 10, group = grpZ)
 m30Right     = input.int(1, "M30 swing confirmation (candles to the right)", minval = 1, maxval = 10, group = grpZ,
      tooltip = "M30 bases are short, so an M30 swing low/high is confirmed after this many candles (H4 and H1 use the swing strength on both sides).")
@@ -64,13 +65,13 @@ keepDead     = input.bool(false, "Keep invalidated zones on chart", group = grpZ
 hideTested   = input.bool(true, "Only fresh zones (remove a zone once it has been tested)", group = grpZ,
      tooltip = "A zone is removed once price has come back to it and then moved away again (or once it gave its entry and price moved away). A breakout (grey) zone is fresh again until its retest.")
 
-showBases       = input.bool(true, "Mark DBD / RBR bases", group = grpZ,
+showBases       = input.bool(false, "Mark DBD / RBR bases", group = grpZ,
      tooltip = "Also draws the base itself (the sideways part between the two drops or rallies) as a grey zone, e.g. 'M30 base (DBD)'.")
-showLevels      = input.bool(true, "Mark SNR levels (swing highs / lows)", group = grpZ,
+showLevels      = input.bool(false, "Mark SNR levels (swing highs / lows)", group = grpZ,
      tooltip = "Every swing high (resistance) and swing low (support) on H4, H1 and M30 that price reacted from by at least the reaction below.")
 snrReact        = input.float(1.0, "SNR level: min reaction (× ATR)", minval = 0.0, step = 0.25, group = grpZ)
-showLevelBreaks = input.bool(true, "Mark breakouts", group = grpZ,
-     tooltip = "When a candle closes through an H4, H1 or M30 swing high or low (SNR), the level is marked as a breakout zone, e.g. 'H4 breakout'.")
+showLevelBreaks = input.bool(true, "Mark breakouts (horizontal lines)", group = grpZ,
+     tooltip = "When a candle closes through an H4 or H1 swing high or low (SNR), or through a DBD / RBR zone, the level is marked with a horizontal line, e.g. 'H4 breakout'.")
 hideLowerTf     = input.bool(false, "Hide lower-TF zones under higher-TF zones", group = grpZ,
      tooltip = "Off = every timeframe's zones are drawn. On = an H1 / M30 zone that overlaps an H4 zone (or an M30 zone under an H1 zone) is hidden.")
 
@@ -430,7 +431,8 @@ type Zone
     bool   broken     = false // breakout zone
     int    tAge       = na    // age is counted from here (zone start, or the breakout)
     int    cat        = 0     // 0 SND (SNR with DBD / RBR), 1 base, 2 plain SNR level, 3 breakout
-    line   mid        = na    // dashed midline of a breakout zone
+    line   mid        = na    // horizontal line of a breakout
+    label  lab        = na    // name of a breakout line, at its right end
     bool   armed      = false // price has moved clear of the zone once since it formed
     int    state      = 0     // 0 FRESH (untouched), 1 IN PLAY (first approach), 2 TESTED (no pattern), 3 VALID (pattern formed)
     int    firstTouch = na
@@ -450,27 +452,42 @@ zoneColor(Zone z) =>
     z.broken ? (brkRoleColor ? (z.role == 1 ? colSup : colRes) : colBrk) : z.isBase ? colBase : z.role == 1 ? colSup : colRes
 
 styleZone(Zone z) =>
-    color base = zoneColor(z)
-    color c    = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0)))
-    box.set_bgcolor(z.bx, c)
-    box.set_border_color(z.bx, color.new(base, z.state == 2 ? 70 : 20))
-    box.set_border_width(z.bx, z.state == 3 ? 2 : 1)
-    box.set_border_style(z.bx, z.tf == "M30" ? line.style_dotted : z.tf == "H1" ? line.style_dashed : line.style_solid)
-    string st = z.state == 0 ? "fresh" : z.state == 1 ? "in play" : z.state == 2 ? "tested" : "✓ valid"
-    box.set_text(z.bx, showZoneText ? zoneName(z) + (showStatus ? " · " + st : "") : "")
-    color tcol = z.isBase and not z.broken ? (z.role == 1 ? colSup : colRes) : base
-    box.set_text_color(z.bx, color.new(tcol, z.state == 2 ? 50 : 0))
+    color  base = zoneColor(z)
+    string st   = z.state == 0 ? "fresh" : z.state == 1 ? "in play" : z.state == 2 ? "tested" : "✓ valid"
+    string name = showZoneText ? zoneName(z) + (showStatus ? " · " + st : "") : ""
     if z.broken
+        // breakout: a horizontal line at the middle of the broken level, no box
+        color none = color.new(color.white, 100)
+        box.set_bgcolor(z.bx, none)
+        box.set_border_color(z.bx, none)
+        box.set_text(z.bx, "")
         float m = (z.top + z.bot) / 2
+        color lc = color.new(base, z.state == 2 ? 60 : 0)
         if na(z.mid)
-            z.mid := line.new(z.t0, m, time, m, xloc = xloc.bar_time, style = line.style_dashed, force_overlay = true)
-        line.set_color(z.mid, color.new(base, 10))
+            z.mid := line.new(z.t0, m, time, m, xloc = xloc.bar_time, width = 2, force_overlay = true)
+            z.lab := label.new(time, m, "", xloc = xloc.bar_time, style = label.style_label_left, color = none,
+                 size = size.normal, force_overlay = true)
+        line.set_color(z.mid, lc)
+        line.set_style(z.mid, z.tf == "H4" ? line.style_solid : line.style_dashed)
+        label.set_text(z.lab, name)
+        label.set_textcolor(z.lab, lc)
+    else
+        color c = color.new(base, math.min(100, color.t(base) + (z.state == 2 ? 12 : 0)))
+        box.set_bgcolor(z.bx, c)
+        box.set_border_color(z.bx, color.new(base, z.state == 2 ? 70 : 20))
+        box.set_border_width(z.bx, z.state == 3 ? 2 : 1)
+        box.set_border_style(z.bx, z.tf == "M30" ? line.style_dotted : z.tf == "H1" ? line.style_dashed : line.style_solid)
+        box.set_text(z.bx, name)
+        color tcol = z.isBase ? (z.role == 1 ? colSup : colRes) : base
+        box.set_text_color(z.bx, color.new(tcol, z.state == 2 ? 50 : 0))
     true
 
 killZone(Zone z) =>
     box.delete(z.bx)
     if not na(z.mid)
         line.delete(z.mid)
+    if not na(z.lab)
+        label.delete(z.lab)
     true
 
 // zone category (a broken zone counts as a breakout)
@@ -612,6 +629,8 @@ if array.size(zones) > 0
                 box.set_text(z.bx, "")
                 if not na(z.mid)
                     line.set_x2(z.mid, time)
+                    line.set_color(z.mid, color.new(color.gray, 80))
+                    label.set_text(z.lab, "")
             else
                 killZone(z)
             array.remove(zones, i)
@@ -1057,6 +1076,7 @@ if barstate.islast
         box.set_right(z.bx, ext)
         if not na(z.mid)
             line.set_x2(z.mid, ext)
+            label.set_x(z.lab, ext)
 
 hideZone(Zone z) =>
     color none = color.new(color.white, 100)
@@ -1065,6 +1085,7 @@ hideZone(Zone z) =>
     box.set_text_color(z.bx, none)
     if not na(z.mid)
         line.set_color(z.mid, none)
+        label.set_textcolor(z.lab, none)
     true
 
 // Only the zones around the current market price: on each timeframe (H4, H1, M30) the nearest
@@ -1175,7 +1196,7 @@ if barstate.islast and showStats
     table.cell(tb, 0, 1, "Pattern TF", text_color = tc, text_size = size.small)
     table.cell(tb, 1, 1, isPatTF ? "M" + timeframe.period + " ✓" : "Signals need a chart of 30m or lower (M1, M5, M15, M30)", text_color = isPatTF ? color.lime : color.orange, text_size = size.small)
     table.cell(tb, 0, 2, "Zones", text_color = tc, text_size = size.small)
-    table.cell(tb, 1, 2, "H4 solid · H1 dashed · M30 dotted · Red supply · Blue demand · Grey base", text_color = tc, text_size = size.small)
+    table.cell(tb, 1, 2, "Boxes: H4 / H1 DBD-RBR · Lines: breakouts", text_color = tc, text_size = size.small)
     int nFresh = 0
     int nPlay  = 0
     for z in zones

@@ -1,23 +1,22 @@
 # 1PC Headline & Storyline Indicator (TradingView)
 
-`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 / M30 supply & demand zone; the **storyline** is what price does when it comes back to it.
+`1pc-headline-storyline.pine` (Pine Script v6). The **headline** is the fresh H4 / H1 supply & demand zone; the **storyline** is what price does when it comes back to it.
 
-1. **Fresh key zones (rectangles) on H4, H1 and M30** (H4 solid border, H1 dashed, M30 dotted), labelled in the middle of the box:
-   - **H4 / H1 / M30 SNR (DBD)**, red supply: a swing high that price left with drop → base → second drop.
+1. **Fresh key zones on H4 and H1:**
+   - **Boxes, H4 / H1 SNR (DBD)**, red supply: a swing high that price left with drop → base → second drop (H4 solid border, H1 dashed).
      **SNR (RBR)**, blue demand: a swing low that price left with rally → base → second rally.
      The zone runs from the swing wick to the candle body and is at least 1 × ATR tall. The first leg must be ≥ 2 × ATR and the base may retrace at most 80% of it.
-   - **H4 / H1 / M30 base (DBD / RBR)**, grey: the base itself, the sideways part between the two drops or rallies (red label for DBD, blue for RBR).
-     On M30, the drop into the base is measured from the highest high of the last 20 candles, and the second drop needs a candle body of at least 0.5 × ATR.
-   - **H4 / H1 / M30 breakout**: a swing high or low that a candle of its timeframe has closed through (or any zone that got broken).
-     It's coloured by its new role (red = now resistance, blue = now support) and has a dashed midline. It's fresh again until its retest.
-     If price closes back through a breakout zone, the zone is removed.
-   - **Plain SNR levels**: every H4 / H1 / M30 swing high (*resistance*, red) and swing low (*support*, blue) that price reacted from by at least 1 × ATR (*SNR level: min reaction*).
-     When a DBD / RBR forms from the same swing, the SND zone replaces the plain level.
-   - **Every timeframe is drawn**: H4, H1 and M30 zones all show, even where they overlap. Labels sit in the middle (H4), on the right (H1) or on the left (M30) of the box.
-     Only duplicates (same kind, same timeframe) are merged. Turn on *Hide lower-TF zones under higher-TF zones* for a cleaner chart.
+   - **Horizontal lines, H4 / H1 breakout**: an H4 / H1 swing high or low, or a DBD / RBR box, that a candle of its timeframe has closed through.
+     The line sits at the middle of the broken level, labelled "H4 breakout" / "H1 breakout" at its right end (H4 solid, H1 dashed).
+     It's coloured by its new role (red = now resistance, blue = now support) and is fresh again until its retest. If price closes back through it, it's removed.
+   - **Off by default, in the settings:**
+     - *M30 zones*.
+     - *Mark DBD / RBR bases*: the base itself, as a grey box.
+     - *Mark SNR levels*: every swing high / low with at least a 1 × ATR reaction.
+     Where zones of different timeframes overlap, all are drawn. Turn on *Hide lower-TF zones under higher-TF zones* for a cleaner chart.
    - **Recent and fresh only:** zones from the last 4 trading days that price hasn't tested yet. All of them are shown by default; set *Nearest zones to current price, per timeframe* to 1 or 2 to keep only the closest ones.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
-     (or once it gave its entry and price moved away). A grey breakout zone is fresh again until its retest.
+     (or once it gave its entry and price moved away). A breakout line is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).
 2. **Entry on M1, M5, M15 or M30, fresh zones only.** When price reaches a fresh zone for the first time, the indicator works out an exact limit price inside the zone. Choose the method under **Entry method**:
    - **Smart zone entry**: the indicator follows the extreme that price makes inside the zone.
