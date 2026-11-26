@@ -16,7 +16,7 @@
      - *Mark DBD / RBR bases*: the base itself, as a grey box.
      - *Mark SNR levels*: every swing high / low with at least a 1 × ATR reaction.
      Where zones of different timeframes overlap, all are drawn. Turn on *Hide lower-TF zones under higher-TF zones* for a cleaner chart.
-   - **Recent and fresh only:** zones from the last 4 trading days that price hasn't tested yet. All of them are shown by default; set *Nearest zones to current price, per timeframe* to 1 or 2 to keep only the closest ones.
+   - **Recent and fresh only:** zones confirmed (or broken) in the last 4 trading days that price hasn't tested yet. The age counts from the confirmation because H4 DBD / RBR zones often take days to form. All of them are shown by default; set *Nearest zones to current price, per timeframe* to 1 or 2 to keep only the closest ones.
    - **Fresh only:** a zone is removed once price has come back to it and then moved 1 × ATR away again
      (or once it gave its entry and price moved away). A breakout line is fresh again until its retest.
      Turn off *Only fresh zones* to keep tested zones on the chart (faded).

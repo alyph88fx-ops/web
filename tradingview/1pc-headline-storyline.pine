@@ -56,7 +56,7 @@ minZoneAtr   = input.float(1.0, "Min zone height (× zone TF ATR)", minval = 0.0
 nearCount    = input.int(0, "Nearest zones to current price, per timeframe (above / below)", minval = 0, maxval = 10, group = grpZ,
      tooltip = "Keeps the chart around the current market price: on each of H4, H1 and M30, only this many zones above price and this many below are shown (a zone price is inside is always shown). 0 = show all zones.")
 maxAgeDays   = input.int(4, "Only show zones from the last (trading days)", minval = 1, maxval = 365, group = grpZ,
-     tooltip = "A zone is removed once the swing it starts at is older than this many trading days (Saturdays and Sundays don't count).")
+     tooltip = "A zone is removed once it was confirmed (or broken) more than this many trading days ago (Saturdays and Sundays don't count). H4 DBD / RBR zones often take days to confirm, so the age counts from the confirmation, not from the swing.")
 perType      = input.int(6, "Max zones per type and TF (newest kept)", minval = 1, maxval = 20, group = grpZ,
      tooltip = "At most this many red (SNR + DBD) and this many blue (SNR + RBR) zones on each timeframe; older ones are removed first.")
 mergeOverlap = input.bool(true, "Merge duplicates (same kind, same timeframe)", group = grpZ,
@@ -431,7 +431,7 @@ type Zone
     string tf                 // "H4", "H1" or "M30"
     bool   isBase     = false // DBD / RBR base zone
     bool   broken     = false // breakout zone
-    int    tAge       = na    // age is counted from here (zone start, or the breakout)
+    int    tAge       = na    // age is counted from here (when the zone was confirmed, or the breakout)
     int    cat        = 0     // 0 SND (SNR with DBD / RBR), 1 base, 2 plain SNR level, 3 breakout
     line   mid        = na    // horizontal line of a breakout
     label  lab        = na    // name of a breakout line, at its right end
@@ -530,7 +530,7 @@ addZone(float top, float bot, int t, int role, string kind, string tf, int cat) 
         Zone nz = Zone.new(box.new(t, top, time, bot, xloc = xloc.bar_time, border_width = 1, force_overlay = true,
              text_size = size.normal, text_valign = text.align_center,
              text_halign = tf == "H4" ? text.align_center : tf == "H1" ? text.align_right : text.align_left),
-             top, bot, role, kind, t, tf, cat == 1, brk, brk ? time : t)
+             top, bot, role, kind, t, tf, cat == 1, brk, time)
         nz.cat := cat
         styleZone(nz)
         array.push(zones, nz)
@@ -595,7 +595,7 @@ tradeDays(int t0, int t1) =>
     float d = (t1 - t0) / 86400000.0
     d - 2 * math.floor(d / 7) - (dayofweek(t1) < dayofweek(t0) ? 2 : 0)
 
-// Only recent zones: drop zones older than maxAgeDays trading days (breakouts count from the break)
+// Only recent zones: drop zones confirmed (or broken) more than maxAgeDays trading days ago
 if array.size(zones) > 0
     for i = array.size(zones) - 1 to 0
         Zone z = array.get(zones, i)
