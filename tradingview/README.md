@@ -47,6 +47,21 @@
 4. **AI second opinion (optional):** with **Send alerts as JSON for the AI service** turned on and a webhook to the [1PC AI signal service](ai-signal-service/README.md),
    Claude reviews every PREPARE setup. It sends back take / wait / skip with its own exact entry price inside the zone, shown on the service's page (and Telegram if set up).
 
+## M30 breakout with the H1 trend
+
+- **H1 direction:** H1 is **bullish** after an H1 candle closes above the last H1 swing high, and **bearish** after one closes below the last H1 swing low.
+- **Signal:** when H1 is bullish and an M30 candle closes above the last M30 swing high, the indicator draws the broken level as a blue line labelled "M30 breakout ▲ BUY" and gives a **BUY**. A bearish H1 with an M30 close below the last M30 swing low gives a red line and a **SELL**.
+- **Entry** (*M30 breakout entry*):
+  - **Retest of the broken level** (default): a limit at the line, filled when price comes back to it within 16 candles. If price closes back through the line first, the setup is cancelled.
+  - **Breakout close:** enters at the close of the breakout candle.
+- On 60 days of gold M30 data, the retest entry did clearly better than the breakout-close entry. With 600 / 1000 points it was about break-even; with wider stops at the same ratio it was positive. Past results only.
+- Works on M1, M5, M15 and M30 charts. Turn it off with *M30 breakout signals in the H1 direction*.
+
+## DBD / RBR forming
+
+With *Show DBD / RBR while forming* on (default), a DBD or RBR shows as a dashed box as soon as the first leg and the base are there, for example "H1 RBR forming".
+It becomes the normal box when the second leg confirms it, and disappears if the setup fails.
+
 ## Live signal at current price
 
 Off by default. Turn on *Show the live signal at current price* to add a line and label at the right edge of the chart, next to the price, showing what to do now. It updates on every tick:

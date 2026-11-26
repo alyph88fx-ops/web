@@ -78,6 +78,8 @@ lvlRight        = input.int(2, "Support / resistance confirmation (candles to th
      tooltip = "A swing high / low becomes a support / resistance level once this many candles of its timeframe have closed after it (H4: 2 candles = 8 hours).")
 showLevelBreaks = input.bool(true, "Mark breakouts (horizontal lines)", group = grpZ,
      tooltip = "When a candle closes through an H4 or H1 swing high or low (SNR), or through a DBD / RBR zone, the level is marked with a horizontal line, e.g. 'H4 breakout'.")
+showForming     = input.bool(true, "Show DBD / RBR while forming (dashed box)", group = grpZ,
+     tooltip = "As soon as the first leg and the base are there, the zone is shown as a dashed box, e.g. 'H1 RBR forming'. It becomes the normal box when the second leg confirms it, and disappears if the setup fails.")
 hideLowerTf     = input.bool(false, "Hide lower-TF zones under higher-TF zones", group = grpZ,
      tooltip = "Off = every timeframe's zones are drawn. On = an H1 / M30 zone that overlaps an H4 zone (or an M30 zone under an H1 zone) is hidden.")
 
@@ -112,6 +114,10 @@ retestExpiry = input.int(16, "Retest must happen within (bars after the break)",
 retestTolAtr = input.float(0.15, "Retest tolerance (× ATR)", minval = 0.0, step = 0.05, group = grpP,
      tooltip = "The retest counts if price gets this close to the neckline.")
 allowBrk    = input.bool(true, "Allow entries at breakout zones", group = grpP)
+brkSignals  = input.bool(true, "M30 breakout signals in the H1 direction", group = grpP,
+     tooltip = "H1 is bullish after an H1 candle closes above the last H1 swing high, and bearish after one closes below the last H1 swing low. When H1 is bullish and an M30 candle closes above the last M30 swing high, you get a BUY; when H1 is bearish and M30 closes below the last M30 swing low, a SELL. Works on M1-M30 charts.")
+brkEntry    = input.string("Retest of the broken level", "M30 breakout entry", options = ["Breakout close", "Retest of the broken level"], group = grpP,
+     tooltip = "Breakout close: enter at the close of the M30 candle that broke the level. Retest: place a limit at the broken level and enter when price comes back to it.")
 entryMode   = input.string("Smart zone entry only", "Entry method", options = ["Smart zone entry + M/W", "Smart zone entry only", "M/W pattern only"], group = grpP,
      tooltip = "Smart zone entry: when price reaches a fresh zone, the indicator reads the reaction (the extreme inside the zone, the rejection wick and the candle that closes back through the extreme candle) and gives an exact limit price inside the zone. M/W: the double top / double bottom with neckline break and retest.")
 smartFib    = input.float(0.5, "Smart entry: retracement of the rejection move", minval = 0.236, maxval = 0.786, step = 0.05, group = grpP,
@@ -226,6 +232,12 @@ zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, b
     float bkBot  = na
     int   bkT    = na
     int   bkRole = 0     // its new role: 1 = now support, -1 = now resistance
+    float fdTop  = na    // newest DBD still forming (first drop + base, no second drop yet)
+    float fdBot  = na
+    int   fdT    = na
+    float fuTop  = na    // newest RBR still forming
+    float fuBot  = na
+    int   fuT    = na
     float hiTop  = na    // plain SNR: a swing high confirmed on this bar (resistance)
     float hiBot  = na
     int   hiT    = na
@@ -420,11 +432,66 @@ zoneScan(int len, int rgt, float minMove, float retr, int maxBase, float minH, b
         array.shift(lvI)
         array.shift(lvDir)
 
-    [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], dbTop[1], dbBot[1], dbT[1], rbTop[1], rbBot[1], rbT[1], bkTop[1], bkBot[1], bkT[1], bkRole[1], hiTop[1], hiBot[1], hiT[1], loTop[1], loBot[1], loT[1], close[1], atr[1]]
+    if array.size(dL1) > 0
+        int j = array.size(dL1) - 1
+        fdTop := array.get(dH0, j)
+        fdBot := math.min(array.get(dH0B, j), fdTop - minH * atr)
+        fdT   := array.get(dH0T, j)
+    if array.size(uH1) > 0
+        int j = array.size(uH1) - 1
+        fuBot := array.get(uL0, j)
+        fuTop := math.max(array.get(uL0B, j), fuBot + minH * atr)
+        fuT   := array.get(uL0T, j)
 
-[rTop, rBot, rT, sTop, sBot, sT, dTop, dBot, dT, uTop, uBot, uT, bTop, bBot, bT, bRole, xhTop, xhBot, xhT, xlTop, xlBot, xlT, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
-[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, d1Top, d1Bot, d1T, u1Top, u1Bot, u1T, b1Top, b1Bot, b1T, b1Role, x1hTop, x1hBot, x1hT, x1lTop, x1lBot, x1lT, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
-[rmTop, rmBot, rmT, smTop, smBot, smT, dmTop, dmBot, dmT, umTop, umBot, umT, bmTop, bmBot, bmT, bmRole, xmhTop, xmhBot, xmhT, xmlTop, xmlBot, xmlT, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, m30Right, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, true, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
+    [resTop[1], resBot[1], resT[1], supTop[1], supBot[1], supT[1], dbTop[1], dbBot[1], dbT[1], rbTop[1], rbBot[1], rbT[1], bkTop[1], bkBot[1], bkT[1], bkRole[1], hiTop[1], hiBot[1], hiT[1], loTop[1], loBot[1], loT[1], fdTop[1], fdBot[1], fdT[1], fuTop[1], fuBot[1], fuT[1], close[1], atr[1]]
+
+[rTop, rBot, rT, sTop, sBot, sT, dTop, dBot, dT, uTop, uBot, uT, bTop, bBot, bT, bRole, xhTop, xhBot, xhT, xlTop, xlBot, xlT, fdTop4, fdBot4, fdT4, fuTop4, fuBot4, fuT4, h4C, h4Atr] = request.security(syminfo.tickerid, "240", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
+[r1Top, r1Bot, r1T, s1Top, s1Bot, s1T, d1Top, d1Bot, d1T, u1Top, u1Bot, u1T, b1Top, b1Bot, b1T, b1Role, x1hTop, x1hBot, x1hT, x1lTop, x1lBot, x1lT, fdTop1, fdBot1, fdT1, fuTop1, fuBot1, fuT1, h1C, h1Atr] = request.security(syminfo.tickerid, "60", zoneScan(swLen, swLen, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, false, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
+[rmTop, rmBot, rmT, smTop, smBot, smT, dmTop, dmBot, dmT, umTop, umBot, umT, bmTop, bmBot, bmT, bmRole, xmhTop, xmhBot, xmhT, xmlTop, xmlBot, xmlT, fdTopM, fdBotM, fdTM, fuTopM, fuBotM, fuTM, m30C, m30Atr] = request.security(syminfo.tickerid, "30", zoneScan(swLen, m30Right, minMoveAtr, maxRetr, maxBaseBars, minZoneAtr, true, true, snrReact, lvlRight, lvlBox == "Open to wick"), lookahead = barmerge.lookahead_on)
+
+// Break of structure on the timeframe it runs on: brk = 1 when a candle closes above the last
+// swing high, -1 when one closes below the last swing low (0 = none on this candle); dir = the
+// direction of the last break (H1 dir = bullish / bearish dominance).
+structBreak(int len, int rgt) =>
+    float ph  = ta.pivothigh(high, len, rgt)
+    float pl  = ta.pivotlow(low, len, rgt)
+    var float sh  = na
+    var float sl  = na
+    var int   shT = na
+    var int   slT = na
+    var int   dir = 0
+    int   brk = 0
+    float lvl = na
+    int   lvT = na
+    if not na(ph)
+        sh  := ph
+        shT := time[rgt]
+    if not na(pl)
+        sl  := pl
+        slT := time[rgt]
+    if not na(sh) and close > sh
+        brk := 1
+        lvl := sh
+        lvT := shT
+        dir := 1
+        sh  := na
+    else if not na(sl) and close < sl
+        brk := -1
+        lvl := sl
+        lvT := slT
+        dir := -1
+        sl  := na
+    [brk, lvl, dir, lvT]
+
+// the same, for the last closed candle (used through request.security with lookahead_on)
+structPrev(int len, int rgt) =>
+    [b, l, d, lt] = structBreak(len, rgt)
+    [b[1], l[1], d[1], lt[1], time[1]]
+
+[h1Brk, h1Lvl, h1Dir, h1LvT, h1T] = request.security(syminfo.tickerid, "60", structPrev(swLen, swLen), lookahead = barmerge.lookahead_on)
+[m30Brk, m30Lvl, m30Dir, m30LvT, m30T] = request.security(syminfo.tickerid, "30", structPrev(swLen, m30Right), lookahead = barmerge.lookahead_on)
+// on an M30 chart read the breakout on the candle itself (the request above would be one candle late)
+[nBrk, nLvl, nDir, nLvT] = structBreak(swLen, m30Right)
 
 h4Ok  = useH4 and timeframe.in_seconds() <= 14400
 h1Ok  = useH1 and timeframe.in_seconds() <= 3600
@@ -757,6 +824,7 @@ var float  smExt     = na       // extreme reached inside the zone (high for sel
 var float  smExOther = na       // low (sells) / high (buys) of the candle that made the extreme
 var float  smWick    = 0.0      // rejection wick of that candle, as a share of its range
 var int    smStart   = na
+var int    lastBrkKey = 0       // last M30 breakout already turned into a signal
 
 drawPattern(int i1, float p1, int iN, float neck, int i2, float p2, int dir) =>
     color c = dir == -1 ? color.red : color.blue
@@ -869,6 +937,42 @@ if showEntries and isPatTF and barstate.isconfirmed
                 entryPx := pendDir == -1 ? math.min(pendNeck, high) : math.max(pendNeck, low)
                 pendDir := 0
                 markValid(pendZ)
+
+    // M30 breakout in the H1 direction -> limit at the broken level (retest), or market at the breakout close
+    bool  chart30 = timeframe.period == "30"
+    int   evBrk   = chart30 ? nBrk : m30Brk
+    float evLvl   = chart30 ? nLvl : m30Lvl
+    int   evKey   = chart30 ? time : m30T
+    int   evLvT   = chart30 ? nLvT : m30LvT
+    if brkSignals and evBrk != 0 and evKey != lastBrkKey
+        lastBrkKey := evKey
+        if evBrk == h1Dir
+            // the broken M30 level as a horizontal line, like a hand-drawn breakout line
+            color bc = evBrk == 1 ? colBrkBuy : colBrkSell
+            int   x2 = time + 20 * timeframe.in_seconds() * 1000
+            if not showHistory and openCount == 0 and pendDir == 0
+                clearHistory()
+            array.push(sigLn, line.new(nz(evLvT, time), evLvl, x2, evLvl, xloc = xloc.bar_time, color = bc, width = 2, force_overlay = true))
+            array.push(sigL, label.new(x2, evLvl, "M30 breakout " + (evBrk == 1 ? "▲ BUY" : "▼ SELL"), xloc = xloc.bar_time,
+                 style = label.style_label_left, color = color.new(color.white, 100), textcolor = bc, size = size.small, force_overlay = true))
+            string bz = "M30 breakout of " + str.tostring(evLvl, format.mintick) + " · H1 " + (h1Dir == 1 ? "bullish" : "bearish")
+            if brkEntry == "Breakout close" and sig == 0
+                sig     := evBrk
+                sigZone := bz
+                sigKind := "breakout"
+                entryPx := close
+            else if brkEntry != "Breakout close" and pendDir == 0
+                pendZ     := na
+                pendDir   := evBrk
+                pendNeck  := evLvl
+                pendInv   := evLvl - evBrk * 2 * zTol
+                pendZone  := bz
+                pendStage := 2
+                pendBrkI  := bar_index
+                pendExp   := bar_index + retestExpiry
+                pendKind  := "breakout"
+                pendScore := na
+                setupDir  := evBrk
 
     // Smart zone entry. Step 1: price reaches a fresh zone -> follow the extreme it makes inside
     // the zone. Step 2: a candle closes back through the extreme candle (below its low for sells,
@@ -1048,7 +1152,7 @@ if setupDir != 0
     if showPrepLbl
         array.push(sigL, label.new(bar_index, lim, (smart ? "SMART " : "PREPARE ") + pside + " LIMIT\n" + str.tostring(lim, format.mintick) + scTxt,
              style = label.style_label_left, color = color.new(color.orange, 0), textcolor = color.white, size = size.small, force_overlay = true))
-    string how = smart ? "smart zone entry" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
+    string how = smart ? "smart zone entry" : pendKind == "breakout" ? "M30 breakout with the H1 trend, waiting for the retest" : (setupDir == 1 ? "W / double bottom, neckline broken" : "M / double top, neckline broken")
     nPrepare += 1
     lastSig := pside + " limit " + str.tostring(lim, format.mintick) + " · " + str.format_time(time, "dd MMM HH:mm", syminfo.timezone)
     alert(aiJson ? jSetup("prepare", str.lower(pside), pendKind, lim, psl, ptp, pendScore, pendZ) :
@@ -1079,9 +1183,9 @@ if sig != 0 and not (oneTrade and openCount > 0)
          color = sig == 1 ? color.blue : color.red, textcolor = color.white, size = size.small, force_overlay = true))
     buyFired  := sig == 1
     sellFired := sig == -1
-    string how = sigKind == "smart" ? "smart zone entry" : (sig == 1 ? "W / double bottom" : "M / double top")
-    alert(aiJson ? jSetup("entry", str.lower(side), sigKind, entry, sl, tp, float(na), pendZ) :
-         "1PC ENTRY " + side + " " + syminfo.ticker + " (" + how + " in " + sigZone + " zone) | Entry " + str.tostring(entry, format.mintick) +
+    string how = sigKind == "smart" ? "smart zone entry" : sigKind == "breakout" ? "M30 breakout with the H1 trend" : (sig == 1 ? "W / double bottom" : "M / double top")
+    alert(aiJson ? jSetup("entry", str.lower(side), sigKind, entry, sl, tp, float(na), sigKind == "breakout" ? na : pendZ) :
+         "1PC ENTRY " + side + " " + syminfo.ticker + " (" + how + (sigKind == "breakout" ? ": " + sigZone : " in " + sigZone + " zone") + ") | Entry " + str.tostring(entry, format.mintick) +
          " | SL " + str.tostring(sl, format.mintick) + " | TP " + str.tostring(tp, format.mintick), alert.freq_once_per_bar_close)
 
 plotshape(buyFired, "Buy signal", shape.triangleup, location.belowbar, color.blue, size = size.tiny, force_overlay = true)
@@ -1091,6 +1195,30 @@ alertcondition(prepBuy, "1PC Prepare Buy", "PREPARE BUY {{ticker}}: buy limit se
 alertcondition(prepSell, "1PC Prepare Sell", "PREPARE SELL {{ticker}}: sell limit set inside a sell zone")
 alertcondition(buyFired, "1PC Entry Buy", "ENTRY BUY {{ticker}}: buy limit filled")
 alertcondition(sellFired, "1PC Entry Sell", "ENTRY SELL {{ticker}}: sell limit filled")
+
+// DBD / RBR still forming: dashed boxes, redrawn on the last bar
+var array<box> formBx = array.new<box>()
+formBox(float top, float bot, int t, string txt, color c, int ext) =>
+    if not na(t) and not na(top) and not na(bot)
+        array.push(formBx, box.new(t, top, ext, bot, xloc = xloc.bar_time, border_color = color.new(c, 30), border_style = line.style_dashed,
+             bgcolor = color.new(c, 94), text = txt, text_color = color.new(c, 20), text_size = size.small,
+             text_halign = text.align_center, text_valign = text.align_center, force_overlay = true))
+    true
+
+if barstate.islast
+    while array.size(formBx) > 0
+        box.delete(array.pop(formBx))
+    if showForming
+        int fext = time + 40 * timeframe.in_seconds() * 1000
+        if h4Ok
+            formBox(fdTop4, fdBot4, fdT4, "H4 DBD forming", color.red, fext)
+            formBox(fuTop4, fuBot4, fuT4, "H4 RBR forming", color.blue, fext)
+        if h1Ok
+            formBox(fdTop1, fdBot1, fdT1, "H1 DBD forming", color.red, fext)
+            formBox(fuTop1, fuBot1, fuT1, "H1 RBR forming", color.blue, fext)
+        if m30Ok
+            formBox(fdTopM, fdBotM, fdTM, "M30 DBD forming", color.red, fext)
+            formBox(fuTopM, fuBotM, fuTM, "M30 RBR forming", color.blue, fext)
 
 // Keep live zones extended past the current bar
 if barstate.islast
