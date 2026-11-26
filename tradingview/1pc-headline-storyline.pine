@@ -139,7 +139,7 @@ tpPts      = input.int(1000, "Take profit (points)", minval = 1, group = grpR)
 ptOverride = input.float(0.0, "Point size override (0 = auto)", minval = 0.0, step = 0.00001, group = grpR,
      tooltip = "Auto: 1 point = 0.01 on gold (XAU / GOLD), so 600 points = $6 like on MT5, even when the TradingView feed quotes 3 decimals; on other symbols 1 point = the symbol's smallest price step (EURUSD: 0.00001).")
 oneTrade   = input.bool(true, "One trade at a time", group = grpR)
-showStats  = input.bool(true, "Show stats table", group = grpR)
+showStats  = input.bool(false, "Show stats table", group = grpR)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Zone scan (runs on H4 and on H1 through request.security)

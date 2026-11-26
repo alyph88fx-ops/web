@@ -43,7 +43,7 @@
      When price moves 1 × ATR away from the zone without an entry, the zone counts as tested and is removed.
    - Under **Entry**, choose **Neckline break** to enter on the break itself, or **Second top** to enter as soon as an M / W forms.
 3. **Risk**: the indicator draws **600-point SL** and **1000-point TP** boxes from the entry price,
-   marks each trade "TP ✓" or "SL ✗" when one is hit, and shows wins, losses and win rate in a table.
+   marks each trade "TP ✓" or "SL ✗" when one is hit. Turn on *Show stats table* for wins, losses and win rate (off by default).
 4. **AI second opinion (optional):** with **Send alerts as JSON for the AI service** turned on and a webhook to the [1PC AI signal service](ai-signal-service/README.md),
    Claude reviews every PREPARE setup. It sends back take / wait / skip with its own exact entry price inside the zone, shown on the service's page (and Telegram if set up).
 
