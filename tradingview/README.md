@@ -49,7 +49,7 @@
 
 ## Live signal at current price
 
-At the right edge of the chart, next to the price, a line and label always show what to do now. It updates on every tick:
+Off by default. Turn on *Show the live signal at current price* to add a line and label at the right edge of the chart, next to the price, showing what to do now. It updates on every tick:
 - **IN TRADE SELL @ …**: the trade you're in, with SL, TP and the points so far.
 - **ACTIVE SELL LIMIT …**: a limit order is waiting for its fill (smart entry or M / W), with SL, TP and score.
 - **SELL LIMIT … / BUY LIMIT …**: otherwise, the plan at the nearest zone above price (sell) and below (buy).

@@ -126,7 +126,7 @@ aiJson      = input.bool(false, "Send alerts as JSON for the AI service", group 
 aiCandles   = input.int(40, "Candles to send to the AI", minval = 10, maxval = 80, group = grpA)
 
 grpL = "5 · Live signal at current price"
-showLive    = input.bool(true, "Show the live signal at current price", group = grpL,
+showLive    = input.bool(false, "Show the live signal at current price", group = grpL,
      tooltip = "At the right edge of the chart: the trade you're in, the limit order waiting for a fill, or the plan at the nearest zone above (sell) and below (buy) with exact entry, SL and TP. Updates on every tick.")
 liveEntry   = input.string("Zone 50%", "Live plan entry price", options = ["Zone 50%", "Zone edge (first touch)"], group = grpL,
      tooltip = "Where the plan puts the limit before price has reached the zone: the middle of the zone, or its near edge. Once price reacts inside the zone, the smart entry replaces it with the exact rejection-based price.")
