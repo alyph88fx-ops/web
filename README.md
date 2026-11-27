@@ -49,5 +49,5 @@ engraved plate) and shows a bar to copy the pick. Published at `/apex.html`.
 
 ## 1 Percent Club
 
-A second site built from the same template, in black, red and chrome: `1percentclub/` (main page `index.html`,
-member desk `account.html`). The Pages workflow publishes it at `/1percentclub/` next to 88FX.
+1 Percent Club moved to its own repository, [alyph88fx-ops/1percentclub](https://github.com/alyph88fx-ops/1percentclub),
+and is live at https://1-percentclub.com. `1percentclub/` here only holds two pages that forward old links there.
